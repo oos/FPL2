@@ -1427,6 +1427,152 @@ def squad_page():
                     font-size: 0.85em;
                     line-height: 1.4;
                 }
+                .football-pitch {
+                    background: linear-gradient(135deg, #2d5a27 0%, #4a7c59 50%, #2d5a27 100%);
+                    border: 3px solid #ffffff;
+                    border-radius: 15px;
+                    padding: 20px;
+                    margin: 20px 0;
+                    position: relative;
+                    min-height: 600px;
+                }
+                .pitch-lines {
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    bottom: 0;
+                    pointer-events: none;
+                }
+                .center-circle {
+                    position: absolute;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                    width: 100px;
+                    height: 100px;
+                    border: 2px solid rgba(255,255,255,0.3);
+                    border-radius: 50%;
+                }
+                .center-line {
+                    position: absolute;
+                    top: 0;
+                    left: 50%;
+                    width: 2px;
+                    height: 100%;
+                    background: rgba(255,255,255,0.3);
+                }
+                .penalty-area {
+                    position: absolute;
+                    top: 10%;
+                    left: 5%;
+                    width: 20%;
+                    height: 80%;
+                    border: 2px solid rgba(255,255,255,0.2);
+                    border-radius: 10px;
+                }
+                .penalty-area.right {
+                    left: 75%;
+                }
+                .player-position {
+                    position: absolute;
+                    width: 120px;
+                    text-align: center;
+                }
+                .player-card {
+                    background: white;
+                    border-radius: 10px;
+                    padding: 10px;
+                    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+                    border: 2px solid transparent;
+                    transition: all 0.3s ease;
+                }
+                .player-card:hover {
+                    transform: translateY(-5px);
+                    box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+                }
+                .player-card.transfer-in {
+                    border-color: #28a745;
+                    background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+                }
+                .player-card.transfer-out {
+                    border-color: #dc3545;
+                    background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+                }
+                .player-card.no-transfer {
+                    border-color: #6c757d;
+                }
+                .player-name {
+                    font-weight: bold;
+                    font-size: 0.9em;
+                    margin-bottom: 5px;
+                    color: #2c3e50;
+                }
+                .player-team {
+                    font-size: 0.8em;
+                    color: #6c757d;
+                    margin-bottom: 5px;
+                }
+                .player-stats {
+                    font-size: 0.75em;
+                    color: #495057;
+                    line-height: 1.3;
+                }
+                .player-price {
+                    font-weight: bold;
+                    color: #28a745;
+                }
+                .player-points {
+                    font-weight: bold;
+                    color: #007bff;
+                }
+                .captain-badge {
+                    position: absolute;
+                    top: -5px;
+                    right: -5px;
+                    background: #ffc107;
+                    color: #212529;
+                    border-radius: 50%;
+                    width: 20px;
+                    height: 20px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-size: 0.7em;
+                    font-weight: bold;
+                }
+                .formation-label {
+                    position: absolute;
+                    top: -15px;
+                    left: 50%;
+                    transform: translateX(-50%);
+                    background: #2c3e50;
+                    color: white;
+                    padding: 5px 15px;
+                    border-radius: 20px;
+                    font-size: 0.9em;
+                    font-weight: bold;
+                }
+                .substitutes-section {
+                    background: #f8f9fa;
+                    border-radius: 10px;
+                    padding: 20px;
+                    margin-top: 20px;
+                }
+                .substitute-player {
+                    background: white;
+                    border-radius: 8px;
+                    padding: 12px;
+                    margin: 8px 0;
+                    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                    border-left: 4px solid #6c757d;
+                }
+                .substitute-player.transfer-in {
+                    border-left-color: #28a745;
+                }
+                .substitute-player.transfer-out {
+                    border-left-color: #dc3545;
+                }
             </style>
         </head>
         <body class="p-4">
@@ -1522,53 +1668,143 @@ def squad_page():
                                 </div>
                             </div>
                             
-                            <!-- Starting XI -->
-                            <h4>Starting XI</h4>
-                            <div class="row">
-                                {% for player in gw.starting_xi %}
-                                <div class="col-md-6">
-                                    <div class="player-row {% if player in gw.transfers_in %}transfer-in{% elif player in gw.transfers_out %}transfer-out{% else %}no-transfer{% endif %}">
-                                        <div class="d-flex justify-content-between align-items-center">
-                                            <div>
-                                                <strong>{{ player.name }}</strong>
-                                                <span class="position-badge 
-                                                    {% if player.position == 'Goalkeeper' %}gk
-                                                    {% elif player.position == 'Defender' %}def
-                                                    {% elif player.position == 'Midfielder' %}mid
-                                                    {% else %}fwd{% endif %}">
-                                                    {{ player.position[:3] }}
-                                                </span>
-                                                <small class="text-muted">{{ player.team }}</small>
-                                                {% if player.captain %}
-                                                <span class="badge bg-warning text-dark ms-2">C</span>
-                                                {% endif %}
-                                            </div>
-                                            <div class="text-end">
-                                                <div>£{{ "%.1f"|format(player.price) }}M</div>
-                                                <div class="text-success">{{ "%.1f"|format(player.points) }} pts</div>
-                                            </div>
+                            <!-- Football Formation Layout -->
+                            <div class="football-pitch">
+                                <div class="formation-label">{{ gw.formation }}</div>
+                                
+                                <!-- Pitch Lines -->
+                                <div class="pitch-lines">
+                                    <div class="center-circle"></div>
+                                    <div class="center-line"></div>
+                                    <div class="penalty-area"></div>
+                                    <div class="penalty-area right"></div>
+                                </div>
+                                
+                                <!-- Starting XI positioned on pitch -->
+                                {% set gk_players = gw.starting_xi | selectattr("position", "equalto", "Goalkeeper") | list %}
+                                {% set def_players = gw.starting_xi | selectattr("position", "equalto", "Defender") | list %}
+                                {% set mid_players = gw.starting_xi | selectattr("position", "equalto", "Midfielder") | list %}
+                                {% set fwd_players = gw.starting_xi | selectattr("position", "equalto", "Forward") | list %}
+                                
+                                <!-- Goalkeeper -->
+                                {% if gk_players %}
+                                {% set gk = gk_players[0] %}
+                                <div class="player-position" style="top: 85%; left: 50%; transform: translateX(-50%);">
+                                    <div class="player-card {% if gk.name in gw.transfers_in %}transfer-in{% elif gk.name in gw.transfers_out %}transfer-out{% else %}no-transfer{% endif %}">
+                                        {% if gk.captain %}
+                                        <div class="captain-badge">C</div>
+                                        {% endif %}
+                                        <div class="player-name">{{ gk.name }}</div>
+                                        <div class="player-team">{{ gk.team }}</div>
+                                        <div class="player-stats">
+                                            <div class="player-price">£{{ "%.1f"|format(gk.price) }}M</div>
+                                            <div class="player-points">{{ "%.1f"|format(gk.points) }} pts</div>
                                         </div>
-                                        {% if player.name in gw.transfers_in %}
-                                        <small class="text-success"><i class="fas fa-plus-circle"></i> TRANSFER IN (Replaced {{ gw.transfer_mapping.get(player.name, "Unknown player") }})</small>
-                                        {% elif player.name in gw.transfers_out %}
-                                        <small class="text-danger"><i class="fas fa-minus-circle"></i> TRANSFER OUT (Removed from Squad)</small>
-                                        {% elif player in gw.bench_promotions %}
-                                        <small class="text-info"><i class="fas fa-arrow-up"></i> Promoted from Bench</small>
+                                        {% if gk.name in gw.transfers_in %}
+                                        <small class="text-success"><i class="fas fa-plus-circle"></i> IN ({{ gw.transfer_mapping.get(gk.name, "Unknown") }})</small>
+                                        {% elif gk.name in gw.transfers_out %}
+                                        <small class="text-danger"><i class="fas fa-minus-circle"></i> OUT</small>
+                                        {% elif gk in gw.bench_promotions %}
+                                        <small class="text-info"><i class="fas fa-arrow-up"></i> ↑</small>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                {% endif %}
+                                
+                                <!-- Defenders -->
+                                {% for def in def_players %}
+                                {% set top_pos = 70 - (loop.index0 * 12) %}
+                                {% set left_pos = 20 + (loop.index0 * 15) %}
+                                <div class="player-position" style="top: {{ top_pos }}%; left: {{ left_pos }}%;">
+                                    <div class="player-card {% if def.name in gw.transfers_in %}transfer-in{% elif def.name in gw.transfers_out %}transfer-out{% else %}no-transfer{% endif %}">
+                                        {% if def.captain %}
+                                        <div class="captain-badge">C</div>
+                                        {% endif %}
+                                        <div class="player-name">{{ def.name }}</div>
+                                        <div class="player-team">{{ def.team }}</div>
+                                        <div class="player-stats">
+                                            <div class="player-price">£{{ "%.1f"|format(def.price) }}M</div>
+                                            <div class="player-points">{{ "%.1f"|format(def.points) }} pts</div>
+                                        </div>
+                                        {% if def.name in gw.transfers_in %}
+                                        <small class="text-success"><i class="fas fa-plus-circle"></i> IN ({{ gw.transfer_mapping.get(def.name, "Unknown") }})</small>
+                                        {% elif def.name in gw.transfers_out %}
+                                        <small class="text-danger"><i class="fas fa-minus-circle"></i> OUT</small>
+                                        {% elif def in gw.bench_promotions %}
+                                        <small class="text-info"><i class="fas fa-arrow-up"></i> ↑</small>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                {% endfor %}
+                                
+                                <!-- Midfielders -->
+                                {% for mid in mid_players %}
+                                {% set top_pos = 45 - (loop.index0 * 10) %}
+                                {% set left_pos = 25 + (loop.index0 * 12) %}
+                                <div class="player-position" style="top: {{ top_pos }}%; left: {{ left_pos }}%;">
+                                    <div class="player-card {% if mid.name in gw.transfers_in %}transfer-in{% elif mid.name in gw.transfers_out %}transfer-out{% else %}no-transfer{% endif %}">
+                                        {% if mid.captain %}
+                                        <div class="captain-badge">C</div>
+                                        {% endif %}
+                                        <div class="player-name">{{ mid.name }}</div>
+                                        <div class="player-team">{{ mid.team }}</div>
+                                        <div class="player-stats">
+                                            <div class="player-price">£{{ "%.1f"|format(mid.price) }}M</div>
+                                            <div class="player-points">{{ "%.1f"|format(mid.points) }} pts</div>
+                                        </div>
+                                        {% if mid.name in gw.transfers_in %}
+                                        <small class="text-success"><i class="fas fa-plus-circle"></i> IN ({{ gw.transfer_mapping.get(mid.name, "Unknown") }})</small>
+                                        {% elif mid.name in gw.transfers_out %}
+                                        <small class="text-danger"><i class="fas fa-minus-circle"></i> OUT</small>
+                                        {% elif mid in gw.bench_promotions %}
+                                        <small class="text-info"><i class="fas fa-arrow-up"></i> ↑</small>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                {% endfor %}
+                                
+                                <!-- Forwards -->
+                                {% for fwd in fwd_players %}
+                                {% set top_pos = 20 - (loop.index0 * 8) %}
+                                {% set left_pos = 35 + (loop.index0 * 20) %}
+                                <div class="player-position" style="top: {{ top_pos }}%; left: {{ left_pos }}%;">
+                                    <div class="player-card {% if fwd.name in gw.transfers_in %}transfer-in{% elif fwd.name in gw.transfers_out %}transfer-out{% else %}no-transfer{% endif %}">
+                                        {% if fwd.captain %}
+                                        <div class="captain-badge">C</div>
+                                        {% endif %}
+                                        <div class="player-name">{{ fwd.name }}</div>
+                                        <div class="player-team">{{ fwd.team }}</div>
+                                        <div class="player-stats">
+                                            <div class="player-price">£{{ "%.1f"|format(fwd.price) }}M</div>
+                                            <div class="player-points">{{ "%.1f"|format(fwd.points) }} pts</div>
+                                        </div>
+                                        {% if fwd.name in gw.transfers_in %}
+                                        <small class="text-success"><i class="fas fa-plus-circle"></i> IN ({{ gw.transfer_mapping.get(fwd.name, "Unknown") }})</small>
+                                        {% elif fwd.name in gw.transfers_out %}
+                                        <small class="text-danger"><i class="fas fa-minus-circle"></i> OUT</small>
+                                        {% elif fwd in gw.bench_promotions %}
                                         {% endif %}
                                     </div>
                                 </div>
                                 {% endfor %}
                             </div>
                             
-                            <!-- Bench -->
-                            <h4 class="mt-3">Bench</h4>
-                            <div class="row">
-                                {% for player in gw.bench %}
-                                <div class="col-md-6">
-                                    <div class="player-row {% if player in gw.bench_demotions %}transfer-out{% else %}no-transfer{% endif %}">
-                                        <div class="d-flex justify-content-between align-items-center">
-                                            <div>
-                                                <strong>{{ player.name }}</strong>
+                            <!-- Substitutes Section -->
+                            <div class="substitutes-section">
+                                <h4><i class="fas fa-users"></i> Substitutes</h4>
+                                <div class="row">
+                                    {% for player in gw.bench %}
+                                    <div class="col-md-6 col-lg-3 mb-2">
+                                        <div class="substitute-player {% if player.name in gw.transfers_in %}transfer-in{% elif player.name in gw.transfers_out %}transfer-out{% else %}no-transfer{% endif %}">
+                                            <div class="d-flex justify-content-between align-items-start">
+                                                <div>
+                                                    <div class="player-name">{{ player.name }}</div>
+                                                    <div class="player-team">{{ player.team }}</div>
+                                                    <div class="player-stats">
+                                                        <span class="player-price">£{{ "%.1f"|format(player.price) }}M</span> | 
+                                                        <span class="player-points">{{ "%.1f"|format(player.points) }} pts</span>
+                                                    </div>
+                                                </div>
                                                 <span class="position-badge 
                                                     {% if player.position == 'Goalkeeper' %}gk
                                                     {% elif player.position == 'Defender' %}def
@@ -1576,22 +1812,16 @@ def squad_page():
                                                     {% else %}fwd{% endif %}">
                                                     {{ player.position[:3] }}
                                                 </span>
-                                                <small class="text-muted">{{ player.team }}</small>
-                                                {% if player.captain %}
-                                                <span class="badge bg-warning text-dark ms-2">C</span>
-                                                {% endif %}
                                             </div>
-                                            <div class="text-end">
-                                                <div>£{{ "%.1f"|format(player.price) }}M</div>
-                                                <div class="text-muted">{{ "%.1f"|format(player.points) }} pts</div>
-                                            </div>
+                                            {% if player.name in gw.transfers_in %}
+                                            <small class="text-success"><i class="fas fa-plus-circle"></i> TRANSFER IN ({{ gw.transfer_mapping.get(player.name, "Unknown") }})</small>
+                                            {% elif player in gw.bench_demotions %}
+                                            <small class="text-danger"><i class="fas fa-minus-circle"></i> Demoted to Bench</small>
+                                            {% endif %}
                                         </div>
-                                        {% if player in gw.bench_demotions %}
-                                        <small class="text-warning"><i class="fas fa-arrow-down"></i> Demoted to Bench</small>
-                                        {% endif %}
                                     </div>
+                                    {% endfor %}
                                 </div>
-                                {% endfor %}
                             </div>
                         </div>
                     </div>
