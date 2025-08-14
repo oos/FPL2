@@ -705,6 +705,59 @@ def players_table():
                     border-radius: 5px;
                     border-left: 3px solid #007bff;
                 }
+                
+                /* Sort pills styling */
+                .sort-pill {
+                    display: inline-flex;
+                    align-items: center;
+                    background: linear-gradient(135deg, #007bff, #0056b3);
+                    color: white;
+                    padding: 4px 8px;
+                    border-radius: 16px;
+                    font-size: 12px;
+                    font-weight: 500;
+                    box-shadow: 0 2px 4px rgba(0,123,255,0.3);
+                    transition: all 0.2s ease;
+                    cursor: default;
+                    user-select: none;
+                }
+                
+                .sort-pill:hover {
+                    transform: translateY(-1px);
+                    box-shadow: 0 4px 8px rgba(0,123,255,0.4);
+                }
+                
+                .sort-pill .pill-text {
+                    margin-right: 6px;
+                }
+                
+                .sort-pill .remove-btn {
+                    background: rgba(255,255,255,0.2);
+                    border: none;
+                    color: white;
+                    border-radius: 50%;
+                    width: 16px;
+                    height: 16px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    cursor: pointer;
+                    font-size: 10px;
+                    transition: all 0.2s ease;
+                }
+                
+                .sort-pill .remove-btn:hover {
+                    background: rgba(255,255,255,0.3);
+                    transform: scale(1.1);
+                }
+                
+                .sort-pill.asc {
+                    background: linear-gradient(135deg, #28a745, #1e7e34);
+                }
+                
+                .sort-pill.desc {
+                    background: linear-gradient(135deg, #dc3545, #c82333);
+                }
             </style>
         </head>
         <body class="p-4">
@@ -775,8 +828,11 @@ def players_table():
                         <span id="filterInfo" class="ms-3 text-muted"></span>
                         <div class="mt-2">
                             <small class="text-muted">
-                                <strong>Sorting:</strong> Click column headers to sort • Shift+Click to add secondary sorting • DataTables handles multi-column sorting automatically
+                                <strong>Sorting:</strong> Click column headers to sort • Each click adds a new sort level • Remove individual sorts with the X button
                             </small>
+                        </div>
+                        <div id="sortPills" class="mt-2 d-flex flex-wrap gap-1">
+                            <!-- Sort pills will be dynamically added here -->
                         </div>
                         <div class="mt-1">
                             <span id="sortOrderInfo" class="text-info fw-bold"></span>
@@ -914,19 +970,22 @@ def players_table():
                         orderClasses: true, // Enable default order classes
                         pageLength: 25,
                         lengthMenu: [[10, 25, 50, 100], [10, 25, 50, 100]],
-                        // Enable multi-column sorting
-                        orderMulti: true
+                        // Disable default multi-column sorting since we handle it manually
+                        orderMulti: false
                     });
                     
                     // Enhanced multi-column sorting functionality
                     var currentSortOrder = [];
                     
-                    // Function to update sort indicators
+                    // Function to update sort indicators and create sort pills
                     function updateSortIndicators() {
                         // Remove all existing sort indicators
                         $('#playersTable thead th').removeClass('sorting_asc sorting_desc').addClass('sorting');
                         
-                        // Add sort indicators for current sort order
+                        // Clear existing sort pills
+                        $('#sortPills').empty();
+                        
+                        // Add sort indicators for current sort order and create pills
                         currentSortOrder.forEach(function(sort, index) {
                             var columnIndex = sort[0];
                             var direction = sort[1];
@@ -938,9 +997,17 @@ def players_table():
                                 header.removeClass('sorting').addClass('sorting_desc');
                             }
                             
-                            // Add sort level indicator
-                            header.find('.sort-level').remove();
-                            header.append('<span class="sort-level">' + (index + 1) + '</span>');
+                            // Create sort pill
+                            var columnNames = ['Rank', 'Player Name', 'Pos', 'Team', 'Price', 'Form', 'Total (GW1-9)', 'Points/£', 'Chance of Playing', 'GW1', 'GW2', 'GW3', 'GW4', 'GW5', 'GW6', 'GW7', 'GW8', 'GW9'];
+                            var columnName = columnNames[columnIndex];
+                            var directionText = direction === 'asc' ? '↑' : '↓';
+                            
+                            var pillHtml = '<div class="sort-pill ' + direction + '" data-column="' + columnIndex + '" data-index="' + index + '">' +
+                                '<span class="pill-text">' + columnName + ' ' + directionText + '</span>' +
+                                '<button class="remove-btn" onclick="removeSortPill(' + columnIndex + ')">×</button>' +
+                                '</div>';
+                            
+                            $('#sortPills').append(pillHtml);
                         });
                     }
                     
@@ -962,9 +1029,33 @@ def players_table():
                         var columnIndex = $(this).index();
                         console.log('Header clicked:', columnIndex);
                         
-                        // Let DataTable handle the sorting, our order.dt event will catch it
-                        // This ensures compatibility with DataTable's built-in functionality
+                        // Add this column to the sort order
+                        var existingIndex = currentSortOrder.findIndex(sort => sort[0] === columnIndex);
+                        var newDirection = 'asc';
+                        
+                        if (existingIndex !== -1) {
+                            // Column already exists, toggle direction
+                            newDirection = currentSortOrder[existingIndex][1] === 'asc' ? 'desc' : 'asc';
+                            currentSortOrder[existingIndex][1] = newDirection;
+                        } else {
+                            // Add new column to sort order
+                            currentSortOrder.push([columnIndex, newDirection]);
+                        }
+                        
+                        // Limit to 5 sort levels for performance
+                        if (currentSortOrder.length > 5) {
+                            currentSortOrder = currentSortOrder.slice(0, 5);
+                        }
+                        
+                        // Apply the new sort order
+                        table.order(currentSortOrder).draw();
                     });
+                    
+                    // Function to remove a specific sort column
+                    window.removeSortPill = function(columnIndex) {
+                        currentSortOrder = currentSortOrder.filter(sort => sort[0] !== columnIndex);
+                        table.order(currentSortOrder).draw();
+                    };
                     
                     // Function to display current sort order
                     function updateSortOrderInfo() {
