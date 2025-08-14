@@ -859,104 +859,90 @@ def players_table():
                         <span id="filterInfo" class="ms-3 text-muted"></span>
                         <div class="mt-2">
                             <small class="text-muted">
-                                <strong>Sorting:</strong> Use ↑/↓ buttons above to add sort levels • Each button adds to existing sorts • Numbers show sort order • Remove individual sorts with X button on pills
+                                <strong>Sorting:</strong> Use ↑/↓ buttons above each column to add sort levels • Each button adds to existing sorts • Numbers show sort order below column headers • Remove individual sorts with X button on pills
                             </small>
                         </div>
-                        <div class="mt-3">
-                            <h6>Add Sort Levels:</h6>
-                            <div class="row mb-2">
-                                <div class="col-auto">
-                                    <small class="text-muted">Rank:</small>
-                                    <button class="btn btn-sm btn-outline-primary ms-1" onclick="addSortLevel(0, 'asc')">↑</button>
-                                    <button class="btn btn-sm btn-outline-secondary ms-1" onclick="addSortLevel(0, 'desc')">↓</button>
-                                </div>
-                                <div class="col-auto">
-                                    <small class="text-muted">Name:</small>
-                                    <button class="btn btn-sm btn-outline-primary ms-1" onclick="addSortLevel(1, 'asc')">↑</button>
-                                    <button class="btn btn-sm btn-outline-secondary ms-1" onclick="addSortLevel(1, 'desc')">↓</button>
-                                </div>
-                                <div class="col-auto">
-                                    <small class="text-muted">Position:</small>
-                                    <button class="btn btn-sm btn-outline-primary ms-1" onclick="addSortLevel(2, 'asc')">↑</button>
-                                    <button class="btn btn-sm btn-outline-secondary ms-1" onclick="addSortLevel(2, 'desc')">↓</button>
-                                </div>
-                                <div class="col-auto">
-                                    <small class="text-muted">Team:</small>
-                                    <button class="btn btn-sm btn-outline-primary ms-1" onclick="addSortLevel(3, 'asc')">↑</button>
-                                    <button class="btn btn-sm btn-outline-secondary ms-1" onclick="addSortLevel(3, 'desc')">↓</button>
-                                </div>
-                                <div class="col-auto">
-                                    <small class="text-muted">Price:</small>
-                                    <button class="btn btn-sm btn-outline-primary ms-1" onclick="addSortLevel(4, 'asc')">↑</button>
-                                    <button class="btn btn-sm btn-outline-secondary ms-1" onclick="addSortLevel(4, 'desc')">↓</button>
-                                </div>
-                                <div class="col-auto">
-                                    <small class="text-muted">Form:</small>
-                                    <button class="btn btn-sm btn-outline-primary ms-1" onclick="addSortLevel(5, 'asc')">↑</button>
-                                    <button class="btn btn-sm btn-outline-secondary ms-1" onclick="addSortLevel(5, 'desc')">↓</button>
-                                </div>
-                                <div class="col-auto">
-                                    <small class="text-muted">Total:</small>
-                                    <button class="btn btn-sm btn-outline-primary ms-1" onclick="addSortLevel(6, 'asc')">↑</button>
-                                    <button class="btn btn-sm btn-outline-secondary ms-1" onclick="addSortLevel(6, 'desc')">↓</button>
-                                </div>
-                                <div class="col-auto">
-                                    <small class="text-muted">Points/£:</small>
-                                    <button class="btn btn-sm btn-outline-primary ms-1" onclick="addSortLevel(7, 'asc')">↑</button>
-                                    <button class="btn btn-sm btn-outline-secondary ms-1" onclick="addSortLevel(7, 'desc')">↓</button>
-                                </div>
-                            </div>
-                            <div class="row mb-2">
-                                <div class="col-auto">
-                                    <small class="text-muted">Chance:</small>
-                                    <button class="btn btn-sm btn-outline-primary ms-1" onclick="addSortLevel(8, 'asc')">↑</button>
-                                    <button class="btn btn-sm btn-outline-secondary ms-1" onclick="addSortLevel(8, 'desc')">↓</button>
-                                </div>
-                                <div class="col-auto">
-                                    <small class="text-muted">GW1:</small>
-                                    <button class="btn btn-sm btn-outline-primary ms-1" onclick="addSortLevel(9, 'asc')">↑</button>
-                                    <button class="btn btn-sm btn-outline-secondary ms-1" onclick="addSortLevel(9, 'desc')">↓</button>
-                                </div>
-                                <div class="col-auto">
-                                    <small class="text-muted">GW2:</small>
-                                    <button class="btn btn-sm btn-outline-primary ms-1" onclick="addSortLevel(10, 'asc')">↑</button>
-                                    <button class="btn btn-sm btn-outline-secondary ms-1" onclick="addSortLevel(10, 'desc')">↓</button>
-                                </div>
-                                <div class="col-auto">
-                                    <small class="text-muted">GW3:</small>
-                                    <button class="btn btn-sm btn-outline-primary ms-1" onclick="addSortLevel(11, 'asc')">↑</button>
-                                    <button class="btn btn-sm btn-outline-secondary ms-1" onclick="addSortLevel(11, 'desc')">↓</button>
-                                </div>
-                                <div class="col-auto">
-                                    <small class="text-muted">GW4:</small>
-                                    <button class="btn btn-sm btn-outline-primary ms-1" onclick="addSortLevel(12, 'asc')">↑</button>
-                                    <button class="btn btn-sm btn-outline-secondary ms-1" onclick="addSortLevel(12, 'desc')">↓</button>
-                                </div>
-                                <div class="col-auto">
-                                    <small class="text-muted">GW5:</small>
-                                    <button class="btn btn-sm btn-outline-primary ms-1" onclick="addSortLevel(13, 'asc')">↑</button>
-                                    <button class="btn btn-sm btn-outline-secondary ms-1" onclick="addSortLevel(13, 'desc')">↓</button>
-                                </div>
-                                <div class="col-auto">
-                                    <small class="text-muted">GW6:</small>
-                                    <button class="btn btn-sm btn-outline-primary ms-1" onclick="addSortLevel(14, 'asc')">↑</button>
-                                    <button class="btn btn-sm btn-outline-secondary ms-1" onclick="addSortLevel(14, 'desc')">↓</button>
-                                </div>
-                                <div class="col-auto">
-                                    <small class="text-muted">GW7:</small>
-                                    <button class="btn btn-sm btn-outline-primary ms-1" onclick="addSortLevel(15, 'asc')">↑</button>
-                                    <button class="btn btn-sm btn-outline-secondary ms-1" onclick="addSortLevel(15, 'desc')">↓</button>
-                                </div>
-                                <div class="col-auto">
-                                    <small class="text-muted">GW8:</small>
-                                    <button class="btn btn-sm btn-outline-primary ms-1" onclick="addSortLevel(16, 'asc')">↑</button>
-                                    <button class="btn btn-sm btn-outline-secondary ms-1" onclick="addSortLevel(16, 'desc')">↓</button>
-                                </div>
-                                <div class="col-auto">
-                                    <small class="text-muted">GW9:</small>
-                                    <button class="btn btn-sm btn-outline-primary ms-1" onclick="addSortLevel(17, 'asc')">↑</button>
-                                    <button class="btn btn-sm btn-outline-secondary ms-1" onclick="addSortLevel(17, 'desc')">↓</button>
-                                </div>
+                        <div class="mt-3 mb-2">
+                            <h6>Sort Controls:</h6>
+                            <div class="table-responsive">
+                                <table class="table table-sm table-bordered" style="width: 100%;">
+                                    <thead>
+                                        <tr>
+                                            <th style="width: 40px; text-align: center; padding: 2px;">
+                                                <button class="btn btn-sm btn-outline-primary" onclick="addSortLevel(0, 'asc')" style="width: 20px; height: 20px; padding: 0; font-size: 10px;">↑</button>
+                                                <button class="btn btn-sm btn-outline-secondary" onclick="addSortLevel(0, 'desc')" style="width: 20px; height: 20px; padding: 0; font-size: 10px;">↓</button>
+                                            </th>
+                                            <th style="width: 120px; text-align: center; padding: 2px;">
+                                                <button class="btn btn-sm btn-outline-primary" onclick="addSortLevel(1, 'asc')" style="width: 20px; height: 20px; padding: 0; font-size: 10px;">↑</button>
+                                                <button class="btn btn-sm btn-outline-secondary" onclick="addSortLevel(1, 'desc')" style="width: 20px; height: 20px; padding: 0; font-size: 10px;">↓</button>
+                                            </th>
+                                            <th style="width: 60px; text-align: center; padding: 2px;">
+                                                <button class="btn btn-sm btn-outline-primary" onclick="addSortLevel(2, 'asc')" style="width: 20px; height: 20px; padding: 0; font-size: 10px;">↑</button>
+                                                <button class="btn btn-sm btn-outline-secondary" onclick="addSortLevel(2, 'desc')" style="width: 20px; height: 20px; padding: 0; font-size: 10px;">↓</button>
+                                            </th>
+                                            <th style="width: 80px; text-align: center; padding: 2px;">
+                                                <button class="btn btn-sm btn-outline-primary" onclick="addSortLevel(3, 'asc')" style="width: 20px; height: 20px; padding: 0; font-size: 10px;">↑</button>
+                                                <button class="btn btn-sm btn-outline-secondary" onclick="addSortLevel(3, 'desc')" style="width: 20px; height: 20px; padding: 0; font-size: 10px;">↓</button>
+                                            </th>
+                                            <th style="width: 70px; text-align: center; padding: 2px;">
+                                                <button class="btn btn-sm btn-outline-primary" onclick="addSortLevel(4, 'asc')" style="width: 20px; height: 20px; padding: 0; font-size: 10px;">↑</button>
+                                                <button class="btn btn-sm btn-outline-secondary" onclick="addSortLevel(4, 'desc')" style="width: 20px; height: 20px; padding: 0; font-size: 10px;">↓</button>
+                                            </th>
+                                            <th style="width: 50px; text-align: center; padding: 2px;">
+                                                <button class="btn btn-sm btn-outline-primary" onclick="addSortLevel(5, 'asc')" style="width: 20px; height: 20px; padding: 0; font-size: 10px;">↑</button>
+                                                <button class="btn btn-sm btn-outline-secondary" onclick="addSortLevel(5, 'desc')" style="width: 20px; height: 20px; padding: 0; font-size: 10px;">↓</button>
+                                            </th>
+                                            <th style="width: 80px; text-align: center; padding: 2px;">
+                                                <button class="btn btn-sm btn-outline-primary" onclick="addSortLevel(6, 'asc')" style="width: 20px; height: 20px; padding: 0; font-size: 10px;">↑</button>
+                                                <button class="btn btn-sm btn-outline-secondary" onclick="addSortLevel(6, 'desc')" style="width: 20px; height: 20px; padding: 0; font-size: 10px;">↓</button>
+                                            </th>
+                                            <th style="width: 70px; text-align: center; padding: 2px;">
+                                                <button class="btn btn-sm btn-outline-primary" onclick="addSortLevel(7, 'asc')" style="width: 20px; height: 20px; padding: 0; font-size: 10px;">↑</button>
+                                                <button class="btn btn-sm btn-outline-secondary" onclick="addSortLevel(7, 'desc')" style="width: 20px; height: 20px; padding: 0; font-size: 10px;">↓</button>
+                                            </th>
+                                            <th style="width: 80px; text-align: center; padding: 2px;">
+                                                <button class="btn btn-sm btn-outline-primary" onclick="addSortLevel(8, 'asc')" style="width: 20px; height: 20px; padding: 0; font-size: 10px;">↑</button>
+                                                <button class="btn btn-sm btn-outline-secondary" onclick="addSortLevel(8, 'desc')" style="width: 20px; height: 20px; padding: 0; font-size: 10px;">↓</button>
+                                            </th>
+                                            <th style="width: 45px; text-align: center; padding: 2px;">
+                                                <button class="btn btn-sm btn-outline-primary" onclick="addSortLevel(9, 'asc')" style="width: 20px; height: 20px; padding: 0; font-size: 10px;">↑</button>
+                                                <button class="btn btn-sm btn-outline-secondary" onclick="addSortLevel(9, 'desc')" style="width: 20px; height: 20px; padding: 0; font-size: 10px;">↓</button>
+                                            </th>
+                                            <th style="width: 45px; text-align: center; padding: 2px;">
+                                                <button class="btn btn-sm btn-outline-primary" onclick="addSortLevel(10, 'asc')" style="width: 20px; height: 20px; padding: 0; font-size: 10px;">↑</button>
+                                                <button class="btn btn-sm btn-outline-secondary" onclick="addSortLevel(10, 'desc')" style="width: 20px; height: 20px; padding: 0; font-size: 10px;">↓</button>
+                                            </th>
+                                            <th style="width: 45px; text-align: center; padding: 2px;">
+                                                <button class="btn btn-sm btn-outline-primary" onclick="addSortLevel(11, 'asc')" style="width: 20px; height: 20px; padding: 0; font-size: 10px;">↑</button>
+                                                <button class="btn btn-sm btn-outline-secondary" onclick="addSortLevel(11, 'desc')" style="width: 20px; height: 20px; padding: 0; font-size: 10px;">↓</button>
+                                            </th>
+                                            <th style="width: 45px; text-align: center; padding: 2px;">
+                                                <button class="btn btn-sm btn-outline-primary" onclick="addSortLevel(12, 'asc')" style="width: 20px; height: 20px; padding: 0; font-size: 10px;">↑</button>
+                                                <button class="btn btn-sm btn-outline-secondary" onclick="addSortLevel(12, 'desc')" style="width: 20px; height: 20px; padding: 0; font-size: 10px;">↓</button>
+                                            </th>
+                                            <th style="width: 45px; text-align: center; padding: 2px;">
+                                                <button class="btn btn-sm btn-outline-primary" onclick="addSortLevel(13, 'asc')" style="width: 20px; height: 20px; padding: 0; font-size: 10px;">↑</button>
+                                                <button class="btn btn-sm btn-outline-secondary" onclick="addSortLevel(13, 'desc')" style="width: 20px; height: 20px; padding: 0; font-size: 10px;">↓</button>
+                                            </th>
+                                            <th style="width: 45px; text-align: center; padding: 2px;">
+                                                <button class="btn btn-sm btn-outline-primary" onclick="addSortLevel(14, 'asc')" style="width: 20px; height: 20px; padding: 0; font-size: 10px;">↑</button>
+                                                <button class="btn btn-sm btn-outline-secondary" onclick="addSortLevel(14, 'desc')" style="width: 20px; height: 20px; padding: 0; font-size: 10px;">↓</button>
+                                            </th>
+                                            <th style="width: 45px; text-align: center; padding: 2px;">
+                                                <button class="btn btn-sm btn-outline-primary" onclick="addSortLevel(15, 'asc')" style="width: 20px; height: 20px; padding: 0; font-size: 10px;">↑</button>
+                                                <button class="btn btn-sm btn-outline-secondary" onclick="addSortLevel(15, 'desc')" style="width: 20px; height: 20px; padding: 0; font-size: 10px;">↓</button>
+                                            </th>
+                                            <th style="width: 45px; text-align: center; padding: 2px;">
+                                                <button class="btn btn-sm btn-outline-primary" onclick="addSortLevel(16, 'asc')" style="width: 20px; height: 20px; padding: 0; font-size: 10px;">↑</button>
+                                                <button class="btn btn-sm btn-outline-secondary" onclick="addSortLevel(16, 'desc')" style="width: 20px; height: 20px; padding: 0; font-size: 10px;">↓</button>
+                                            </th>
+                                            <th style="width: 45px; text-align: center; padding: 2px;">
+                                                <button class="btn btn-sm btn-outline-primary" onclick="addSortLevel(17, 'asc')" style="width: 20px; height: 20px; padding: 0; font-size: 10px;">↑</button>
+                                                <button class="btn btn-sm btn-outline-secondary" onclick="addSortLevel(17, 'desc')" style="width: 20px; height: 20px; padding: 0; font-size: 10px;">↓</button>
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                </table>
                             </div>
                         </div>
                         
