@@ -25,6 +25,67 @@ def fetch_fpl_data():
         print(f"Error fetching FPL data: {e}")
         return {}, {}, []
 
+# Fetch player data from FPL API
+def fetch_players_data():
+    """Fetch player data from FPL API"""
+    try:
+        response = requests.get("https://fantasy.premierleague.com/api/bootstrap-static/")
+        if response.status_code == 200:
+            data = response.json()
+            players = data.get("elements", [])
+            teams = data.get("teams", [])
+            
+            # Create team mapping
+            team_map = {t["id"]: t["name"] for t in teams}
+            
+            # Process players data
+            players_data = []
+            for player in players:
+                if player.get("status") == "a":  # Only active players
+                    player_info = {
+                        "id": player.get("id"),
+                        "name": player.get("web_name", ""),
+                        "full_name": player.get("first_name", "") + " " + player.get("second_name", ""),
+                        "position": player.get("element_type"),
+                        "team": team_map.get(player.get("team"), "Unknown"),
+                        "price": player.get("now_cost", 0) / 10.0,  # Convert from 0.1M units
+                        "total_points": player.get("total_points", 0),
+                        "form": player.get("form", "0.0"),
+                        "points_per_game": player.get("points_per_game", "0.0"),
+                        "selected_by_percent": player.get("selected_by_percent", "0.0"),
+                        "transfers_in": player.get("transfers_in", 0),
+                        "transfers_out": player.get("transfers_out", 0),
+                        "influence": player.get("influence", "0.0"),
+                        "creativity": player.get("creativity", "0.0"),
+                        "threat": player.get("threat", "0.0"),
+                        "ict_index": player.get("ict_index", "0.0"),
+                        "chance_of_playing_next_round": player.get("chance_of_playing_next_round") or 100,
+                        "news": player.get("news", ""),
+                        "injury_status": player.get("news", "No injury concerns")
+                    }
+                    
+                    # Add position names
+                    position_names = {1: "Goalkeeper", 2: "Defender", 3: "Midfielder", 4: "Forward"}
+                    player_info["position_name"] = position_names.get(player_info["position"], "Unknown")
+                    
+                    # Calculate expected points for GW1-9 (simplified calculation)
+                    base_points = float(player_info["points_per_game"]) if player_info["points_per_game"] != "0.0" else 4.0
+                    player_info["gw1_9_points"] = [round(base_points * (0.8 + 0.4 * (i % 3)), 1) for i in range(9)]
+                    player_info["total_gw1_9"] = sum(player_info["gw1_9_points"])
+                    
+                    # Calculate efficiency metrics
+                    player_info["points_per_million"] = player_info["total_gw1_9"] / player_info["price"] if player_info["price"] > 0 else 0
+                    
+                    players_data.append(player_info)
+            
+            return players_data
+        else:
+            print(f"Error fetching players data: {response.status_code}")
+            return []
+    except Exception as e:
+        print(f"Error fetching players data: {e}")
+        return []
+
 # Build FDR DataFrame
 def build_fdr_dataframe():
     """Build the FDR DataFrame with opponent information"""
@@ -255,6 +316,7 @@ def fdr_table():
                 <span class="navbar-brand">FPL Tools</span>
                 <div class="navbar-nav">
                     <a class="nav-link active" href="/">FDR Table</a>
+                    <a class="nav-link" href="/players">Players</a>
                 </div>
             </div>
         </nav>
@@ -337,6 +399,193 @@ def fdr_table():
     </body>
     </html>
     """, table=html_table, gw_from=gw_from, gw_to=gw_to, team_filter=team_filter)
+
+@app.route("/players")
+def players_table():
+    """Display the FPL players table"""
+    try:
+        # Fetch players data
+        players_data = fetch_players_data()
+        
+        if not players_data:
+            return "Error: Could not fetch players data. Please try again later."
+        
+        # Sort players by total GW1-9 points (descending)
+        players_data.sort(key=lambda x: x["total_gw1_9"], reverse=True)
+        
+        return render_template_string("""
+        <html>
+        <head>
+            <title>FPL Players - Expected Points (GW1-9)</title>
+            <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+            <link rel="stylesheet" href="https://cdn.datatables.net/1.11.3/css/jquery.dataTables.min.css">
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+            <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+            <script src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.min.js"></script>
+            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+            <style>
+                body { 
+                    background-color: #f8f9fa; 
+                    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                }
+                .navbar-brand { 
+                    font-weight: bold; 
+                    color: #2c3e50 !important; 
+                }
+                .nav-link { 
+                    color: #34495e !important; 
+                    font-weight: 500;
+                }
+                .nav-link.active { 
+                    background-color: #3498db !important; 
+                    color: white !important; 
+                    border-radius: 5px;
+                }
+                .nav-link:hover { 
+                    color: #3498db !important; 
+                }
+                h1 { 
+                    color: #2c3e50; 
+                    font-weight: 600;
+                    margin-bottom: 1.5rem;
+                }
+                .position-badge { 
+                    font-size: 0.8em; 
+                    padding: 4px 8px; 
+                    border-radius: 12px; 
+                    color: white; 
+                    font-weight: bold;
+                }
+                .gk { background-color: #dc3545; }
+                .def { background-color: #007bff; }
+                .mid { background-color: #28a745; }
+                .fwd { background-color: #ffc107; color: #212529; }
+                .table th { white-space: nowrap; }
+                .table td { vertical-align: middle; }
+                .chance-playing {
+                    font-weight: bold;
+                }
+                .chance-playing.healthy { color: #28a745; }
+                .chance-playing.injured { color: #dc3545; }
+                .points-per-million {
+                    color: #17a2b8;
+                    font-weight: bold;
+                }
+            </style>
+        </head>
+        <body class="p-4">
+            <nav class="navbar navbar-expand-lg navbar-light bg-light mb-4">
+                <div class="container-fluid">
+                    <span class="navbar-brand">FPL Tools</span>
+                    <div class="navbar-nav">
+                        <a class="nav-link" href="/">FDR Table</a>
+                        <a class="nav-link active" href="/players">Players</a>
+                    </div>
+                </div>
+            </nav>
+            
+            <div class="container-fluid">
+                <h1 class="mb-4">FPL Players - Expected Points (GW1-9)</h1>
+                
+                <div class="table-responsive">
+                    <table id="playersTable" class="table table-striped table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Rank</th>
+                                <th>Name</th>
+                                <th>Position</th>
+                                <th>Team</th>
+                                <th>Price</th>
+                                <th>Form</th>
+                                <th>Total (GW1-9)</th>
+                                <th>Points/£</th>
+                                <th>Chance of Playing</th>
+                                <th>GW1</th>
+                                <th>GW2</th>
+                                <th>GW3</th>
+                                <th>GW4</th>
+                                <th>GW5</th>
+                                <th>GW6</th>
+                                <th>GW7</th>
+                                <th>GW8</th>
+                                <th>GW9</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for player in players %}
+                            <tr>
+                                <td>{{ loop.index }}</td>
+                                <td><strong>{{ player.name }}</strong></td>
+                                <td>
+                                    <span class="position-badge 
+                                        {% if player.position_name == 'Goalkeeper' %}gk
+                                        {% elif player.position_name == 'Defender' %}def
+                                        {% elif player.position_name == 'Midfielder' %}mid
+                                        {% else %}fwd{% endif %}">
+                                        {{ player.position_name }}
+                                    </span>
+                                </td>
+                                <td>{{ player.team }}</td>
+                                <td>£{{ "%.1f"|format(player.price) }}M</td>
+                                <td>{{ player.form }}</td>
+                                <td><strong>{{ "%.1f"|format(player.total_gw1_9) }}</strong></td>
+                                <td class="points-per-million">{{ "%.2f"|format(player.points_per_million) }}</td>
+                                <td>
+                                    {% if player.chance_of_playing_next_round and player.chance_of_playing_next_round < 100 %}
+                                        <span class="chance-playing injured">
+                                            <i class="fas fa-exclamation-triangle"></i> {{ player.chance_of_playing_next_round }}%
+                                        </span>
+                                    {% else %}
+                                        <span class="chance-playing healthy">{{ player.chance_of_playing_next_round or 100 }}%</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ "%.1f"|format(player.gw1_9_points[0]) }}</td>
+                                <td>{{ "%.1f"|format(player.gw1_9_points[1]) }}</td>
+                                <td>{{ "%.1f"|format(player.gw1_9_points[2]) }}</td>
+                                <td>{{ "%.1f"|format(player.gw1_9_points[3]) }}</td>
+                                <td>{{ "%.1f"|format(player.gw1_9_points[4]) }}</td>
+                                <td>{{ "%.1f"|format(player.gw1_9_points[5]) }}</td>
+                                <td>{{ "%.1f"|format(player.gw1_9_points[6]) }}</td>
+                                <td>{{ "%.1f"|format(player.gw1_9_points[7]) }}</td>
+                                <td>{{ "%.1f"|format(player.gw1_9_points[8]) }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <script>
+                $(document).ready(function() {
+                    $('#playersTable').DataTable({
+                        paging: true,
+                        pageLength: 25,
+                        ordering: true,
+                        info: true,
+                        searching: true,
+                        order: [[6, 'desc']], // Sort by Total (GW1-9) by default
+                        scrollX: true,
+                        columnDefs: [
+                            { targets: [0], orderable: false }, // Rank column not sortable
+                            { targets: [1, 2, 3], orderable: true }, // Name, Position, Team
+                            { targets: [4, 5, 6, 7], orderable: true, type: 'num' }, // Price, Form, Total, Points/£
+                            { targets: [8], orderable: false }, // Chance of Playing not sortable
+                            { targets: [9, 10, 11, 12, 13, 14, 15, 16, 17], orderable: true, type: 'num' } // GW columns
+                        ],
+                        language: {
+                            search: "Search players:",
+                            lengthMenu: "Show _MENU_ players per page",
+                            info: "Showing _START_ to _END_ of _TOTAL_ players"
+                        }
+                    });
+                });
+            </script>
+        </body>
+        </html>
+        """, players=players_data)
+        
+    except Exception as e:
+        return f"Error generating players table: {str(e)}"
 
 @app.route("/health")
 def health_check():
