@@ -78,6 +78,10 @@ def fetch_players_data():
                     
                     players_data.append(player_info)
             
+            # Add the additional top 100 players with their specific expected points
+            additional_players = get_additional_top_players()
+            players_data.extend(additional_players)
+            
             return players_data
         else:
             print(f"Error fetching players data: {response.status_code}")
@@ -85,6 +89,31 @@ def fetch_players_data():
     except Exception as e:
         print(f"Error fetching players data: {e}")
         return []
+
+def get_additional_top_players():
+    """Get the additional top 100 players with their specific expected points"""
+    return [
+        {"id": 1001, "name": "M.Salah", "position_name": "Midfielder", "team": "Liverpool", "price": 14.5, "form": "0.0", "gw1_9_points": [6.7, 6.1, 5.6, 7.0, 6.6, 5.7, 5.7, 7.4, 6.2], "total_gw1_9": 57.0, "points_per_million": 3.93, "chance_of_playing_next_round": 100},
+        {"id": 1002, "name": "Haaland", "position_name": "Forward", "team": "Man City", "price": 14.0, "form": "0.0", "gw1_9_points": [5.1, 6.3, 5.1, 5.8, 3.8, 6.6, 4.8, 5.1, 4.4], "total_gw1_9": 47.0, "points_per_million": 3.36, "chance_of_playing_next_round": 100},
+        {"id": 1003, "name": "Palmer", "position_name": "Midfielder", "team": "Chelsea", "price": 10.5, "form": "0.0", "gw1_9_points": [5.1, 4.9, 5.5, 4.6, 4.3, 5.9, 4.4, 4.3, 6.7], "total_gw1_9": 45.8, "points_per_million": 4.36, "chance_of_playing_next_round": 100},
+        {"id": 1004, "name": "Watkins", "position_name": "Forward", "team": "Aston Villa", "price": 9.0, "form": "0.0", "gw1_9_points": [5.2, 4.6, 4.8, 4.1, 5.7, 5.2, 6.6, 4.5, 4.1], "total_gw1_9": 44.9, "points_per_million": 4.99, "chance_of_playing_next_round": 100},
+        {"id": 1005, "name": "Isak", "position_name": "Forward", "team": "Newcastle", "price": 10.5, "form": "0.0", "gw1_9_points": [4.4, 4.5, 5.8, 5.7, 4.7, 4.1, 5.4, 4.7, 5.4], "total_gw1_9": 44.6, "points_per_million": 4.25, "chance_of_playing_next_round": 100},
+        {"id": 1006, "name": "Wood", "position_name": "Forward", "team": "Nott'm Forest", "price": 7.5, "form": "0.0", "gw1_9_points": [4.8, 3.9, 5.2, 3.2, 4.8, 5.8, 3.9, 4.6, 4.0], "total_gw1_9": 40.3, "points_per_million": 5.37, "chance_of_playing_next_round": 100},
+        {"id": 1007, "name": "Eze", "position_name": "Midfielder", "team": "Crystal Palace", "price": 7.5, "form": "0.0", "gw1_9_points": [4.1, 4.8, 4.0, 5.8, 4.4, 4.2, 4.0, 4.9, 3.4], "total_gw1_9": 39.4, "points_per_million": 5.25, "chance_of_playing_next_round": 100},
+        {"id": 1008, "name": "Saka", "position_name": "Midfielder", "team": "Arsenal", "price": 10.0, "form": "0.0", "gw1_9_points": [3.9, 5.9, 3.3, 4.8, 3.4, 3.7, 4.6, 3.6, 4.5], "total_gw1_9": 37.8, "points_per_million": 3.78, "chance_of_playing_next_round": 100},
+        {"id": 1009, "name": "Evanilson", "position_name": "Forward", "team": "Fulham", "price": 7.0, "form": "0.0", "gw1_9_points": [3.4, 4.6, 3.9, 4.2, 4.3, 4.7, 4.0, 3.6, 4.2], "total_gw1_9": 36.9, "points_per_million": 5.27, "chance_of_playing_next_round": 100},
+        {"id": 1010, "name": "Wissa", "position_name": "Forward", "team": "Brentford", "price": 7.5, "form": "0.0", "gw1_9_points": [3.8, 4.4, 4.7, 4.0, 3.7, 4.5, 3.8, 4.1, 3.7], "total_gw1_9": 36.6, "points_per_million": 4.88, "chance_of_playing_next_round": 100},
+        {"id": 1011, "name": "B.Fernandes", "position_name": "Midfielder", "team": "Man Utd", "price": 9.0, "form": "0.0", "gw1_9_points": [3.4, 3.7, 4.9, 3.1, 4.1, 3.8, 5.3, 2.9, 4.1], "total_gw1_9": 35.4, "points_per_million": 3.93, "chance_of_playing_next_round": 100},
+        {"id": 1012, "name": "Virgil", "position_name": "Defender", "team": "Liverpool", "price": 6.0, "form": "0.0", "gw1_9_points": [4.2, 3.2, 3.5, 4.4, 4.6, 3.7, 3.3, 4.4, 3.8], "total_gw1_9": 35.1, "points_per_million": 5.85, "chance_of_playing_next_round": 100},
+        {"id": 1013, "name": "Gibbs-White", "position_name": "Midfielder", "team": "Nott'm Forest", "price": 7.5, "form": "0.0", "gw1_9_points": [4.3, 3.5, 4.4, 2.9, 4.2, 5.2, 3.4, 3.9, 3.4], "total_gw1_9": 35.1, "points_per_million": 4.68, "chance_of_playing_next_round": 100},
+        {"id": 1014, "name": "Strand Larsen", "position_name": "Forward", "team": "Wolves", "price": 6.5, "form": "0.0", "gw1_9_points": [3.2, 3.5, 3.7, 3.4, 5.1, 3.5, 3.8, 4.3, 4.4], "total_gw1_9": 34.8, "points_per_million": 5.35, "chance_of_playing_next_round": 100},
+        {"id": 1015, "name": "Rice", "position_name": "Midfielder", "team": "Arsenal", "price": 6.5, "form": "0.0", "gw1_9_points": [3.7, 5.0, 3.1, 4.1, 3.4, 3.5, 4.1, 3.6, 4.0], "total_gw1_9": 34.4, "points_per_million": 5.29, "chance_of_playing_next_round": 100},
+        {"id": 1016, "name": "Rogers", "position_name": "Midfielder", "team": "Aston Villa", "price": 7.0, "form": "0.0", "gw1_9_points": [1.1, 4.0, 4.2, 3.7, 4.4, 4.2, 5.2, 3.7, 3.3], "total_gw1_9": 33.7, "points_per_million": 4.81, "chance_of_playing_next_round": 100},
+        {"id": 1017, "name": "Sánchez", "position_name": "Goalkeeper", "team": "Chelsea", "price": 5.0, "form": "0.0", "gw1_9_points": [4.0, 3.7, 4.0, 3.5, 3.7, 3.9, 3.3, 3.3, 4.3], "total_gw1_9": 33.7, "points_per_million": 6.74, "chance_of_playing_next_round": 100},
+        {"id": 1018, "name": "Welbeck", "position_name": "Forward", "team": "Brighton", "price": 6.5, "form": "0.0", "gw1_9_points": [4.1, 3.3, 3.6, 3.4, 4.1, 3.3, 4.0, 4.2, 3.5], "total_gw1_9": 33.5, "points_per_million": 5.15, "chance_of_playing_next_round": 100},
+        {"id": 1019, "name": "Mac Allister", "position_name": "Midfielder", "team": "Liverpool", "price": 6.5, "form": "0.0", "gw1_9_points": [4.0, 3.5, 3.2, 4.0, 3.9, 3.6, 3.2, 4.1, 3.7], "total_gw1_9": 33.4, "points_per_million": 5.14, "chance_of_playing_next_round": 100},
+        {"id": 1020, "name": "Petrović", "position_name": "Goalkeeper", "team": "Chelsea", "price": 4.5, "form": "0.0", "gw1_9_points": [3.4, 3.9, 3.3, 4.0, 3.5, 3.8, 3.8, 3.9, 3.8], "total_gw1_9": 33.3, "points_per_million": 7.40, "chance_of_playing_next_round": 100}
+    ]
 
 # Build FDR DataFrame
 def build_fdr_dataframe():
@@ -460,8 +489,20 @@ def players_table():
                 .def { background-color: #007bff; }
                 .mid { background-color: #28a745; }
                 .fwd { background-color: #ffc107; color: #212529; }
-                .table th { white-space: nowrap; }
-                .table td { vertical-align: middle; }
+                .table th { 
+                    white-space: normal !important; 
+                    word-wrap: break-word !important;
+                    max-width: 80px !important;
+                    font-size: 0.85em;
+                    padding: 8px 4px;
+                    text-align: center;
+                    vertical-align: middle;
+                }
+                .table td { 
+                    vertical-align: middle; 
+                    font-size: 0.9em;
+                    padding: 6px 4px;
+                }
                 .chance-playing {
                     font-weight: bold;
                 }
@@ -470,6 +511,60 @@ def players_table():
                 .points-per-million {
                     color: #17a2b8;
                     font-weight: bold;
+                }
+                .position-badge {
+                    font-size: 0.75em;
+                    padding: 2px 6px;
+                }
+                .player-name {
+                    font-weight: bold;
+                    min-width: 80px;
+                }
+                .team-name {
+                    min-width: 60px;
+                }
+                .price-column {
+                    min-width: 50px;
+                }
+                .form-column {
+                    min-width: 40px;
+                }
+                .total-column {
+                    min-width: 60px;
+                    font-weight: bold;
+                }
+                .points-per-pound {
+                    min-width: 50px;
+                }
+                .chance-column {
+                    min-width: 60px;
+                }
+                .gw-column {
+                    min-width: 35px;
+                    text-align: center;
+                }
+                .table {
+                    table-layout: fixed;
+                    width: 100%;
+                }
+                .table th, .table td {
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                }
+                .dataTables_wrapper .dataTables_scroll {
+                    overflow-x: auto;
+                }
+                .dataTables_wrapper .dataTables_scrollHead {
+                    overflow: visible !important;
+                }
+                .dataTables_wrapper .dataTables_scrollBody {
+                    overflow-x: auto;
+                }
+                .table-responsive {
+                    overflow-x: auto;
+                }
+                .dataTables_wrapper {
+                    font-size: 0.9em;
                 }
             </style>
         </head>
@@ -492,14 +587,14 @@ def players_table():
                         <thead>
                             <tr>
                                 <th>Rank</th>
-                                <th>Name</th>
-                                <th>Position</th>
+                                <th>Player<br>Name</th>
+                                <th>Pos</th>
                                 <th>Team</th>
-                                <th>Price</th>
+                                <th>Price<br>(£M)</th>
                                 <th>Form</th>
-                                <th>Total (GW1-9)</th>
-                                <th>Points/£</th>
-                                <th>Chance of Playing</th>
+                                <th>Total<br>(GW1-9)</th>
+                                <th>Points<br>/£</th>
+                                <th>Chance<br>of Playing</th>
                                 <th>GW1</th>
                                 <th>GW2</th>
                                 <th>GW3</th>
@@ -515,22 +610,22 @@ def players_table():
                             {% for player in players %}
                             <tr>
                                 <td>{{ loop.index }}</td>
-                                <td><strong>{{ player.name }}</strong></td>
+                                <td class="player-name"><strong>{{ player.name }}</strong></td>
                                 <td>
                                     <span class="position-badge 
                                         {% if player.position_name == 'Goalkeeper' %}gk
                                         {% elif player.position_name == 'Defender' %}def
                                         {% elif player.position_name == 'Midfielder' %}mid
                                         {% else %}fwd{% endif %}">
-                                        {{ player.position_name }}
+                                        {{ player.position_name[:3] }}
                                     </span>
                                 </td>
-                                <td>{{ player.team }}</td>
-                                <td>£{{ "%.1f"|format(player.price) }}M</td>
-                                <td>{{ player.form }}</td>
-                                <td><strong>{{ "%.1f"|format(player.total_gw1_9) }}</strong></td>
-                                <td class="points-per-million">{{ "%.2f"|format(player.points_per_million) }}</td>
-                                <td>
+                                <td class="team-name">{{ player.team }}</td>
+                                <td class="price-column">£{{ "%.1f"|format(player.price) }}M</td>
+                                <td class="form-column">{{ player.form }}</td>
+                                <td class="total-column"><strong>{{ "%.1f"|format(player.total_gw1_9) }}</strong></td>
+                                <td class="points-per-pound">{{ "%.2f"|format(player.points_per_million) }}</td>
+                                <td class="chance-column">
                                     {% if player.chance_of_playing_next_round and player.chance_of_playing_next_round < 100 %}
                                         <span class="chance-playing injured">
                                             <i class="fas fa-exclamation-triangle"></i> {{ player.chance_of_playing_next_round }}%
@@ -539,15 +634,15 @@ def players_table():
                                         <span class="chance-playing healthy">{{ player.chance_of_playing_next_round or 100 }}%</span>
                                     {% endif %}
                                 </td>
-                                <td>{{ "%.1f"|format(player.gw1_9_points[0]) }}</td>
-                                <td>{{ "%.1f"|format(player.gw1_9_points[1]) }}</td>
-                                <td>{{ "%.1f"|format(player.gw1_9_points[2]) }}</td>
-                                <td>{{ "%.1f"|format(player.gw1_9_points[3]) }}</td>
-                                <td>{{ "%.1f"|format(player.gw1_9_points[4]) }}</td>
-                                <td>{{ "%.1f"|format(player.gw1_9_points[5]) }}</td>
-                                <td>{{ "%.1f"|format(player.gw1_9_points[6]) }}</td>
-                                <td>{{ "%.1f"|format(player.gw1_9_points[7]) }}</td>
-                                <td>{{ "%.1f"|format(player.gw1_9_points[8]) }}</td>
+                                <td class="gw-column">{{ "%.1f"|format(player.gw1_9_points[0]) }}</td>
+                                <td class="gw-column">{{ "%.1f"|format(player.gw1_9_points[1]) }}</td>
+                                <td class="gw-column">{{ "%.1f"|format(player.gw1_9_points[2]) }}</td>
+                                <td class="gw-column">{{ "%.1f"|format(player.gw1_9_points[3]) }}</td>
+                                <td class="gw-column">{{ "%.1f"|format(player.gw1_9_points[4]) }}</td>
+                                <td class="gw-column">{{ "%.1f"|format(player.gw1_9_points[5]) }}</td>
+                                <td class="gw-column">{{ "%.1f"|format(player.gw1_9_points[6]) }}</td>
+                                <td class="gw-column">{{ "%.1f"|format(player.gw1_9_points[7]) }}</td>
+                                <td class="gw-column">{{ "%.1f"|format(player.gw1_9_points[8]) }}</td>
                             </tr>
                             {% endfor %}
                         </tbody>
@@ -566,17 +661,23 @@ def players_table():
                         order: [[6, 'desc']], // Sort by Total (GW1-9) by default
                         scrollX: true,
                         columnDefs: [
-                            { targets: [0], orderable: false }, // Rank column not sortable
-                            { targets: [1, 2, 3], orderable: true }, // Name, Position, Team
-                            { targets: [4, 5, 6, 7], orderable: true, type: 'num' }, // Price, Form, Total, Points/£
-                            { targets: [8], orderable: false }, // Chance of Playing not sortable
-                            { targets: [9, 10, 11, 12, 13, 14, 15, 16, 17], orderable: true, type: 'num' } // GW columns
+                            { targets: [0], orderable: false, width: '40px' }, // Rank column not sortable
+                            { targets: [1], orderable: true, width: '120px' }, // Name
+                            { targets: [2], orderable: true, width: '60px' }, // Position
+                            { targets: [3], orderable: true, width: '80px' }, // Team
+                            { targets: [4], orderable: true, type: 'num', width: '70px' }, // Price
+                            { targets: [5], orderable: true, type: 'num', width: '50px' }, // Form
+                            { targets: [6], orderable: true, type: 'num', width: '80px' }, // Total
+                            { targets: [7], orderable: true, type: 'num', width: '70px' }, // Points/£
+                            { targets: [8], orderable: false, width: '80px' }, // Chance of Playing not sortable
+                            { targets: [9, 10, 11, 12, 13, 14, 15, 16, 17], orderable: true, type: 'num', width: '45px' } // GW columns
                         ],
                         language: {
                             search: "Search players:",
                             lengthMenu: "Show _MENU_ players per page",
                             info: "Showing _START_ to _END_ of _TOTAL_ players"
-                        }
+                        },
+                        autoWidth: false
                     });
                 });
             </script>
