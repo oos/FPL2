@@ -1,37 +1,32 @@
-from flask import Flask, render_template, jsonify
-from .config import config
+from flask import Flask, render_template, jsonify, current_app
 from .database.manager import DatabaseManager
+from .services.player_service import PlayerService
+from .services.squad_service import SquadService
 from .routes.players import players_bp
-import os
 
-def create_app(config_name='default'):
-    """Application factory pattern for creating Flask app"""
-    app = Flask(__name__, 
-                template_folder='../templates',  # Templates are in parent directory
-                static_folder='../static')       # Static files are in parent directory
+def create_app():
+    app = Flask(__name__, template_folder='../templates')
     
-    # Load configuration
-    app.config.from_object(config[config_name])
-    
-    # Initialize database
-    db_manager = DatabaseManager()
+    # Initialize database manager
+    app.db_manager = DatabaseManager()
     
     # Register blueprints
     app.register_blueprint(players_bp)
     
     # Store database manager in app context for access in routes
-    app.db_manager = db_manager
+    with app.app_context():
+        app.db_manager = DatabaseManager()
     
     # Root route - FDR page
     @app.route('/')
-    def index():
-        """Serve the FDR page (original UI)"""
+    def fdr_page():
+        """Serve the FDR page"""
         return render_template('fdr.html')
     
-    # Players page route
     @app.route('/players')
     def players_page():
         """Serve the original players page with DataTables"""
+        db_manager = current_app.db_manager # Access db_manager from app context
         players = db_manager.get_all_players()
         teams = db_manager.get_all_teams()
         
@@ -44,81 +39,110 @@ def create_app(config_name='default'):
         
         return render_template('players.html', players=players_data, team_names=team_names)
     
-    # Squad page route
     @app.route('/squad')
     def squad_page():
-        """Serve the original squad page"""
-        return render_template('squad.html')
-    
-
+        """Serve the Squad page with real squad data"""
+        try:
+            db_manager = current_app.db_manager
+            squad_service = SquadService(db_manager)
+            
+            # Get optimal squad strategy for GW1-9
+            strategy_data = squad_service.get_optimal_squad_for_gw1_9()
+            
+            if not strategy_data:
+                return "Error: Could not generate squad data. Please try again later."
+            
+            # Process strategy data for template
+            weekly_data = []
+            total_points = 0
+            total_transfers = 0
+            
+            for gw in range(1, 10):  # GW1-9
+                gw_data = strategy_data[gw]
+                starting_xi = gw_data["starting_xi"]
+                bench = gw_data["bench"]
+                
+                # Calculate points for this GW
+                gw_points = sum(player.get(f"gw{gw}_points", 0) or 0 for player in starting_xi)
+                total_points += gw_points
+                
+                # Get transfer information
+                transfers_in = gw_data.get("transfers", {}).get("in", [])
+                transfers_out = gw_data.get("transfers", {}).get("out", [])
+                
+                if gw > 1:  # GW1 has no transfers
+                    total_transfers += len(transfers_in)
+                
+                # Create transfer mapping (who replaced whom)
+                transfer_mapping = {}
+                if gw > 1 and len(transfers_in) > 0 and len(transfers_out) > 0:
+                    # Map transfers in to transfers out (assuming they correspond in order)
+                    for i, player_in in enumerate(transfers_in):
+                        if i < len(transfers_out):
+                            transfer_mapping[player_in] = transfers_out[i]
+                        else:
+                            transfer_mapping[player_in] = "Unknown player"
+                
+                # Calculate bench promotions/demotions
+                bench_promotions = []
+                bench_demotions = []
+                if gw > 1:
+                    prev_gw_data = strategy_data[gw - 1]
+                    prev_xi = prev_gw_data["starting_xi"]
+                    prev_bench = prev_gw_data["bench"]
+                    
+                    # Find players promoted from bench to starting XI
+                    bench_promotions = [p for p in starting_xi if p["name"] in [bp["name"] for bp in prev_bench]]
+                    
+                    # Find players demoted from starting XI to bench
+                    bench_demotions = [p for p in bench if p["name"] in [px["name"] for px in prev_xi]]
+                
+                weekly_data.append({
+                    "gw": gw,
+                    "starting_xi": starting_xi,
+                    "bench": bench,
+                    "transfers_in": transfers_in,
+                    "transfers_out": transfers_out,
+                    "transfer_mapping": transfer_mapping,
+                    "bench_promotions": bench_promotions,
+                    "bench_demotions": bench_demotions,
+                    "points": gw_points,
+                    "formation": squad_service.get_formation(starting_xi)
+                })
+            
+            # Calculate total squad value (use GW1 as reference)
+            gw1_data = strategy_data[1]
+            all_players = gw1_data["starting_xi"] + gw1_data["bench"]
+            total_value = sum(player.get("price", 0) or 0 for player in all_players)
+            remaining_budget = 100.0 - total_value
+            
+            return render_template('squad.html', 
+                                weekly_data=weekly_data, 
+                                total_points=total_points, 
+                                total_transfers=total_transfers, 
+                                total_value=total_value, 
+                                remaining_budget=remaining_budget)
+            
+        except Exception as e:
+            return f"Error generating squad page: {str(e)}"
     
     # Legacy API routes for backward compatibility
-    @app.route('/api/players', methods=['GET'])
-    def get_players():
-        """Get all players - legacy route"""
-        players = db_manager.get_all_players()
+    @app.route('/api/players')
+    def api_players():
+        """Get all players as JSON"""
+        players = current_app.db_manager.get_all_players()
         return jsonify([player.to_dict() for player in players])
     
-    @app.route('/api/players/<position>', methods=['GET'])
-    def get_players_by_position(position):
-        """Get players by position - legacy route"""
-        players = db_manager.get_players_by_position(position)
-        return jsonify([player.to_dict() for player in players])
-    
-    @app.route('/api/teams', methods=['GET'])
-    def get_teams():
-        """Get all teams - legacy route"""
-        teams = db_manager.get_all_teams()
+    @app.route('/api/teams')
+    def api_teams():
+        """Get all teams as JSON"""
+        teams = current_app.db_manager.get_all_teams()
         return jsonify([team.to_dict() for team in teams])
     
-    @app.route('/api/fdr', methods=['GET'])
-    def get_fdr():
-        """Get FDR data - legacy route"""
-        fixtures = db_manager.get_all_fixtures()
+    @app.route('/api/fdr')
+    def api_fdr():
+        """Get FDR data as JSON"""
+        fixtures = current_app.db_manager.get_all_fixtures()
         return jsonify([fixture.to_dict() for fixture in fixtures])
     
-    # Health check route
-    @app.route('/health', methods=['GET'])
-    def health_check():
-        """Health check endpoint"""
-        try:
-            stats = db_manager.get_database_stats()
-            return jsonify({
-                'status': 'healthy',
-                'database': stats,
-                'timestamp': '2024-01-01T00:00:00Z'  # In real app, use datetime.now().isoformat()
-            })
-        except Exception as e:
-            return jsonify({
-                'status': 'unhealthy',
-                'error': str(e)
-            }), 500
-    
-    # Error handlers
-    @app.errorhandler(404)
-    def not_found(error):
-        return jsonify({'error': 'Not found'}), 404
-    
-    @app.errorhandler(500)
-    def internal_error(error):
-        return jsonify({'error': 'Internal server error'}), 500
-    
     return app
-
-def run_app():
-    """Run the Flask application"""
-    # Get configuration from environment
-    config_name = os.environ.get('FLASK_CONFIG', 'default')
-    
-    # Create and run app
-    app = create_app(config_name)
-    
-    print("Database initialized successfully")
-    app.run(
-        host='0.0.0.0',
-        port=app.config['PORT'],
-        debug=app.config['DEBUG']
-    )
-
-if __name__ == '__main__':
-    run_app()

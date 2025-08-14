@@ -116,7 +116,11 @@ class DatabaseManager:
         with self._get_connection() as conn:
             cursor = conn.cursor()
             cursor.execute("""
-                SELECT * FROM players ORDER BY name
+                SELECT id, name, position_name, team, price, availability, uncertainty_percent, 
+                       overall_total, gw1_points, gw2_points, gw3_points, gw4_points, gw5_points, 
+                       gw6_points, gw7_points, gw8_points, gw9_points, points_per_million, 
+                       chance_of_playing_next_round, team_id
+                FROM players ORDER BY name
             """)
             rows = cursor.fetchall()
             return [Player.from_db_row(row) for row in rows]
