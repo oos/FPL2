@@ -559,6 +559,19 @@
             // Create default "Value + Points" view if it doesn't exist
             createDefaultValuePointsView();
             
+            // Test dropdown population immediately
+            console.log('Testing immediate dropdown population...');
+            console.log('Dropdown element exists:', $('#loadView').length);
+            console.log('Dropdown element:', $('#loadView')[0]);
+            
+            updateViewsDropdown();
+            console.log('Immediate dropdown population complete. Options count:', $('#loadView option').length);
+            console.log('Dropdown HTML:', $('#loadView').html());
+            
+            // Test manual option addition
+            $('#loadView').append('<option value="test">TEST OPTION</option>');
+            console.log('After manual addition. Options count:', $('#loadView option').length);
+            
             // Initialize DataTable
             initializeDataTable();
             
@@ -863,6 +876,9 @@
             }
             
             function updateViewsDropdown() {
+                console.log('updateViewsDropdown function called');
+                console.log('Dropdown element at start:', $('#loadView').length);
+                
                 const savedViews = JSON.parse(localStorage.getItem('fplPlayerViews') || '{}');
                 const viewNames = Object.keys(savedViews);
                 
@@ -870,6 +886,7 @@
                 console.log('View names found:', viewNames);
                 
                 $('#loadView').empty().append('<option value="">Select a view or sorting option...</option>');
+                console.log('Added default option. Options count:', $('#loadView option').length);
                 
                 // Add quick sorting options at the top
                 $('#loadView').append('<optgroup label="Quick Sorting Options">');
@@ -877,6 +894,7 @@
                 $('#loadView').append('<option value="sort_value">💰 Sort by Points/£ (High to Low)</option>');
                 $('#loadView').append('<option value="sort_value_points">🎯 Sort by Value + Points (Best Value First)</option>');
                 $('#loadView').append('</optgroup>');
+                console.log('Added quick sorting options. Options count:', $('#loadView option').length);
                 
                 // Add saved views if any exist
                 if (viewNames.length > 0) {
@@ -889,9 +907,11 @@
                         $('#loadView').append(`<option value="${name}" title="${displayText}">${displayText}</option>`);
                     });
                     $('#loadView').append('</optgroup>');
+                    console.log('Added saved views. Options count:', $('#loadView option').length);
                 }
                 
                 console.log('Dropdown updated. Total options:', $('#loadView option').length);
+                console.log('Final dropdown HTML:', $('#loadView').html());
             }
             
             function applyFilters() {
