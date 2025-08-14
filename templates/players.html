@@ -230,6 +230,7 @@
         #playersTable {
             width: 100% !important;
             margin: 0 !important;
+            table-layout: fixed !important;
         }
         
         .dataTables_wrapper {
@@ -241,6 +242,22 @@
         .dataTables_wrapper .dataTable {
             width: 100% !important;
             margin: 0 !important;
+            table-layout: fixed !important;
+        }
+        
+        /* Ensure column widths are respected */
+        #playersTable th,
+        #playersTable td {
+            white-space: nowrap !important;
+            overflow: hidden !important;
+            text-overflow: ellipsis !important;
+        }
+        
+        /* Allow name column to wrap if needed */
+        #playersTable th:first-child,
+        #playersTable td:first-child {
+            white-space: normal !important;
+            word-wrap: break-word !important;
         }
         
         /* Ensure table stretches to full container width */
@@ -545,6 +562,18 @@
         $(document).ready(function() {
             let currentTable = null;
             
+            // Utility function for consistent number formatting
+            function formatNumber(value, decimals = 1) {
+                if (value === null || value === undefined || value === '') {
+                    return '0.0';
+                }
+                const num = parseFloat(value);
+                if (isNaN(num)) {
+                    return '0.0';
+                }
+                return num.toFixed(decimals);
+            }
+            
             // Use players data from template (like the original implementation)
             const playersData = {{ players|tojson }};
             console.log('Players data loaded from template:', playersData.length, 'players');
@@ -645,10 +674,15 @@
                 currentTable = $('#playersTable').DataTable({
                     data: playersData,
                     columns: [
-                        { data: 'name', className: 'text-center' },
+                        { 
+                            data: 'name', 
+                            className: 'text-center',
+                            width: '12%'
+                        },
                         { 
                             data: 'position',
                             className: 'text-center',
+                            width: '8%',
                             render: function(data) {
                                 const classes = {
                                     'Goalkeeper': 'gk',
@@ -659,104 +693,129 @@
                                 return `<span class="position-badge ${classes[data] || ''}">${data}</span>`;
                             }
                         },
-                        { data: 'team', className: 'text-center' },
+                        { 
+                            data: 'team', 
+                            className: 'text-center',
+                            width: '8%'
+                        },
                         { 
                             data: 'price', 
                             className: 'text-center',
+                            width: '6%',
                             render: function(data) {
-                                return '£' + parseFloat(data || 0).toFixed(1) + 'M';
+                                return '£' + formatNumber(data, 1) + 'M';
                             }
                         },
                         { 
                             data: 'chance_of_playing_next_round', 
                             className: 'text-center',
+                            width: '6%',
                             render: function(data) {
-                                return parseFloat(data || 0).toFixed(1) + '%';
+                                return formatNumber(data, 1) + '%';
                             }
                         },
                         { 
                             data: 'points_per_million', 
                             className: 'text-center',
+                            width: '8%',
                             render: function(data) {
-                                return parseFloat(data || 0).toFixed(1);
+                                return formatNumber(data, 1);
                             }
                         },
-                        { data: 'total_points', className: 'text-center' },
+                        { 
+                            data: 'total_points', 
+                            className: 'text-center',
+                            width: '8%',
+                            render: function(data) {
+                                return formatNumber(data, 1);
+                            }
+                        },
                         { 
                             data: 'form', 
                             className: 'text-center',
+                            width: '6%',
                             render: function(data) {
-                                return parseFloat(data || 0).toFixed(1);
+                                return formatNumber(data, 1);
                             }
                         },
                         { 
                             data: 'ownership', 
                             className: 'text-center',
+                            width: '6%',
                             render: function(data) {
-                                return parseFloat(data || 0).toFixed(1) + '%';
+                                return formatNumber(data, 1) + '%';
                             }
                         },
                         { 
                             data: 'gw1_points', 
                             className: 'text-center',
+                            width: '4%',
                             render: function(data) {
-                                return parseFloat(data || 0).toFixed(1);
+                                return formatNumber(data, 1);
                             }
                         },
                         { 
                             data: 'gw2_points', 
                             className: 'text-center',
+                            width: '4%',
                             render: function(data) {
-                                return parseFloat(data || 0).toFixed(1);
+                                return formatNumber(data, 1);
                             }
                         },
                         { 
                             data: 'gw3_points', 
                             className: 'text-center',
+                            width: '4%',
                             render: function(data) {
-                                return parseFloat(data || 0).toFixed(1);
+                                return formatNumber(data, 1);
                             }
                         },
                         { 
                             data: 'gw4_points', 
                             className: 'text-center',
+                            width: '4%',
                             render: function(data) {
-                                return parseFloat(data || 0).toFixed(1);
+                                return formatNumber(data, 1);
                             }
                         },
                         { 
                             data: 'gw5_points', 
                             className: 'text-center',
+                            width: '4%',
                             render: function(data) {
-                                return parseFloat(data || 0).toFixed(1);
+                                return formatNumber(data, 1);
                             }
                         },
                         { 
                             data: 'gw6_points', 
                             className: 'text-center',
+                            width: '4%',
                             render: function(data) {
-                                return parseFloat(data || 0).toFixed(1);
+                                return formatNumber(data, 1);
                             }
                         },
                         { 
                             data: 'gw7_points', 
                             className: 'text-center',
+                            width: '4%',
                             render: function(data) {
-                                return parseFloat(data || 0).toFixed(1);
+                                return formatNumber(data, 1);
                             }
                         },
                         { 
                             data: 'gw8_points', 
                             className: 'text-center',
+                            width: '4%',
                             render: function(data) {
-                                return parseFloat(data || 0).toFixed(1);
+                                return formatNumber(data, 1);
                             }
                         },
                         { 
                             data: 'gw9_points', 
                             className: 'text-center',
+                            width: '4%',
                             render: function(data) {
-                                return parseFloat(data || 0).toFixed(1);
+                                return formatNumber(data, 1);
                             }
                         }
                     ],
@@ -775,13 +834,8 @@
                         $('.dataTables_wrapper').css('width', '100%');
                         $('.dataTables_wrapper .dataTable').css('width', '100%');
                         
-                        // Adjust column widths for better distribution (with null check and delay)
-                        setTimeout(() => {
-                            if (currentTable && currentTable.columns) {
-                                currentTable.columns.adjust();
-                                console.log('Column widths adjusted successfully');
-                            }
-                        }, 100);
+                        // Column widths are now fixed, no need to adjust
+                        console.log('Fixed column widths applied successfully');
                         
                         // Now that DataTable is ready, update the dropdown
                         updateViewsDropdown();
