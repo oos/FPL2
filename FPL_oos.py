@@ -882,6 +882,25 @@ def players_table():
                     </div>
                 </div>
                 
+                <!-- Table Controls - Above sort buttons -->
+                <div class="mb-3">
+                    <div class="row align-items-center">
+                        <div class="col-md-3">
+                            <label for="pageLength" class="form-label mb-1">Show players per page:</label>
+                            <select id="pageLength" class="form-select form-select-sm">
+                                <option value="10">10</option>
+                                <option value="25" selected>25</option>
+                                <option value="50">50</option>
+                                <option value="100">100</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="searchPlayers" class="form-label mb-1">Search players:</label>
+                            <input type="text" id="searchPlayers" class="form-control form-control-sm" placeholder="Type to search...">
+                        </div>
+                    </div>
+                </div>
+                
                 <!-- Sort Controls - Positioned directly above the table -->
                 <div class="mb-2">
                     <div class="table-responsive">
@@ -1094,6 +1113,17 @@ def players_table():
                     
                     // Enhanced multi-column sorting functionality
                     var currentSortOrder = [];
+                    
+                    // Custom controls event handlers
+                    $('#pageLength').on('change', function() {
+                        var newLength = parseInt($(this).val());
+                        table.page.len(newLength).draw();
+                    });
+                    
+                    $('#searchPlayers').on('keyup', function() {
+                        var searchTerm = $(this).val();
+                        table.search(searchTerm).draw();
+                    });
                     
                     // Function to update sort indicators and create sort pills
                     function updateSortIndicators() {
