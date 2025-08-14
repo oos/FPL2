@@ -346,6 +346,7 @@ def fdr_table():
                 <div class="navbar-nav">
                     <a class="nav-link active" href="/">FDR Table</a>
                     <a class="nav-link" href="/players">Players</a>
+                    <a class="nav-link" href="/squad">Squad</a>
                 </div>
             </div>
         </nav>
@@ -574,7 +575,8 @@ def players_table():
                     <span class="navbar-brand">FPL Tools</span>
                     <div class="navbar-nav">
                         <a class="nav-link" href="/">FDR Table</a>
-                        <a class="nav-link active" href="/players">Players</a>
+                        <a class="nav-link" href="/players">Players</a>
+                        <a class="nav-link" href="/squad">Squad</a>
                     </div>
                 </div>
             </nav>
@@ -687,6 +689,76 @@ def players_table():
         
     except Exception as e:
         return f"Error generating players table: {str(e)}"
+
+@app.route("/squad")
+def squad_page():
+    """Display the Squad page"""
+    return render_template_string("""
+    <html>
+    <head>
+        <title>FPL Squad</title>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+        <style>
+            body { 
+                background-color: #f8f9fa; 
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            }
+            .navbar-brand { 
+                font-weight: bold; 
+                color: #2c3e50 !important; 
+            }
+            .nav-link { 
+                color: #34495e !important; 
+                font-weight: 500;
+            }
+            .nav-link.active { 
+                background-color: #3498db !important; 
+                color: white !important; 
+                border-radius: 5px;
+            }
+            .nav-link:hover { 
+                color: #3498db !important; 
+            }
+            h1 { 
+                color: #2c3e50; 
+                font-weight: 600;
+                margin-bottom: 1.5rem;
+            }
+            .content-area {
+                background: white;
+                padding: 30px;
+                border-radius: 10px;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+                margin-top: 2rem;
+            }
+        </style>
+    </head>
+    <body class="p-4">
+        <nav class="navbar navbar-expand-lg navbar-light bg-light mb-4">
+            <div class="container-fluid">
+                <span class="navbar-brand">FPL Tools</span>
+                <div class="navbar-nav">
+                    <a class="nav-link" href="/">FDR Table</a>
+                    <a class="nav-link" href="/players">Players</a>
+                    <a class="nav-link active" href="/squad">Squad</a>
+                </div>
+            </div>
+        </nav>
+        
+        <div class="container-fluid">
+            <h1 class="text-center mb-4">FPL Squad</h1>
+            
+            <div class="content-area">
+                <div class="text-center">
+                    <h3 class="text-muted">Squad page coming soon...</h3>
+                    <p class="lead">This page will display your optimal FPL squad selection.</p>
+                </div>
+            </div>
+        </div>
+    </body>
+    </html>
+    """)
 
 @app.route("/health")
 def health_check():
