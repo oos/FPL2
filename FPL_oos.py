@@ -777,6 +777,12 @@ def players_table():
                     font-weight: bold;
                     box-shadow: 0 2px 4px rgba(0,123,255,0.3);
                     z-index: 10;
+                    border: 2px solid white;
+                }
+                
+                /* Debug: Make sure numbers are visible */
+                .sort-level-number::before {
+                    content: attr(data-number);
                 }
                 
                 /* Ensure headers have relative positioning for absolute positioning of numbers */
@@ -1004,6 +1010,8 @@ def players_table():
                     
                     // Function to update sort indicators and create sort pills
                     function updateSortIndicators() {
+                        console.log('updateSortIndicators called with currentSortOrder:', JSON.stringify(currentSortOrder));
+                        
                         // Remove all existing sort indicators and level numbers
                         $('#playersTable thead th').removeClass('sorting_asc sorting_desc').addClass('sorting');
                         $('.sort-level-number').remove();
@@ -1017,6 +1025,8 @@ def players_table():
                             var direction = sort[1];
                             var header = $('#playersTable thead th').eq(columnIndex);
                             
+                            console.log('Processing sort:', index, 'column:', columnIndex, 'direction:', direction);
+                            
                             if (direction === 'asc') {
                                 header.removeClass('sorting').addClass('sorting_asc');
                             } else {
@@ -1025,6 +1035,7 @@ def players_table():
                             
                             // Add sort level number under the header
                             header.append('<div class="sort-level-number">' + (index + 1) + '</div>');
+                            console.log('Added sort level number:', index + 1, 'to column:', columnIndex);
                             
                             // Create sort pill
                             var columnNames = ['Rank', 'Player Name', 'Pos', 'Team', 'Price', 'Form', 'Total (GW1-9)', 'Points/£', 'Chance of Playing', 'GW1', 'GW2', 'GW3', 'GW4', 'GW5', 'GW6', 'GW7', 'GW8', 'GW9'];
@@ -1037,7 +1048,10 @@ def players_table():
                                 '</div>';
                             
                             $('#sortPills').append(pillHtml);
+                            console.log('Added pill for:', columnName, directionText);
                         });
+                        
+                        console.log('updateSortIndicators completed');
                     }
                     
                     // Remove the order.dt event listener to prevent conflicts with manual sorting
@@ -1047,14 +1061,21 @@ def players_table():
                     $('#playersTable thead th').on('click', function(e) {
                         var columnIndex = $(this).index();
                         console.log('Header clicked:', columnIndex);
+                        console.log('Current sort order before:', JSON.stringify(currentSortOrder));
+                        
+                        // Show alert to confirm click is working
+                        alert('Header clicked: ' + columnIndex + ' - Current sorts: ' + currentSortOrder.length);
                         
                         // Always add this column as a new sort level
                         var newDirection = 'asc';
                         currentSortOrder.push([columnIndex, newDirection]);
                         
+                        console.log('Current sort order after adding:', JSON.stringify(currentSortOrder));
+                        
                         // Limit to 5 sort levels for performance
                         if (currentSortOrder.length > 5) {
                             currentSortOrder = currentSortOrder.slice(0, 5);
+                            console.log('Limited to 5 levels:', JSON.stringify(currentSortOrder));
                         }
                         
                         // Apply the new sort order
@@ -1063,6 +1084,8 @@ def players_table():
                         // Update visual indicators manually
                         updateSortIndicators();
                         updateSortOrderInfo();
+                        
+                        console.log('Visual indicators updated');
                     });
                     
                     // Function to remove a specific sort column
@@ -1094,6 +1117,14 @@ def players_table():
                     }
                     
                     // Initialize sort indicators
+                    console.log('Initializing sort indicators...');
+                    updateSortIndicators();
+                    updateSortOrderInfo();
+                    
+                    // Test: Add a simple sort to verify functionality
+                    console.log('Testing with initial sort...');
+                    currentSortOrder = [[6, 'desc']]; // Sort by Total (GW1-9) descending
+                    table.order(currentSortOrder).draw();
                     updateSortIndicators();
                     updateSortOrderInfo();
                     
