@@ -146,3 +146,8 @@ def create_app():
         return jsonify([fixture.to_dict() for fixture in fixtures])
     
     return app
+
+def run_app():
+    """Run the Flask application"""
+    app = create_app()
+    app.run(host='0.0.0.0', port=5001, debug=True)

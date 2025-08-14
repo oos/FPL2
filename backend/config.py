@@ -3,7 +3,7 @@ import os
 class Config:
     """Base configuration class"""
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'dev-secret-key-change-in-production'
-    DATABASE_PATH = os.environ.get('DATABASE_PATH') or 'fpl_oos.db'
+    DATABASE_PATH = os.environ.get('DATABASE_PATH') or 'fpl.db'
     DEBUG = os.environ.get('FLASK_DEBUG', 'True').lower() == 'true'
     PORT = int(os.environ.get('PORT', 5001))
     
