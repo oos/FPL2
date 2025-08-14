@@ -761,12 +761,19 @@ def players_table():
                         <span id="filterInfo" class="ms-3 text-muted"></span>
                         <div class="mt-2">
                             <small class="text-muted">
-                                <strong>Sorting:</strong> Click column header to sort • Shift+Click to add secondary sort • Ctrl+Click (Cmd+Click on Mac) to add tertiary sort
+                                <strong>Sorting:</strong> Click column header to add sort level • Click again to toggle direction • Each click adds another sort level
                             </small>
                         </div>
                         <div class="mt-1">
                             <span id="sortOrderInfo" class="text-info fw-bold"></span>
                             <button id="clearSort" class="btn btn-outline-warning btn-sm ms-2">Clear Sort</button>
+                            <div class="mt-2">
+                                <input type="text" id="viewName" class="form-control form-control-sm d-inline-block" style="width: 200px;" placeholder="Enter view name...">
+                                <button id="saveView" class="btn btn-success btn-sm ms-2">Save View</button>
+                                <select id="loadView" class="form-select form-select-sm d-inline-block ms-2" style="width: 200px;">
+                                    <option value="">Load Saved View...</option>
+                                </select>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -926,8 +933,6 @@ def players_table():
                         e.preventDefault();
                         
                         var columnIndex = $(this).index();
-                        var isShiftPressed = e.shiftKey;
-                        var isCtrlPressed = e.ctrlKey || e.metaKey; // metaKey for Mac Cmd key
                         
                         // Determine sort direction
                         var currentDirection = 'asc';
@@ -936,20 +941,11 @@ def players_table():
                         if (existingSortIndex !== -1) {
                             // Column already in sort order, toggle direction
                             currentDirection = currentSortOrder[existingSortIndex][1] === 'asc' ? 'desc' : 'asc';
-                        }
-                        
-                        if (isShiftPressed || isCtrlPressed) {
-                            // Add to existing sort order
-                            if (existingSortIndex !== -1) {
-                                // Update existing sort
-                                currentSortOrder[existingSortIndex] = [columnIndex, currentDirection];
-                            } else {
-                                // Add new sort level
-                                currentSortOrder.push([columnIndex, currentDirection]);
-                            }
+                            // Update existing sort
+                            currentSortOrder[existingSortIndex] = [columnIndex, currentDirection];
                         } else {
-                            // Replace entire sort order
-                            currentSortOrder = [[columnIndex, currentDirection]];
+                            // Add new sort level
+                            currentSortOrder.push([columnIndex, currentDirection]);
                         }
                         
                         // Limit to 5 sort levels for performance
@@ -996,6 +992,76 @@ def players_table():
                         updateSortIndicators();
                         updateSortOrderInfo();
                     });
+                    
+                    // Save view functionality
+                    var savedViews = JSON.parse(localStorage.getItem('fplSavedViews') || '{}');
+                    
+                    // Function to save current view
+                    $('#saveView').on('click', function() {
+                        var viewName = $('#viewName').val().trim();
+                        if (!viewName) {
+                            alert('Please enter a name for this view');
+                            return;
+                        }
+                        
+                        if (currentSortOrder.length === 0) {
+                            alert('No sorting applied to save');
+                            return;
+                        }
+                        
+                        // Save the current sort order with the view name
+                        savedViews[viewName] = {
+                            sortOrder: currentSortOrder,
+                            timestamp: new Date().toISOString()
+                        };
+                        
+                        localStorage.setItem('fplSavedViews', JSON.stringify(savedViews));
+                        
+                        // Update the load view dropdown
+                        updateLoadViewDropdown();
+                        
+                        // Clear the input and show success message
+                        $('#viewName').val('');
+                        alert('View "' + viewName + '" saved successfully!');
+                    });
+                    
+                    // Function to load a saved view
+                    $('#loadView').on('change', function() {
+                        var selectedView = $(this).val();
+                        if (!selectedView) return;
+                        
+                        var viewData = savedViews[selectedView];
+                        if (viewData && viewData.sortOrder) {
+                            currentSortOrder = viewData.sortOrder;
+                            table.order(currentSortOrder).draw();
+                            updateSortIndicators();
+                            updateSortOrderInfo();
+                            
+                            // Reset dropdown
+                            $(this).val('');
+                        }
+                    });
+                    
+                    // Function to update the load view dropdown
+                    function updateLoadViewDropdown() {
+                        var loadSelect = $('#loadView');
+                        loadSelect.find('option:not(:first)').remove();
+                        
+                        Object.keys(savedViews).forEach(function(viewName) {
+                            var viewData = savedViews[viewName];
+                            var timestamp = new Date(viewData.timestamp).toLocaleDateString();
+                            var sortInfo = viewData.sortOrder.map(function(sort, index) {
+                                var columnNames = ['Rank', 'Player Name', 'Pos', 'Team', 'Price', 'Form', 'Total (GW1-9)', 'Points/£', 'Chance of Playing', 'GW1', 'GW2', 'GW3', 'GW4', 'GW5', 'GW6', 'GW7', 'GW8', 'GW9'];
+                                var direction = sort[1] === 'asc' ? '↑' : '↓';
+                                return columnNames[sort[0]] + ' ' + direction;
+                            }).join(' → ');
+                            
+                            loadSelect.append($('<option></option>').val(viewName).text(viewName + ' (' + sortInfo + ') - ' + timestamp));
+                        });
+                    }
+                    
+                    // Initialize the load view dropdown
+                    updateLoadViewDropdown();
                     
                     // Custom filtering function
                     function customFilter() {
