@@ -94,7 +94,7 @@ def get_additional_top_players():
     """Get the additional top 400 players with their specific expected points"""
     return [
         # Top 20 players (existing)
-        {"id": 1001, "name": "M.Salah", "position_name": "Midfielder", "team": "Liverpool", "price": 14.5, "form": 0.0, "gw1_9_points": [6.7, 6.1, 5.6, 7.0, 6.6, 5.7, 5.7, 7.4, 6.2], "total_gw1_9": 57.0, "points_per_million": 3.93, "chance_of_playing_next_round": 100},
+        {"id": 1001, "name": "M.Salah", "position_name": "Midfielder", "team": "Liverpool", "price": 14.5, "form": 0.0, "gw1_9_points": [6.7, 6.1, 5.6, 7.0, 6.6, 5.7, 5.7, 7.4, 6.2], "total_gw1_9": 57.0, "points_per_million": 3.93, "chance_of_playing_next_round": 100, "ownership": "24%"},
         {"id": 1002, "name": "Haaland", "position_name": "Forward", "team": "Man City", "price": 14.0, "form": 0.0, "gw1_9_points": [5.1, 6.3, 5.1, 5.8, 3.8, 6.6, 4.8, 5.1, 4.4], "total_gw1_9": 47.0, "points_per_million": 3.36, "chance_of_playing_next_round": 100},
         {"id": 1003, "name": "Palmer", "position_name": "Midfielder", "team": "Chelsea", "price": 10.5, "form": 0.0, "gw1_9_points": [5.1, 4.9, 5.5, 4.6, 4.3, 5.9, 4.4, 4.3, 6.7], "total_gw1_9": 45.8, "points_per_million": 4.36, "chance_of_playing_next_round": 100},
         {"id": 1004, "name": "Watkins", "position_name": "Forward", "team": "Aston Villa", "price": 9.0, "form": 0.0, "gw1_9_points": [5.2, 4.6, 4.8, 4.1, 5.7, 5.2, 6.6, 4.5, 4.1], "total_gw1_9": 44.9, "points_per_million": 4.99, "chance_of_playing_next_round": 100},
@@ -263,6 +263,9 @@ def fdr_table():
     
     if df.empty:
         return "Error: Could not fetch FPL data. Please try again later."
+
+    # Get list of teams for dropdown
+    teams_list = sorted(df.index.tolist())
 
     # Filter columns based on gameweek range
     cols = []
@@ -442,7 +445,9 @@ def fdr_table():
                     </div>
                     <div class="col-md-3">
                         <label>Filter by team:</label>
-                        <input type="text" name="filter" value="{{ team_filter }}" placeholder="e.g., Arsenal" class="form-control">
+                        <select id="teamFilter" class="form-select">
+                            <option value="">All Teams</option>
+                        </select>
                     </div>
                     <div class="col-md-3">
                         <button type="submit" class="btn btn-primary">Apply Filters</button>
@@ -458,7 +463,15 @@ def fdr_table():
         
         <script>
             $(document).ready(function() {
-                $('#fdrTable').DataTable({
+                // Populate team filter dropdown
+                var teams = {{ teams_list|tojson }};
+                var teamSelect = $('#teamFilter');
+                teams.forEach(function(team) {
+                    teamSelect.append($('<option></option>').val(team).text(team));
+                });
+                
+                // Initialize DataTable
+                var table = $('#fdrTable').DataTable({
                     paging: false,
                     ordering: true,
                     info: false,
@@ -474,11 +487,24 @@ def fdr_table():
                         info: "Showing _START_ to _END_ of _TOTAL_ teams"
                     }
                 });
+                
+                // Team filter functionality
+                $('#teamFilter').on('change', function() {
+                    var selectedTeam = $(this).val();
+                    
+                    // Clear any existing filters
+                    table.search('').columns().search('').draw();
+                    
+                    if (selectedTeam) {
+                        // Filter by team name (first column)
+                        table.column(0).search(selectedTeam).draw();
+                    }
+                });
             });
         </script>
     </body>
     </html>
-    """, table=html_table, gw_from=gw_from, gw_to=gw_to, team_filter=team_filter)
+    """, table=html_table, gw_from=gw_from, gw_to=gw_to, team_filter=team_filter, teams_list=teams_list)
 
 @app.route("/players")
 def players_table():
@@ -663,6 +689,25 @@ def players_table():
                 </div>
                 
                 <div class="row mb-3">
+                    <div class="col-md-3">
+                        <label for="pointsPerPoundFilter" class="form-label">Min Points/£:</label>
+                        <input type="number" id="pointsPerPoundFilter" class="form-control" placeholder="e.g., 3.0" step="0.1" min="0">
+                    </div>
+                    <div class="col-md-3">
+                        <label for="totalPointsFilter" class="form-label">Min Total Points (GW1-9):</label>
+                        <input type="number" id="totalPointsFilter" class="form-control" placeholder="e.g., 30.0" step="0.1" min="0">
+                    </div>
+                    <div class="col-md-3">
+                        <label for="formFilter" class="form-label">Min Form:</label>
+                        <input type="number" id="formFilter" class="form-control" placeholder="e.g., 5.0" step="0.1" min="0">
+                    </div>
+                    <div class="col-md-3">
+                        <label for="ownershipFilter" class="form-label">Min Ownership (%):</label>
+                        <input type="number" id="ownershipFilter" class="form-control" placeholder="e.g., 5.0" step="0.1" min="0">
+                    </div>
+                </div>
+                
+                <div class="row mb-3">
                     <div class="col-12">
                         <button id="clearFilters" class="btn btn-outline-secondary btn-sm">Clear All Filters</button>
                         <span id="filterInfo" class="ms-3 text-muted"></span>
@@ -756,7 +801,7 @@ def players_table():
                     });
                     
                     // Populate team filter dropdown
-                    var teams = [...new Set({{ players|map(attribute='team')|list|tojson }}.map(p => p.team))].sort();
+                    var teams = [...new Set({{ players|tojson }}.map(p => p.team))].sort();
                     var teamSelect = $('#teamFilter');
                     teams.forEach(function(team) {
                         teamSelect.append($('<option></option>').val(team).text(team));
@@ -843,12 +888,69 @@ def players_table():
                         customFilter();
                     });
                     
+                    // Points/£ filter
+                    $('#pointsPerPoundFilter').on('input', function() {
+                        var minPointsPerPound = parseFloat($(this).val());
+                        if (isNaN(minPointsPerPound)) return;
+                        
+                        $.fn.dataTable.ext.search.push(function(settings, data, dataIndex) {
+                            var pointsPerPound = parseFloat(data[7]);
+                            return pointsPerPound >= minPointsPerPound;
+                        });
+                        customFilter();
+                    });
+                    
+                    // Total Points filter
+                    $('#totalPointsFilter').on('input', function() {
+                        var minTotalPoints = parseFloat($(this).val());
+                        if (isNaN(minTotalPoints)) return;
+                        
+                        $.fn.dataTable.ext.search.push(function(settings, data, dataIndex) {
+                            var totalPoints = parseFloat(data[6]);
+                            return totalPoints >= minTotalPoints;
+                        });
+                        customFilter();
+                    });
+                    
+                    // Form filter
+                    $('#formFilter').on('input', function() {
+                        var minForm = parseFloat($(this).val());
+                        if (isNaN(minForm)) return;
+                        
+                        $.fn.dataTable.ext.search.push(function(settings, data, dataIndex) {
+                            var form = parseFloat(data[5]);
+                            return form >= minForm;
+                        });
+                        customFilter();
+                    });
+                    
+                    // Ownership filter
+                    $('#ownershipFilter').on('input', function() {
+                        var minOwnership = parseFloat($(this).val());
+                        if (isNaN(minOwnership)) return;
+                        
+                        $.fn.dataTable.ext.search.push(function(settings, data, dataIndex) {
+                            // Extract ownership percentage from player data
+                            var player = {{ players|tojson }}.find(p => p.name === data[1]);
+                            if (player && player.ownership) {
+                                var ownership = parseFloat(player.ownership.replace('%', ''));
+                                return ownership >= minOwnership;
+                            }
+                            return true; // If no ownership data, don't filter out
+                        });
+                        customFilter();
+                    });
+                    
                     // Clear all filters
                     $('#clearFilters').on('click', function() {
                         $('#positionFilter').val('');
                         $('#teamFilter').val('');
                         $('#priceFilter').val('');
                         $('#chanceFilter').val('');
+                        $('#pointsPerPoundFilter').val('');
+                        $('#totalPointsFilter').val('');
+                        $('#formFilter').val('');
+                        $('#ownershipFilter').val('');
                         $.fn.dataTable.ext.search.splice(0, $.fn.dataTable.ext.search.length);
                         table.draw();
                         updateFilterInfo();
@@ -1200,6 +1302,19 @@ def squad_page():
             if gw > 1:  # GW1 has no transfers
                 total_transfers += len(transfers_in)
             
+            # Create transfer mapping (who replaced whom)
+            transfer_mapping = {}
+            if gw > 1 and len(transfers_in) > 0 and len(transfers_out) > 0:
+                # Map transfers in to transfers out (assuming they correspond in order)
+                for i, player_in in enumerate(transfers_in):
+                    if i < len(transfers_out):
+                        # Transfers are stored as strings (player names)
+                        transfer_mapping[player_in] = transfers_out[i]
+                    else:
+                        transfer_mapping[player_in] = "Unknown player"
+                
+
+            
             # Calculate bench promotions/demotions
             bench_promotions = []
             bench_demotions = []
@@ -1220,6 +1335,7 @@ def squad_page():
                 "bench": bench,
                 "transfers_in": transfers_in,
                 "transfers_out": transfers_out,
+                "transfer_mapping": transfer_mapping,
                 "bench_promotions": bench_promotions,
                 "bench_demotions": bench_demotions,
                 "points": gw_points,
@@ -1300,6 +1416,17 @@ def squad_page():
                 .budget-info { font-size: 1.1em; color: #6c757d; }
                 .nav-tabs .nav-link { color: #495057; }
                 .nav-tabs .nav-link.active { color: #007bff; font-weight: 600; }
+                .transfer-summary {
+                    background: #f8f9fa;
+                    padding: 8px;
+                    border-radius: 5px;
+                    margin-top: 5px;
+                    border-left: 3px solid #28a745;
+                }
+                .transfer-summary small {
+                    font-size: 0.85em;
+                    line-height: 1.4;
+                }
             </style>
         </head>
         <body class="p-4">
@@ -1372,6 +1499,15 @@ def squad_page():
                                 </div>
                                 <div class="col-md-4">
                                     <h4>Transfers: {{ gw.transfers_in|length }} IN, {{ gw.transfers_out|length }} OUT</h4>
+                                    {% if gw.transfers_in|length > 0 %}
+                                    <div class="transfer-summary">
+                                        <small class="text-success">
+                                            {% for player_in in gw.transfers_in %}
+                                            <i class="fas fa-arrow-right"></i> {{ player_in }} → {{ gw.transfer_mapping.get(player_in, "Unknown player") }}<br>
+                                            {% endfor %}
+                                        </small>
+                                    </div>
+                                    {% endif %}
                                     {% if gw.bench_promotions|length > 0 or gw.bench_demotions|length > 0 %}
                                     <div>
                                         {% if gw.bench_promotions|length > 0 %}
@@ -1413,7 +1549,7 @@ def squad_page():
                                             </div>
                                         </div>
                                         {% if player.name in gw.transfers_in %}
-                                        <small class="text-success"><i class="fas fa-plus-circle"></i> TRANSFER IN (New to Squad)</small>
+                                        <small class="text-success"><i class="fas fa-plus-circle"></i> TRANSFER IN (Replaced {{ gw.transfer_mapping.get(player.name, "Unknown player") }})</small>
                                         {% elif player.name in gw.transfers_out %}
                                         <small class="text-danger"><i class="fas fa-minus-circle"></i> TRANSFER OUT (Removed from Squad)</small>
                                         {% elif player in gw.bench_promotions %}
