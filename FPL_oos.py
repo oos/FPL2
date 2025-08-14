@@ -759,75 +759,387 @@ def players_table():
     except Exception as e:
         return f"Error generating players table: {str(e)}"
 
+def optimize_squad_for_gw1_9():
+    """Optimize squad for maximum points across GW1-9 while following FPL rules"""
+    players_data = fetch_players_data()
+    
+    if not players_data:
+        return None
+    
+    # Sort players by total GW1-9 points (descending)
+    players_data.sort(key=lambda x: x["total_gw1_9"], reverse=True)
+    
+    # Initialize squad with best 15 players following FPL rules
+    squad = []
+    team_counts = {}
+    position_counts = {"Goalkeeper": 0, "Defender": 0, "Midfielder": 0, "Forward": 0}
+    
+    for player in players_data:
+        # Check if we can add this player
+        if len(squad) >= 15:
+            break
+            
+        # Check position limits
+        if position_counts[player["position_name"]] >= get_position_limit(player["position_name"]):
+            continue
+            
+        # Check team limits (max 3 per team)
+        if team_counts.get(player["team"], 0) >= 3:
+            continue
+            
+        # Add player to squad
+        squad.append(player)
+        position_counts[player["position_name"]] += 1
+        team_counts[player["team"]] = team_counts.get(player["team"], 0) + 1
+    
+    # Sort squad by position for display
+    squad.sort(key=lambda x: get_position_order(x["position_name"]))
+    
+    return squad
+
+def get_position_limit(position):
+    """Get the maximum number of players allowed for a position"""
+    limits = {
+        "Goalkeeper": 2,
+        "Defender": 5,
+        "Midfielder": 5,
+        "Forward": 3
+    }
+    return limits.get(position, 0)
+
+def get_position_order(position):
+    """Get position order for sorting (GK=1, DEF=2, MID=3, FWD=4)"""
+    order = {
+        "Goalkeeper": 1,
+        "Defender": 2,
+        "Midfielder": 3,
+        "Forward": 4
+    }
+    return order.get(position, 5)
+
+def get_optimal_team_for_gw(squad, gw_index):
+    """Get optimal starting XI and bench for a specific gameweek"""
+    if not squad:
+        return [], []
+    
+    # Sort squad by expected points for this GW
+    gw_squad = sorted(squad, key=lambda x: x["gw1_9_points"][gw_index], reverse=True)
+    
+    # Select starting XI (best 11 players)
+    starting_xi = []
+    bench = []
+    
+    # Must have at least 1 GK, 3 DEF, 3 MID, 1 FWD in starting XI
+    min_requirements = {"Goalkeeper": 1, "Defender": 3, "Midfielder": 3, "Forward": 1}
+    position_counts = {"Goalkeeper": 0, "Defender": 0, "Midfielder": 0, "Forward": 0}
+    
+    # First pass: add required minimum players
+    for player in gw_squad:
+        if len(starting_xi) >= 11:
+            break
+            
+        if position_counts[player["position_name"]] < min_requirements[player["position_name"]]:
+            starting_xi.append(player)
+            position_counts[player["position_name"]] += 1
+    
+    # Second pass: fill remaining spots with best available players
+    for player in gw_squad:
+        if len(starting_xi) >= 11:
+            break
+            
+        if player not in starting_xi:
+            starting_xi.append(player)
+    
+    # Remaining players go to bench
+    bench = [p for p in gw_squad if p not in starting_xi]
+    
+    return starting_xi, bench
+
+def calculate_weekly_transfers(squad, gw_index):
+    """Calculate transfers needed for optimal performance in this GW"""
+    if gw_index == 0:  # GW1 - no transfers needed
+        return [], []
+    
+    # Get current optimal team for this GW
+    current_xi, current_bench = get_optimal_team_for_gw(squad, gw_index)
+    
+    # Get previous GW optimal team
+    prev_xi, prev_bench = get_optimal_team_for_gw(squad, gw_index - 1)
+    
+    # Find players coming in and out
+    transfers_in = [p for p in current_xi if p not in prev_xi]
+    transfers_out = [p for p in prev_xi if p not in current_xi]
+    
+    return transfers_in, transfers_out
+
 @app.route("/squad")
 def squad_page():
-    """Display the Squad page"""
-    return render_template_string("""
-    <html>
-    <head>
-        <title>FPL Squad</title>
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-        <style>
-            body { 
-                background-color: #f8f9fa; 
-                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            }
-            .navbar-brand { 
-                font-weight: bold; 
-                color: #2c3e50 !important; 
-            }
-            .nav-link { 
-                color: #34495e !important; 
-                font-weight: 500;
-            }
-            .nav-link.active { 
-                background-color: #3498db !important; 
-                color: white !important; 
-                border-radius: 5px;
-            }
-            .nav-link:hover { 
-                color: #3498db !important; 
-            }
-            h1 { 
-                color: #2c3e50; 
-                font-weight: 600;
-                margin-bottom: 1.5rem;
-            }
-            .content-area {
-                background: white;
-                padding: 30px;
-                border-radius: 10px;
-                box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-                margin-top: 2rem;
-            }
-        </style>
-    </head>
-    <body class="p-4">
-        <nav class="navbar navbar-expand-lg navbar-light bg-light mb-4">
-            <div class="container-fluid">
-                <span class="navbar-brand">FPL Tools</span>
-                <div class="navbar-nav">
-                    <a class="nav-link" href="/">FDR Table</a>
-                    <a class="nav-link" href="/players">Players</a>
-                    <a class="nav-link active" href="/squad">Squad</a>
-                </div>
-            </div>
-        </nav>
+    """Display the optimal FPL squad for GW1-9"""
+    try:
+        # Get optimized squad
+        squad = optimize_squad_for_gw1_9()
         
-        <div class="container-fluid">
-            <h1 class="text-center mb-4">FPL Squad</h1>
+        if not squad:
+            return "Error: Could not generate optimal squad. Please try again later."
+        
+        # Calculate weekly data
+        weekly_data = []
+        total_points = 0
+        total_transfers = 0
+        
+        for gw in range(9):
+            starting_xi, bench = get_optimal_team_for_gw(squad, gw)
+            transfers_in, transfers_out = calculate_weekly_transfers(squad, gw)
             
-            <div class="content-area">
-                <div class="text-center">
-                    <h3 class="text-muted">Squad page coming soon...</h3>
-                    <p class="lead">This page will display your optimal FPL squad selection.</p>
+            gw_points = sum(player["gw1_9_points"][gw] for player in starting_xi)
+            total_points += gw_points
+            
+            weekly_data.append({
+                "gw": gw + 1,
+                "starting_xi": starting_xi,
+                "bench": bench,
+                "transfers_in": transfers_in,
+                "transfers_out": transfers_out,
+                "points": gw_points,
+                "formation": get_formation(starting_xi)
+            })
+            
+            if gw > 0:  # GW1 has no transfers
+                total_transfers += len(transfers_in)
+        
+        # Calculate total squad value
+        total_value = sum(player["price"] for player in squad)
+        remaining_budget = 100.0 - total_value
+        
+        return render_template_string("""
+        <html>
+        <head>
+            <title>FPL Optimal Squad - GW1-9</title>
+            <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+            <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+            <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+            <style>
+                body { 
+                    background-color: #f8f9fa; 
+                    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                }
+                .navbar-brand { 
+                    font-weight: bold; 
+                    color: #2c3e50 !important; 
+                }
+                .nav-link { 
+                    color: #34495e !important; 
+                    font-weight: 500;
+                }
+                .nav-link.active { 
+                    background-color: #3498db !important; 
+                    color: white !important; 
+                    border-radius: 5px;
+                }
+                .nav-link:hover { 
+                    color: #3498db !important; 
+                }
+                h1, h2, h3 { 
+                    color: #2c3e50; 
+                    font-weight: 600;
+                    margin-bottom: 1.5rem;
+                }
+                .summary-card {
+                    background: white;
+                    padding: 20px;
+                    border-radius: 10px;
+                    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+                    margin-bottom: 2rem;
+                }
+                .gw-card {
+                    background: white;
+                    padding: 20px;
+                    border-radius: 10px;
+                    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+                    margin-bottom: 2rem;
+                }
+                .position-badge { 
+                    font-size: 0.8em; 
+                    padding: 4px 8px; 
+                    border-radius: 12px; 
+                    color: white; 
+                    font-weight: bold;
+                }
+                .gk { background-color: #dc3545; }
+                .def { background-color: #007bff; }
+                .mid { background-color: #28a745; }
+                .fwd { background-color: #ffc107; color: #212529; }
+                .transfer-in { background-color: #d4edda; border-left: 4px solid #28a745; }
+                .transfer-out { background-color: #f8d7da; border-left: 4px solid #dc3545; }
+                .no-transfer { background-color: #f8f9fa; border-left: 4px solid #6c757d; }
+                .player-row { padding: 8px; margin: 2px 0; border-radius: 5px; }
+                .formation-display { font-weight: bold; color: #2c3e50; }
+                .points-display { font-size: 1.2em; font-weight: bold; color: #28a745; }
+                .budget-info { font-size: 1.1em; color: #6c757d; }
+                .nav-tabs .nav-link { color: #495057; }
+                .nav-tabs .nav-link.active { color: #007bff; font-weight: 600; }
+            </style>
+        </head>
+        <body class="p-4">
+            <nav class="navbar navbar-expand-lg navbar-light bg-light mb-4">
+                <div class="container-fluid">
+                    <span class="navbar-brand">FPL Tools</span>
+                    <div class="navbar-nav">
+                        <a class="nav-link" href="/">FDR Table</a>
+                        <a class="nav-link" href="/players">Players</a>
+                        <a class="nav-link active" href="/squad">Squad</a>
+                    </div>
+                </div>
+            </nav>
+            
+            <div class="container-fluid">
+                <h1 class="text-center mb-4">FPL Optimal Squad - GW1-9</h1>
+                
+                <!-- Summary Section -->
+                <div class="summary-card">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <h4>Total Points (GW1-9)</h4>
+                            <div class="points-display">{{ "%.1f"|format(total_points) }}</div>
+                        </div>
+                        <div class="col-md-3">
+                            <h4>Total Transfers</h4>
+                            <div class="points-display">{{ total_transfers }}</div>
+                        </div>
+                        <div class="col-md-3">
+                            <h4>Squad Value</h4>
+                            <div class="budget-info">£{{ "%.1f"|format(total_value) }}M</div>
+                        </div>
+                        <div class="col-md-3">
+                            <h4>Remaining Budget</h4>
+                            <div class="budget-info">£{{ "%.1f"|format(remaining_budget) }}M</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Weekly Tabs -->
+                <ul class="nav nav-tabs" id="gwTabs" role="tablist">
+                    {% for gw in weekly_data %}
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link {% if loop.first %}active{% endif %}" 
+                                id="gw{{ gw.gw }}-tab" 
+                                data-bs-toggle="tab" 
+                                data-bs-target="#gw{{ gw.gw }}" 
+                                type="button" 
+                                role="tab">
+                            GW{{ gw.gw }}
+                        </button>
+                    </li>
+                    {% endfor %}
+                </ul>
+                
+                <!-- Weekly Content -->
+                <div class="tab-content" id="gwTabContent">
+                    {% for gw in weekly_data %}
+                    <div class="tab-pane fade {% if loop.first %}show active{% endif %}" 
+                         id="gw{{ gw.gw }}" 
+                         role="tabpanel">
+                        
+                        <div class="gw-card">
+                            <div class="row mb-3">
+                                <div class="col-md-4">
+                                    <h3>GW{{ gw.gw }} - {{ gw.formation }}</h3>
+                                </div>
+                                <div class="col-md-4">
+                                    <h4>Expected Points: <span class="points-display">{{ "%.1f"|format(gw.points) }}</span></h4>
+                                </div>
+                                <div class="col-md-4">
+                                    <h4>Transfers: {{ gw.transfers_in|length }} IN, {{ gw.transfers_out|length }} OUT</h4>
+                                </div>
+                            </div>
+                            
+                            <!-- Starting XI -->
+                            <h4>Starting XI</h4>
+                            <div class="row">
+                                {% for player in gw.starting_xi %}
+                                <div class="col-md-6">
+                                    <div class="player-row {% if player in gw.transfers_in %}transfer-in{% elif player in gw.transfers_out %}transfer-out{% else %}no-transfer{% endif %}">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <strong>{{ player.name }}</strong>
+                                                <span class="position-badge 
+                                                    {% if player.position_name == 'Goalkeeper' %}gk
+                                                    {% elif player.position_name == 'Defender' %}def
+                                                    {% elif player.position_name == 'Midfielder' %}mid
+                                                    {% else %}fwd{% endif %}">
+                                                    {{ player.position_name[:3] }}
+                                                </span>
+                                                <small class="text-muted">{{ player.team }}</small>
+                                            </div>
+                                            <div class="text-end">
+                                                <div>£{{ "%.1f"|format(player.price) }}M</div>
+                                                <div class="text-success">{{ "%.1f"|format(player.gw1_9_points[gw.gw-1]) }} pts</div>
+                                            </div>
+                                        </div>
+                                        {% if player in gw.transfers_in %}
+                                        <small class="text-success"><i class="fas fa-arrow-up"></i> TRANSFER IN</small>
+                                        {% elif player in gw.transfers_out %}
+                                        <small class="text-danger"><i class="fas fa-arrow-down"></i> TRANSFER OUT</small>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            
+                            <!-- Bench -->
+                            <h4 class="mt-3">Bench</h4>
+                            <div class="row">
+                                {% for player in gw.bench %}
+                                <div class="col-md-6">
+                                    <div class="player-row no-transfer">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <strong>{{ player.name }}</strong>
+                                                <span class="position-badge 
+                                                    {% if player.position_name == 'Goalkeeper' %}gk
+                                                    {% elif player.position_name == 'Defender' %}def
+                                                    {% elif player.position_name == 'Midfielder' %}mid
+                                                    {% else %}fwd{% endif %}">
+                                                    {{ player.position_name[:3] }}
+                                                </span>
+                                                <small class="text-muted">{{ player.team }}</small>
+                                            </div>
+                                            <div class="text-end">
+                                                <div>£{{ "%.1f"|format(player.price) }}M</div>
+                                                <div class="text-muted">{{ "%.1f"|format(player.gw1_9_points[gw.gw-1]) }} pts</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
                 </div>
             </div>
-        </div>
-    </body>
-    </html>
-    """)
+            
+            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+        </body>
+        </html>
+        """, squad=squad, weekly_data=weekly_data, total_points=total_points, 
+             total_transfers=total_transfers, total_value=total_value, remaining_budget=remaining_budget)
+        
+    except Exception as e:
+        return f"Error generating squad page: {str(e)}"
+
+def get_formation(starting_xi):
+    """Get formation string from starting XI"""
+    if not starting_xi:
+        return "Unknown"
+    
+    gk_count = sum(1 for p in starting_xi if p["position_name"] == "Goalkeeper")
+    def_count = sum(1 for p in starting_xi if p["position_name"] == "Defender")
+    mid_count = sum(1 for p in starting_xi if p["position_name"] == "Midfielder")
+    fwd_count = sum(1 for p in starting_xi if p["position_name"] == "Forward")
+    
+    return f"{def_count}-{mid_count}-{fwd_count}"
 
 @app.route("/health")
 def health_check():
