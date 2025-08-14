@@ -110,16 +110,57 @@ class DatabaseManager:
         finally:
             conn.close()
     
+    def get_connection(self):
+        """Get a database connection (for direct operations)"""
+        conn = sqlite3.connect(self.db_path, timeout=Config.DATABASE_TIMEOUT)
+        conn.row_factory = sqlite3.Row
+        return conn
+    
+    def bulk_insert_players(self, players_data: List[Dict]) -> int:
+        """Efficiently insert multiple players using batch operations"""
+        try:
+            with self._get_connection() as conn:
+                cursor = conn.cursor()
+                
+                # Use executemany for batch insertion
+                cursor.executemany("""
+                    INSERT INTO players (
+                        name, position, team, price, total_points, 
+                        form, ownership, team_id, gw1_points, gw2_points,
+                        gw3_points, gw4_points, gw5_points, gw6_points,
+                        gw7_points, gw8_points, gw9_points, chance_of_playing_next_round,
+                        points_per_million
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """, [
+                    (
+                        player['name'], player['position'], player['team'], 
+                        player['price'], player['total_points'], player['form'],
+                        player['ownership'], player['team_id'], player['gw1_points'],
+                        player['gw2_points'], player['gw3_points'], player['gw4_points'],
+                        player['gw5_points'], player['gw6_points'], player['gw7_points'],
+                        player['gw8_points'], player['gw9_points'], 
+                        player.get('chance_of_playing_next_round', 100),
+                        player.get('points_per_million', 0.0)
+                    ) for player in players_data
+                ])
+                
+                conn.commit()
+                return cursor.rowcount
+        except Exception as e:
+            print(f"Error in bulk insert: {e}")
+            return 0
+    
     # Player operations
     def get_all_players(self) -> List[Player]:
         """Get all players from database"""
         with self._get_connection() as conn:
             cursor = conn.cursor()
             cursor.execute("""
-                SELECT id, name, position_name, team, price, availability, uncertainty_percent, 
-                       overall_total, gw1_points, gw2_points, gw3_points, gw4_points, gw5_points, 
-                       gw6_points, gw7_points, gw8_points, gw9_points, points_per_million, 
-                       chance_of_playing_next_round, team_id
+                SELECT id, name, position, team, price, total_points, 
+                       form, ownership, team_id, gw1_points, gw2_points, 
+                       gw3_points, gw4_points, gw5_points, gw6_points, 
+                       gw7_points, gw8_points, gw9_points, chance_of_playing_next_round,
+                       points_per_million
                 FROM players ORDER BY name
             """)
             rows = cursor.fetchall()
@@ -140,7 +181,12 @@ class DatabaseManager:
         with self._get_connection() as conn:
             cursor = conn.cursor()
             cursor.execute("""
-                SELECT * FROM players WHERE id = ?
+                SELECT id, name, position, team, price, total_points, 
+                       form, ownership, team_id, gw1_points, gw2_points, 
+                       gw3_points, gw4_points, gw5_points, gw6_points, 
+                       gw7_points, gw8_points, gw9_points, chance_of_playing_next_round,
+                       points_per_million
+                FROM players WHERE id = ?
             """, (player_id,))
             row = cursor.fetchone()
             return Player.from_db_row(row) if row else None
@@ -152,18 +198,19 @@ class DatabaseManager:
                 cursor = conn.cursor()
                 cursor.execute("""
                     INSERT OR REPLACE INTO players (
-                        id, name, position, team, price, chance_of_playing_next_round,
-                        points_per_million, total_points, form, ownership, team_id,
-                        gw1_points, gw2_points, gw3_points, gw4_points, gw5_points,
-                        gw6_points, gw7_points, gw8_points, gw9_points
+                        id, name, position, team, price, total_points, 
+                        form, ownership, team_id, gw1_points, gw2_points, 
+                        gw3_points, gw4_points, gw5_points, gw6_points,
+                        gw7_points, gw8_points, gw9_points, chance_of_playing_next_round,
+                        points_per_million
                     ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """, (
                     player.id, player.name, player.position, player.team, player.price,
-                    player.chance_of_playing_next_round, player.points_per_million,
                     player.total_points, player.form, player.ownership, player.team_id,
                     player.gw1_points, player.gw2_points, player.gw3_points,
                     player.gw4_points, player.gw5_points, player.gw6_points,
-                    player.gw7_points, player.gw8_points, player.gw9_points
+                    player.gw7_points, player.gw8_points, player.gw9_points,
+                    player.chance_of_playing_next_round, player.points_per_million
                 ))
                 conn.commit()
                 return True

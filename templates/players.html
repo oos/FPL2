@@ -73,6 +73,7 @@
             vertical-align: middle; 
             font-size: 0.9em;
             padding: 6px 4px;
+            text-align: center;
             transition: all 0.2s ease;
         }
         
@@ -159,6 +160,26 @@
         .dataTables_wrapper .dataTables_info,
         .dataTables_wrapper .dataTables_paginate {
             margin: 10px 0;
+        }
+        
+        /* Ensure DataTables cells maintain center alignment */
+        .dataTables_wrapper .dataTable td,
+        .dataTables_wrapper .dataTable th {
+            text-align: center !important;
+        }
+        
+        /* Force center alignment for all table elements */
+        #playersTable td,
+        #playersTable th,
+        .table td,
+        .table th {
+            text-align: center !important;
+        }
+        
+        /* Override any DataTables inline styles */
+        .dataTables_wrapper table.dataTable td,
+        .dataTables_wrapper table.dataTable th {
+            text-align: center !important;
         }
         
         .dataTables_wrapper .dataTables_paginate .paginate_button {
@@ -452,6 +473,11 @@
             // Update views dropdown
             updateViewsDropdown();
             
+            function forceCenterAlignment() {
+                // Force center alignment for all table cells
+                $('#playersTable td, #playersTable th').css('text-align', 'center');
+            }
+            
             function initializeDataTable() {
                 console.log('Initializing DataTable with', playersData.length, 'players');
                 console.log('First player data:', playersData[0]);
@@ -464,9 +490,10 @@
                 currentTable = $('#playersTable').DataTable({
                     data: playersData,
                     columns: [
-                        { data: 'name' },
+                        { data: 'name', className: 'text-center' },
                         { 
                             data: 'position',
+                            className: 'text-center',
                             render: function(data) {
                                 const classes = {
                                     'Goalkeeper': 'gk',
@@ -477,27 +504,31 @@
                                 return `<span class="position-badge ${classes[data] || ''}">${data}</span>`;
                             }
                         },
-                        { data: 'team' },
-                        { data: 'price' },
-                        { data: 'chance_of_playing_next_round' },
-                        { data: 'points_per_million' },
-                        { data: 'total_points' },
-                        { data: 'form' },
-                        { data: 'ownership' },
-                        { data: 'gw1_points' },
-                        { data: 'gw2_points' },
-                        { data: 'gw3_points' },
-                        { data: 'gw4_points' },
-                        { data: 'gw5_points' },
-                        { data: 'gw6_points' },
-                        { data: 'gw7_points' },
-                        { data: 'gw8_points' },
-                        { data: 'gw9_points' }
+                        { data: 'team', className: 'text-center' },
+                        { data: 'price', className: 'text-center' },
+                        { data: 'chance_of_playing_next_round', className: 'text-center' },
+                        { data: 'points_per_million', className: 'text-center' },
+                        { data: 'total_points', className: 'text-center' },
+                        { data: 'form', className: 'text-center' },
+                        { data: 'ownership', className: 'text-center' },
+                        { data: 'gw1_points', className: 'text-center' },
+                        { data: 'gw2_points', className: 'text-center' },
+                        { data: 'gw3_points', className: 'text-center' },
+                        { data: 'gw4_points', className: 'text-center' },
+                        { data: 'gw5_points', className: 'text-center' },
+                        { data: 'gw6_points', className: 'text-center' },
+                        { data: 'gw7_points', className: 'text-center' },
+                        { data: 'gw8_points', className: 'text-center' },
+                        { data: 'gw9_points', className: 'text-center' }
                     ],
                     order: [[6, 'desc']], // Sort by total points by default
                     pageLength: 25,
                     responsive: true,
-                    scrollX: true
+                    scrollX: true,
+                    initComplete: function() {
+                        // Force center alignment after DataTables initializes
+                        forceCenterAlignment();
+                    }
                 });
             }
             
@@ -525,11 +556,13 @@
                 // Sort buttons
                 $('#sortByPoints').on('click', function() {
                     currentTable.order([6, 'desc']).draw();
+                    forceCenterAlignment();
                     showNotification('Sorted by Total Points (descending)', 'info');
                 });
                 
                 $('#sortByValue').on('click', function() {
                     currentTable.order([5, 'desc']).draw();
+                    forceCenterAlignment();
                     showNotification('Sorted by Points per Million (descending)', 'info');
                 });
             }
@@ -599,14 +632,17 @@
                 // Apply sorting and other settings
                 if (view.sorting) {
                     currentTable.order(view.sorting).draw();
+                    forceCenterAlignment();
                 }
                 
                 if (view.pageLength) {
                     currentTable.page.len(view.pageLength).draw();
+                    forceCenterAlignment();
                 }
                 
                 if (view.search) {
                     currentTable.search(view.search).draw();
+                    forceCenterAlignment();
                 }
                 
                 showNotification(`View "${viewName}" loaded successfully!`, 'success');
@@ -634,6 +670,7 @@
                 
                 // Apply filters to DataTable
                 currentTable.draw();
+                forceCenterAlignment();
                 
                 // Custom filtering function
                 $.fn.dataTable.ext.search.push(function(settings, data, dataIndex) {
@@ -652,6 +689,7 @@
                 });
                 
                 currentTable.draw();
+                forceCenterAlignment();
                 showNotification('Filters applied successfully!', 'success');
             }
             
@@ -668,6 +706,7 @@
                 // Clear custom filtering
                 $.fn.dataTable.ext.search.pop();
                 currentTable.draw();
+                forceCenterAlignment();
                 
                 showNotification('All filters cleared!', 'info');
             }

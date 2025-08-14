@@ -53,8 +53,9 @@ class SquadService:
             reverse=True
         )
         
-        # Select best 15 players
-        selected_players = sorted_players[:15]
+        # Select more players to ensure position variety (top 100 instead of just 15)
+        # This ensures we have enough players of each position to fill the starting XI
+        selected_players = sorted_players[:100]
         
         # Separate into starting XI and bench
         starting_xi = self._select_starting_xi(selected_players)
@@ -157,18 +158,8 @@ class SquadService:
                 starting_xi.append(fwd_player)
                 used_player_ids.add(fwd_player['id'])
         
-        # Ensure we have exactly 11 players by duplicating players if necessary
-        while len(starting_xi) < 11:
-            # Find the best player to duplicate
-            best_player = max(players, key=lambda x: x.get('total_points', 0) or 0)
-            
-            # Create a copy of the player with a unique ID
-            player_copy = best_player.copy()
-            player_copy['id'] = f"{best_player['id']}_copy_{len(starting_xi)}"
-            player_copy['name'] = f"{best_player['name']} (Copy)"
-            
-            starting_xi.append(player_copy)
-        
+        # Return whatever players we have (should be 11 with the increased player pool)
+        # If we still don't have 11, that's fine - we'll show what we have
         return starting_xi
     
     def get_formation(self, starting_xi: List[Dict[str, Any]]) -> str:
