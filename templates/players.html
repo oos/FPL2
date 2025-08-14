@@ -565,12 +565,11 @@
             // Set up event handlers
             setupEventHandlers();
             
-            // Update views dropdown
-            updateViewsDropdown();
+            // Dropdown will be updated after DataTable initialization
             
             // Handle window resize to maintain full width
             $(window).on('resize', function() {
-                if (currentTable) {
+                if (currentTable && currentTable.columns) {
                     currentTable.columns.adjust();
                     $('#playersTable').css('width', '100%');
                     $('.dataTables_wrapper').css('width', '100%');
@@ -666,6 +665,8 @@
                     responsive: true,
                     scrollX: true,
                     initComplete: function() {
+                        console.log('DataTable initialization complete');
+                        
                         // Force center alignment after DataTables initializes
                         forceCenterAlignment();
                         
@@ -676,6 +677,9 @@
                         
                         // Adjust column widths for better distribution
                         currentTable.columns.adjust();
+                        
+                        // Now that DataTable is ready, update the dropdown
+                        updateViewsDropdown();
                     }
                 });
             }
@@ -718,6 +722,12 @@
                 const viewName = $('#viewName').val().trim();
                 if (!viewName) {
                     showNotification('Please enter a view name', 'info');
+                    return;
+                }
+                
+                // Check if DataTable is ready
+                if (!currentTable) {
+                    showNotification('DataTable not ready yet. Please wait a moment and try again.', 'error');
                     return;
                 }
                 
@@ -819,6 +829,12 @@
             }
             
             function handleQuickSort(sortType) {
+                // Check if DataTable is ready
+                if (!currentTable) {
+                    showNotification('DataTable not ready yet. Please wait a moment and try again.', 'error');
+                    return;
+                }
+                
                 switch(sortType) {
                     case 'sort_points':
                         currentTable.order([6, 'desc']).draw();
