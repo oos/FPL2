@@ -859,9 +859,107 @@ def players_table():
                         <span id="filterInfo" class="ms-3 text-muted"></span>
                         <div class="mt-2">
                             <small class="text-muted">
-                                <strong>Sorting:</strong> Click column headers to add sort levels • Each click adds to existing sorts • Numbers show sort order • Remove individual sorts with X button
+                                <strong>Sorting:</strong> Use ↑/↓ buttons above to add sort levels • Each button adds to existing sorts • Numbers show sort order • Remove individual sorts with X button on pills
                             </small>
                         </div>
+                        <div class="mt-3">
+                            <h6>Add Sort Levels:</h6>
+                            <div class="row mb-2">
+                                <div class="col-auto">
+                                    <small class="text-muted">Rank:</small>
+                                    <button class="btn btn-sm btn-outline-primary ms-1" onclick="addSortLevel(0, 'asc')">↑</button>
+                                    <button class="btn btn-sm btn-outline-secondary ms-1" onclick="addSortLevel(0, 'desc')">↓</button>
+                                </div>
+                                <div class="col-auto">
+                                    <small class="text-muted">Name:</small>
+                                    <button class="btn btn-sm btn-outline-primary ms-1" onclick="addSortLevel(1, 'asc')">↑</button>
+                                    <button class="btn btn-sm btn-outline-secondary ms-1" onclick="addSortLevel(1, 'desc')">↓</button>
+                                </div>
+                                <div class="col-auto">
+                                    <small class="text-muted">Position:</small>
+                                    <button class="btn btn-sm btn-outline-primary ms-1" onclick="addSortLevel(2, 'asc')">↑</button>
+                                    <button class="btn btn-sm btn-outline-secondary ms-1" onclick="addSortLevel(2, 'desc')">↓</button>
+                                </div>
+                                <div class="col-auto">
+                                    <small class="text-muted">Team:</small>
+                                    <button class="btn btn-sm btn-outline-primary ms-1" onclick="addSortLevel(3, 'asc')">↑</button>
+                                    <button class="btn btn-sm btn-outline-secondary ms-1" onclick="addSortLevel(3, 'desc')">↓</button>
+                                </div>
+                                <div class="col-auto">
+                                    <small class="text-muted">Price:</small>
+                                    <button class="btn btn-sm btn-outline-primary ms-1" onclick="addSortLevel(4, 'asc')">↑</button>
+                                    <button class="btn btn-sm btn-outline-secondary ms-1" onclick="addSortLevel(4, 'desc')">↓</button>
+                                </div>
+                                <div class="col-auto">
+                                    <small class="text-muted">Form:</small>
+                                    <button class="btn btn-sm btn-outline-primary ms-1" onclick="addSortLevel(5, 'asc')">↑</button>
+                                    <button class="btn btn-sm btn-outline-secondary ms-1" onclick="addSortLevel(5, 'desc')">↓</button>
+                                </div>
+                                <div class="col-auto">
+                                    <small class="text-muted">Total:</small>
+                                    <button class="btn btn-sm btn-outline-primary ms-1" onclick="addSortLevel(6, 'asc')">↑</button>
+                                    <button class="btn btn-sm btn-outline-secondary ms-1" onclick="addSortLevel(6, 'desc')">↓</button>
+                                </div>
+                                <div class="col-auto">
+                                    <small class="text-muted">Points/£:</small>
+                                    <button class="btn btn-sm btn-outline-primary ms-1" onclick="addSortLevel(7, 'asc')">↑</button>
+                                    <button class="btn btn-sm btn-outline-secondary ms-1" onclick="addSortLevel(7, 'desc')">↓</button>
+                                </div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-auto">
+                                    <small class="text-muted">Chance:</small>
+                                    <button class="btn btn-sm btn-outline-primary ms-1" onclick="addSortLevel(8, 'asc')">↑</button>
+                                    <button class="btn btn-sm btn-outline-secondary ms-1" onclick="addSortLevel(8, 'desc')">↓</button>
+                                </div>
+                                <div class="col-auto">
+                                    <small class="text-muted">GW1:</small>
+                                    <button class="btn btn-sm btn-outline-primary ms-1" onclick="addSortLevel(9, 'asc')">↑</button>
+                                    <button class="btn btn-sm btn-outline-secondary ms-1" onclick="addSortLevel(9, 'desc')">↓</button>
+                                </div>
+                                <div class="col-auto">
+                                    <small class="text-muted">GW2:</small>
+                                    <button class="btn btn-sm btn-outline-primary ms-1" onclick="addSortLevel(10, 'asc')">↑</button>
+                                    <button class="btn btn-sm btn-outline-secondary ms-1" onclick="addSortLevel(10, 'desc')">↓</button>
+                                </div>
+                                <div class="col-auto">
+                                    <small class="text-muted">GW3:</small>
+                                    <button class="btn btn-sm btn-outline-primary ms-1" onclick="addSortLevel(11, 'asc')">↑</button>
+                                    <button class="btn btn-sm btn-outline-secondary ms-1" onclick="addSortLevel(11, 'desc')">↓</button>
+                                </div>
+                                <div class="col-auto">
+                                    <small class="text-muted">GW4:</small>
+                                    <button class="btn btn-sm btn-outline-primary ms-1" onclick="addSortLevel(12, 'asc')">↑</button>
+                                    <button class="btn btn-sm btn-outline-secondary ms-1" onclick="addSortLevel(12, 'desc')">↓</button>
+                                </div>
+                                <div class="col-auto">
+                                    <small class="text-muted">GW5:</small>
+                                    <button class="btn btn-sm btn-outline-primary ms-1" onclick="addSortLevel(13, 'asc')">↑</button>
+                                    <button class="btn btn-sm btn-outline-secondary ms-1" onclick="addSortLevel(13, 'desc')">↓</button>
+                                </div>
+                                <div class="col-auto">
+                                    <small class="text-muted">GW6:</small>
+                                    <button class="btn btn-sm btn-outline-primary ms-1" onclick="addSortLevel(14, 'asc')">↑</button>
+                                    <button class="btn btn-sm btn-outline-secondary ms-1" onclick="addSortLevel(14, 'desc')">↓</button>
+                                </div>
+                                <div class="col-auto">
+                                    <small class="text-muted">GW7:</small>
+                                    <button class="btn btn-sm btn-outline-primary ms-1" onclick="addSortLevel(15, 'asc')">↑</button>
+                                    <button class="btn btn-sm btn-outline-secondary ms-1" onclick="addSortLevel(15, 'desc')">↓</button>
+                                </div>
+                                <div class="col-auto">
+                                    <small class="text-muted">GW8:</small>
+                                    <button class="btn btn-sm btn-outline-primary ms-1" onclick="addSortLevel(16, 'asc')">↑</button>
+                                    <button class="btn btn-sm btn-outline-secondary ms-1" onclick="addSortLevel(16, 'desc')">↓</button>
+                                </div>
+                                <div class="col-auto">
+                                    <small class="text-muted">GW9:</small>
+                                    <button class="btn btn-sm btn-outline-primary ms-1" onclick="addSortLevel(17, 'asc')">↑</button>
+                                    <button class="btn btn-sm btn-outline-secondary ms-1" onclick="addSortLevel(17, 'desc')">↓</button>
+                                </div>
+                            </div>
+                        </div>
+                        
                         <div id="sortPills" class="mt-2 d-flex flex-wrap gap-1">
                             <!-- Sort pills will be dynamically added here -->
                         </div>
@@ -1058,19 +1156,13 @@ def players_table():
                     // Remove the order.dt event listener to prevent conflicts with manual sorting
                     // We'll handle all sorting manually through our click handlers
                     
-                    // Override the default click behavior to add multi-column sorting
-                    // Use event delegation to ensure it works even if headers are added dynamically
-                    $(document).on('click', '#playersTable thead th', function(e) {
-                        var columnIndex = $(this).index();
-                        console.log('Header clicked:', columnIndex);
+                    // Function to add a new sort level
+                    window.addSortLevel = function(columnIndex, direction) {
+                        console.log('Adding sort level:', columnIndex, direction);
                         console.log('Current sort order before:', JSON.stringify(currentSortOrder));
                         
-                        // Show alert to confirm click is working
-                        alert('Header clicked: ' + columnIndex + ' - Current sorts: ' + currentSortOrder.length);
-                        
                         // Always add this column as a new sort level
-                        var newDirection = 'asc';
-                        currentSortOrder.push([columnIndex, newDirection]);
+                        currentSortOrder.push([columnIndex, direction]);
                         
                         console.log('Current sort order after adding:', JSON.stringify(currentSortOrder));
                         
@@ -1088,7 +1180,7 @@ def players_table():
                         updateSortOrderInfo();
                         
                         console.log('Visual indicators updated');
-                    });
+                    };
                     
                     // Function to remove a specific sort column
                     window.removeSortPill = function(columnIndex) {
