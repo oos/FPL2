@@ -572,6 +572,9 @@
             $('#loadView').append('<option value="test">TEST OPTION</option>');
             console.log('After manual addition. Options count:', $('#loadView option').length);
             
+            // Remove test option to keep dropdown clean
+            $('#loadView option[value="test"]').remove();
+            
             // Initialize DataTable
             initializeDataTable();
             
@@ -772,8 +775,13 @@
                         $('.dataTables_wrapper').css('width', '100%');
                         $('.dataTables_wrapper .dataTable').css('width', '100%');
                         
-                        // Adjust column widths for better distribution
-                        currentTable.columns.adjust();
+                        // Adjust column widths for better distribution (with null check and delay)
+                        setTimeout(() => {
+                            if (currentTable && currentTable.columns) {
+                                currentTable.columns.adjust();
+                                console.log('Column widths adjusted successfully');
+                            }
+                        }, 100);
                         
                         // Now that DataTable is ready, update the dropdown
                         updateViewsDropdown();
