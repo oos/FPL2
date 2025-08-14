@@ -479,264 +479,6 @@ def optimal_team():
                     </div>
                 </div>
                 
-                <!-- Weekly Transfer Recommendations -->
-                <div class="team-card">
-                    <h3>Weekly Transfer Recommendations & Performance</h3>
-                    
-                    <!-- Weekly Tabs -->
-                    <ul class="nav nav-tabs" id="weeklyTabs" role="tablist">
-                        {% for week_data in weekly_transfers %}
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link {% if loop.first %}active{% endif %}" 
-                                    id="week{{ week_data.week }}-tab" 
-                                    data-bs-toggle="tab" 
-                                    data-bs-target="#week{{ week_data.week }}" 
-                                    type="button" 
-                                    role="tab">
-                                GW{{ week_data.week }}
-                            </button>
-                        </li>
-                        {% endfor %}
-                    </ul>
-                    
-                    <!-- Weekly Content -->
-                    <div class="tab-content" id="weeklyTabContent">
-                        {% for week_data in weekly_transfers %}
-                        <div class="tab-pane fade {% if loop.first %}show active{% endif %}" 
-                             id="week{{ week_data.week }}" 
-                             role="tabpanel">
-                            
-                            <div class="table-responsive mt-3">
-                                <table class="table table-striped table-sm">
-                                    <thead>
-                                        <tr>
-                                            <th>Name</th>
-                                            <th>Position</th>
-                                            <th>Team</th>
-                                            <th>Price</th>
-                                            <th>GW{{ week_data.week }} Points</th>
-                                            <th>Transfer</th>
-                                            <th>Reason</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {% for transfer in week_data.transfers %}
-                                        <tr>
-                                            <td><strong>{{ transfer.player }}</strong></td>
-                                            <td>
-                                                {% for player in players %}
-                                                    {% if player.Name == transfer.player %}
-                                                        <span class="position-badge 
-                                                            {% if player.Position == 'Goalkeeper' %}gk
-                                                            {% elif player.Position == 'Midfielder' %}mid
-                                                            {% elif player.Position == 'Forward' %}fwd
-                                                            {% else %}def{% endif %}">
-                                                            {{ player.Position }}
-                                                        </span>
-                                                    {% endif %}
-                                                {% endfor %}
-                                            </td>
-                                            <td>
-                                                {% for player in players %}
-                                                    {% if player.Name == transfer.player %}
-                                                        {{ player.Team }}
-                                                    {% endif %}
-                                                {% endfor %}
-                                            </td>
-                                            <td>
-                                                {% for player in players %}
-                                                    {% if player.Name == transfer.player %}
-                                                        £{{ player.Price }}M
-                                                    {% endif %}
-                                                {% endfor %}
-                                            </td>
-                                            <td>
-                                                <span class="{% if transfer.action == 'IN' %}text-success{% elif transfer.action == 'OUT' %}text-danger{% else %}text-muted{% endif %}">
-                                                    {{ "%.1f"|format(transfer.gw_points) }}
-                                                </span>
-                                            </td>
-                                            <td>
-                                                {% if transfer.action == 'IN' %}
-                                                    <span class="badge bg-success">IN</span>
-                                                {% elif transfer.action == 'OUT' %}
-                                                    <span class="badge bg-danger">OUT</span>
-                                                {% else %}
-                                                    <span class="badge bg-secondary">N/A</span>
-                                                {% endif %}
-                                            </td>
-                                            <td>
-                                                <small class="text-muted">{{ transfer.reason }}</small>
-                                            </td>
-                                        </tr>
-                                        {% endfor %}
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                        {% endfor %}
-                    </div>
-                </div>
-                
-                <div class="row">
-                    <div class="col-md-4">
-                        <div class="stats-card">
-                            <h5>Position Breakdown</h5>
-                            <p><strong>Goalkeepers:</strong> {{ gk_count }}</p>
-                            <p><strong>Defenders:</strong> {{ def_count }}</p>
-                            <p><strong>Midfielders:</strong> {{ mid_count }}</p>
-                            <p><strong>Forwards:</strong> {{ fwd_count }}</p>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="stats-card">
-                            <h5>Expected Points by Position</h5>
-                            <p><strong>Goalkeepers:</strong> {{ "%.1f"|format(gk_points) }} pts</p>
-                            <p><strong>Defenders:</strong> {{ "%.1f"|format(def_points) }} pts</p>
-                            <p><strong>Midfielders:</strong> {{ "%.1f"|format(mid_points) }} pts</p>
-                            <p><strong>Forwards:</strong> {{ "%.1f"|format(fwd_points) }} pts</p>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="stats-card">
-                            <h5>Squad Status</h5>
-                            <p><strong>Starting XI:</strong> 11 players</p>
-                            <p><strong>Bench:</strong> 4 players</p>
-                            <p><strong>Total Squad:</strong> 15 players</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <script>
-                // Budget Distribution Pie Chart
-                const ctx = document.getElementById('budgetChart').getContext('2d');
-                const budgetChart = new Chart(ctx, {
-                    type: 'pie',
-                    data: {
-                        labels: ['Goalkeepers', 'Defenders', 'Midfielders', 'Forwards'],
-                        datasets: [{
-                            data: [
-                                {{ gk_budget }},
-                                {{ def_budget }},
-                                {{ mid_budget }},
-                                {{ fwd_budget }}
-                            ],
-                            backgroundColor: [
-                                '#dc3545',  // GK - Red
-                                '#007bff',  // DEF - Blue
-                                '#28a745',  // MID - Green
-                                '#ffc107'   // FWD - Yellow
-                            ],
-                            borderColor: '#ffffff',
-                            borderWidth: 2
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: {
-                                display: false
-                            },
-                            tooltip: {
-                                callbacks: {
-                                    label: function(context) {
-                                        const label = context.label || '';
-                                        const value = context.parsed || 0;
-                                        const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                                        const percentage = ((value / total) * 100).toFixed(1);
-                                        return `${label}: £${value.toFixed(1)}M (${percentage}%)`;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                });
-            </script>
-        </body>
-        </html>
-        """, 
-        players=optimal_team_data["players"],
-        weekly_transfers=weekly_transfers,
-        total_expected_points=optimal_team_data["total_expected_points"],
-        remaining_budget=optimal_team_data["remaining_budget"],
-        team_value=100 - optimal_team_data["remaining_budget"],
-        formation=optimal_team_data["formation"],
-        gk_count=gk_count,
-        def_count=def_count,
-        mid_count=mid_count,
-        fwd_count=fwd_count,
-        gk_points=gk_points,
-        def_points=def_points,
-        mid_points=mid_points,
-        fwd_points=fwd_points,
-        gk_budget=gk_budget,
-        def_budget=def_budget,
-        mid_budget=mid_budget,
-        fwd_budget=fwd_budget
-        )
-                                    <td>
-                                        {% if player.Status == 'Starting' %}
-                                            <span class="badge bg-success">Starting XI</span>
-                                        {% else %}
-                                            <span class="badge bg-secondary">Bench</span>
-                                        {% endif %}
-                                    </td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                    
-                    <!-- Total Spend Summary -->
-                    <div class="mt-4 p-3 bg-light rounded">
-                        <div class="row text-center">
-                            <div class="col-md-4">
-                                <h5 class="text-muted">Total Spend</h5>
-                                <h3 class="text-primary">£{{ "%.1f"|format(team_value) }}M</h3>
-                            </div>
-                            <div class="col-md-4">
-                                <h5 class="text-muted">Remaining Budget</h5>
-                                <h3 class="text-success">£{{ "%.1f"|format(remaining_budget) }}M</h3>
-                            </div>
-                            <div class="col-md-4">
-                                <h5 class="text-muted">Budget Used</h5>
-                                <h3 class="text-info">{{ "%.1f"|format((team_value / 100.0) * 100) }}%</h3>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Budget Distribution Chart -->
-                <div class="team-card">
-                    <h3>Budget Distribution by Position</h3>
-                    <div class="row">
-                        <div class="col-md-8">
-                            <canvas id="budgetChart" width="400" height="200"></canvas>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="budget-legend">
-                                <div class="d-flex align-items-center mb-2">
-                                    <div class="budget-color gk me-2" style="width: 20px; height: 20px; border-radius: 50%;"></div>
-                                    <span><strong>Goalkeepers:</strong> £{{ "%.1f"|format(gk_budget) }}M ({{ "%.1f"|format((gk_budget / team_value) * 100) }}%)</span>
-                                </div>
-                                <div class="d-flex align-items-center mb-2">
-                                    <div class="budget-color def me-2" style="width: 20px; height: 20px; border-radius: 50%;"></div>
-                                    <span><strong>Defenders:</strong> £{{ "%.1f"|format(def_budget) }}M ({{ "%.1f"|format((def_budget / team_value) * 100) }}%)</span>
-                                </div>
-                                <div class="d-flex align-items-center mb-2">
-                                    <div class="budget-color mid me-2" style="width: 20px; height: 20px; border-radius: 50%;"></div>
-                                    <span><strong>Midfielders:</strong> £{{ "%.1f"|format(mid_budget) }}M ({{ "%.1f"|format((mid_budget / team_value) * 100) }}%)</span>
-                                </div>
-                                <div class="d-flex align-items-center mb-2">
-                                    <div class="budget-color fwd me-2" style="width: 20px; height: 20px; border-radius: 50%;"></div>
-                                    <span><strong>Forwards:</strong> £{{ "%.1f"|format(fwd_budget) }}M ({{ "%.1f"|format((fwd_budget / team_value) * 100) }}%)</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
                 <div class="team-card">
                     <h3>Weekly Transfer Recommendations & Performance</h3>
                     
@@ -947,37 +689,8 @@ def players_table():
         gw_columns = [f"GW {i}" for i in range(1, 10)]
         all_players["Total_GW1_9"] = all_players[gw_columns].sum(axis=1)
         
-        # Calculate Points per £ (efficiency metric)
-        all_players["Points_Per_Pound"] = all_players["Total_GW1_9"] / all_players["Price"]
-        
         # Sort by total expected points (descending)
         sorted_players = all_players.sort_values("Total_GW1_9", ascending=False)
-        
-        # Fetch team information from FPL API
-        try:
-            response = requests.get("https://fantasy.premierleague.com/api/bootstrap-static/")
-            if response.status_code == 200:
-                data = response.json()
-                players_api = data.get("elements", [])
-                
-                # Create a mapping of player names to teams
-                player_team_map = {}
-                for player in players_api:
-                    player_name = player.get("web_name", "")
-                    team_id = player.get("team", 0)
-                    team_name = ""
-                    
-                    # Find team name
-                    for team in data.get("teams", []):
-                        if team.get("id") == team_id:
-                            team_name = team.get("short_name", "")
-                            break
-                    
-                    if player_name and team_name:
-                        player_team_map[player_name] = team_name
-        except Exception as e:
-            print(f"Error fetching player team data: {e}")
-            player_team_map = {}
         
         # Fetch injury news from FPL Scout (simplified - in real app you'd parse the HTML)
         injury_news = {
@@ -994,24 +707,13 @@ def players_table():
             player_name = player["Name"]
             is_injured = player_name in injury_news and "injury" in injury_news[player_name].lower()
             
-            # Get team information
-            team_name = "Unknown"
-            if player_name in player_team_map:
-                team_name = player_team_map[player_name]
-            elif player_name.replace(".", "") in player_team_map:
-                team_name = player_team_map[player_name.replace(".", "")]
-            elif player_name.split(".")[-1] in player_team_map:
-                team_name = player_team_map[player_name.split(".")[-1]]
-            
             players_list.append({
                 "Name": player_name,
-                "Team": team_name,
                 "Position": player["Position"],
                 "Price": player["Price"],
                 "Uncertainty": player["Uncertainty"],
                 "Overall": player["Overall"],
                 "Total_GW1_9": player["Total_GW1_9"],
-                "Points_Per_Pound": player["Points_Per_Pound"],
                 "Chance_Playing": "100%" if not is_injured else "75%",
                 "Injury_Status": injury_news.get(player_name, "No injury concerns"),
                 "Is_Injured": is_injured,
@@ -1048,14 +750,6 @@ def players_table():
                 .fwd { background-color: #ffc107; color: #212529; }
                 .table th { white-space: nowrap; }
                 .table td { vertical-align: middle; }
-                .team-badge { 
-                    background-color: #6c757d; 
-                    color: white; 
-                    padding: 2px 6px; 
-                    border-radius: 4px; 
-                    font-size: 0.8em; 
-                    font-weight: bold; 
-                }
             </style>
         </head>
         <body class="p-4">
@@ -1080,13 +774,11 @@ def players_table():
                             <tr>
                                 <th>Rank</th>
                                 <th>Name</th>
-                                <th>Team</th>
                                 <th>Position</th>
                                 <th>Price</th>
                                 <th>Uncertainty</th>
                                 <th>Overall</th>
                                 <th>Total (GW1-9)</th>
-                                <th>Points/£</th>
                                 <th>Chance of Playing</th>
                                 <th>GW1</th>
                                 <th>GW2</th>
@@ -1099,47 +791,45 @@ def players_table():
                                 <th>GW9</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            {% for player in players %}
-                            <tr>
-                                <td>{{ loop.index }}</td>
-                                <td><strong>{{ player.Name }}</strong></td>
-                                <td><span class="team-badge">{{ player.Team }}</span></td>
-                                <td>
-                                    <span class="position-badge 
-                                        {% if player.Position == 'Goalkeeper' %}gk
-                                        {% elif player.Position == 'Midfielder' %}mid
-                                        {% elif player.Position == 'Forward' %}fwd
-                                        {% else %}def{% endif %}">
-                                        {{ player.Position }}
-                                    </span>
-                                </td>
-                                <td>£{{ "%.1f"|format(player.Price) }}M</td>
-                                <td>{{ player.Uncertainty }}%</td>
-                                <td>{{ "%.1f"|format(player.Overall) }}</td>
-                                <td><strong>{{ "%.1f"|format(player.Total_GW1_9) }}</strong></td>
-                                <td><span class="text-info">{{ "%.2f"|format(player.Points_Per_Pound) }}</span></td>
-                                <td>
-                                    {% if player.Is_Injured %}
-                                        <span class="text-danger" style="cursor: pointer;" data-bs-toggle="modal" data-bs-target="#injuryModal{{ loop.index }}">
-                                            <i class="fas fa-exclamation-triangle"></i> {{ player.Chance_Playing }}
+                                                    <tbody>
+                                {% for player in players %}
+                                <tr>
+                                    <td>{{ loop.index }}</td>
+                                    <td><strong>{{ player.Name }}</strong></td>
+                                    <td>
+                                        <span class="position-badge 
+                                            {% if player.Position == 'Goalkeeper' %}gk
+                                            {% elif player.Position == 'Midfielder' %}mid
+                                            {% elif player.Position == 'Forward' %}fwd
+                                            {% else %}def{% endif %}">
+                                            {{ player.Position }}
                                         </span>
-                                    {% else %}
-                                        <span class="text-success">{{ player.Chance_Playing }}</span>
-                                    {% endif %}
-                                </td>
-                                <td>{{ "%.1f"|format(player.GW1) }}</td>
-                                <td>{{ "%.1f"|format(player.GW2) }}</td>
-                                <td>{{ "%.1f"|format(player.GW3) }}</td>
-                                <td>{{ "%.1f"|format(player.GW4) }}</td>
-                                <td>{{ "%.1f"|format(player.GW5) }}</td>
-                                <td>{{ "%.1f"|format(player.GW6) }}</td>
-                                <td>{{ "%.1f"|format(player.GW7) }}</td>
-                                <td>{{ "%.1f"|format(player.GW8) }}</td>
-                                <td>{{ "%.1f"|format(player.GW9) }}</td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
+                                    </td>
+                                    <td>£{{ "%.1f"|format(player.Price) }}M</td>
+                                    <td>{{ player.Uncertainty }}%</td>
+                                    <td>{{ "%.1f"|format(player.Overall) }}</td>
+                                    <td><strong>{{ "%.1f"|format(player.Total_GW1_9) }}</strong></td>
+                                    <td>
+                                        {% if player.Is_Injured %}
+                                            <span class="text-danger" style="cursor: pointer;" data-bs-toggle="modal" data-bs-target="#injuryModal{{ loop.index }}">
+                                                <i class="fas fa-exclamation-triangle"></i> {{ player.Chance_Playing }}
+                                            </span>
+                                        {% else %}
+                                            <span class="text-success">{{ player.Chance_Playing }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ "%.1f"|format(player.GW1) }}</td>
+                                    <td>{{ "%.1f"|format(player.GW2) }}</td>
+                                    <td>{{ "%.1f"|format(player.GW3) }}</td>
+                                    <td>{{ "%.1f"|format(player.GW4) }}</td>
+                                    <td>{{ "%.1f"|format(player.GW5) }}</td>
+                                    <td>{{ "%.1f"|format(player.GW6) }}</td>
+                                    <td>{{ "%.1f"|format(player.GW7) }}</td>
+                                    <td>{{ "%.1f"|format(player.GW8) }}</td>
+                                    <td>{{ "%.1f"|format(player.GW9) }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
                     </table>
                 </div>
             </div>
@@ -1199,13 +889,12 @@ def players_table():
                         ordering: true,
                         info: true,
                         searching: true,
-                        order: [[7, 'desc']], // Sort by Total (GW1-9) by default (updated index)
+                        order: [[6, 'desc']], // Sort by Total (GW1-9) by default
                         columnDefs: [
                             { targets: [0], orderable: false }, // Rank column not sortable
-                            { targets: [1, 2, 3], orderable: true }, // Name, Team, and Position
-                            { targets: [4, 5, 6, 7, 8], orderable: true, type: 'num' }, // Numeric columns (Price, Uncertainty, Overall, Total, Points/£)
-                            { targets: [9], orderable: false }, // Chance of Playing not sortable
-                            { targets: [10, 11, 12, 13, 14, 15, 16, 17, 18], orderable: true, type: 'num' } // GW columns
+                            { targets: [1, 2], orderable: true }, // Name and Position
+                            { targets: [3, 4, 5, 6, 7], orderable: true, type: 'num' }, // Numeric columns
+                            { targets: [8, 9, 10, 11, 12, 13, 14, 15, 16], orderable: true, type: 'num' } // GW columns
                         ],
                         language: {
                             search: "Search players:",
