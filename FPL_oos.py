@@ -643,6 +643,54 @@ def players_table():
                 .dataTables_wrapper {
                     font-size: 0.9em;
                 }
+                
+                /* Enhanced sorting styles */
+                .sort-level {
+                    display: inline-block;
+                    background: #007bff;
+                    color: white;
+                    border-radius: 50%;
+                    width: 18px;
+                    height: 18px;
+                    line-height: 18px;
+                    text-align: center;
+                    font-size: 10px;
+                    font-weight: bold;
+                    margin-left: 5px;
+                    vertical-align: middle;
+                }
+                
+                .sorting_asc .sort-level {
+                    background: #28a745;
+                }
+                
+                .sorting_desc .sort-level {
+                    background: #dc3545;
+                }
+                
+                /* Hover effects for sortable columns */
+                #playersTable thead th {
+                    cursor: pointer;
+                    position: relative;
+                    transition: background-color 0.2s ease;
+                }
+                
+                #playersTable thead th:hover {
+                    background-color: #f8f9fa;
+                }
+                
+                #playersTable thead th.sorting:hover {
+                    background-color: #e9ecef;
+                }
+                
+                /* Sort order info styling */
+                #sortOrderInfo {
+                    font-size: 0.9em;
+                    padding: 5px 10px;
+                    background: #f8f9fa;
+                    border-radius: 5px;
+                    border-left: 3px solid #007bff;
+                }
             </style>
         </head>
         <body class="p-4">
@@ -711,6 +759,15 @@ def players_table():
                     <div class="col-12">
                         <button id="clearFilters" class="btn btn-outline-secondary btn-sm">Clear All Filters</button>
                         <span id="filterInfo" class="ms-3 text-muted"></span>
+                        <div class="mt-2">
+                            <small class="text-muted">
+                                <strong>Sorting:</strong> Click column header to sort • Shift+Click to add secondary sort • Ctrl+Click (Cmd+Click on Mac) to add tertiary sort
+                            </small>
+                        </div>
+                        <div class="mt-1">
+                            <span id="sortOrderInfo" class="text-info fw-bold"></span>
+                            <button id="clearSort" class="btn btn-outline-warning btn-sm ms-2">Clear Sort</button>
+                        </div>
                     </div>
                 </div>
                 
@@ -813,7 +870,7 @@ def players_table():
                         ordering: true,
                         info: true,
                         searching: true,
-                        order: [[6, 'desc'], [7, 'desc']], // Sort by Total (GW1-9) then by Points/£
+                        order: [[6, 'desc'], [7, 'desc']], // Default sort: Total (GW1-9) then by Points/£
                         scrollX: true,
                         columnDefs: [
                             { targets: [0], orderable: true, width: '40px', type: 'num' }, // Rank column now sortable
@@ -836,6 +893,108 @@ def players_table():
                         orderClasses: true,
                         pageLength: 25,
                         lengthMenu: [[10, 25, 50, 100], [10, 25, 50, 100]]
+                    });
+                    
+                    // Enhanced multi-column sorting functionality
+                    var currentSortOrder = [];
+                    
+                    // Function to update sort indicators
+                    function updateSortIndicators() {
+                        // Remove all existing sort indicators
+                        $('#playersTable thead th').removeClass('sorting_asc sorting_desc').addClass('sorting');
+                        
+                        // Add sort indicators for current sort order
+                        currentSortOrder.forEach(function(sort, index) {
+                            var columnIndex = sort[0];
+                            var direction = sort[1];
+                            var header = $('#playersTable thead th').eq(columnIndex);
+                            
+                            if (direction === 'asc') {
+                                header.removeClass('sorting').addClass('sorting_asc');
+                            } else {
+                                header.removeClass('sorting').addClass('sorting_desc');
+                            }
+                            
+                            // Add sort level indicator
+                            header.find('.sort-level').remove();
+                            header.append('<span class="sort-level">' + (index + 1) + '</span>');
+                        });
+                    }
+                    
+                    // Custom header click handler for multi-column sorting
+                    $('#playersTable thead th').on('click', function(e) {
+                        e.preventDefault();
+                        
+                        var columnIndex = $(this).index();
+                        var isShiftPressed = e.shiftKey;
+                        var isCtrlPressed = e.ctrlKey || e.metaKey; // metaKey for Mac Cmd key
+                        
+                        // Determine sort direction
+                        var currentDirection = 'asc';
+                        var existingSortIndex = currentSortOrder.findIndex(sort => sort[0] === columnIndex);
+                        
+                        if (existingSortIndex !== -1) {
+                            // Column already in sort order, toggle direction
+                            currentDirection = currentSortOrder[existingSortIndex][1] === 'asc' ? 'desc' : 'asc';
+                        }
+                        
+                        if (isShiftPressed || isCtrlPressed) {
+                            // Add to existing sort order
+                            if (existingSortIndex !== -1) {
+                                // Update existing sort
+                                currentSortOrder[existingSortIndex] = [columnIndex, currentDirection];
+                            } else {
+                                // Add new sort level
+                                currentSortOrder.push([columnIndex, currentDirection]);
+                            }
+                        } else {
+                            // Replace entire sort order
+                            currentSortOrder = [[columnIndex, currentDirection]];
+                        }
+                        
+                        // Limit to 5 sort levels for performance
+                        if (currentSortOrder.length > 5) {
+                            currentSortOrder = currentSortOrder.slice(0, 5);
+                        }
+                        
+                        // Apply the new sort order
+                        table.order(currentSortOrder).draw();
+                        
+                        // Update visual indicators
+                        updateSortIndicators();
+                        
+                        // Show sort order info
+                        updateSortOrderInfo();
+                    });
+                    
+                    // Function to display current sort order
+                    function updateSortOrderInfo() {
+                        var sortInfo = '';
+                        if (currentSortOrder.length > 0) {
+                            var columnNames = ['Rank', 'Player Name', 'Pos', 'Team', 'Price', 'Form', 'Total (GW1-9)', 'Points/£', 'Chance of Playing', 'GW1', 'GW2', 'GW3', 'GW4', 'GW5', 'GW6', 'GW7', 'GW8', 'GW9'];
+                            sortInfo = 'Sorting by: ';
+                            currentSortOrder.forEach(function(sort, index) {
+                                var columnName = columnNames[sort[0]];
+                                var direction = sort[1] === 'asc' ? '↑' : '↓';
+                                sortInfo += columnName + ' ' + direction;
+                                if (index < currentSortOrder.length - 1) {
+                                    sortInfo += ' → ';
+                                }
+                            });
+                        }
+                        $('#sortOrderInfo').text(sortInfo);
+                    }
+                    
+                    // Initialize sort indicators
+                    updateSortIndicators();
+                    updateSortOrderInfo();
+                    
+                    // Clear sort button handler
+                    $('#clearSort').on('click', function() {
+                        currentSortOrder = [];
+                        table.order([]).draw();
+                        updateSortIndicators();
+                        updateSortOrderInfo();
                     });
                     
                     // Custom filtering function
