@@ -775,7 +775,7 @@ def players_table():
                         <span id="filterInfo" class="ms-3 text-muted"></span>
                         <div class="mt-2">
                             <small class="text-muted">
-                                <strong>Sorting:</strong> Click column header to add sort level • Click again to toggle direction • Each click adds another sort level
+                                <strong>Sorting:</strong> Click column headers to sort • Shift+Click to add secondary sorting • DataTables handles multi-column sorting automatically
                             </small>
                         </div>
                         <div class="mt-1">
@@ -888,22 +888,22 @@ def players_table():
                     var table = $('#playersTable').DataTable({
                         paging: true,
                         pageLength: 25,
-                        ordering: false, // Disable default DataTable ordering
+                        ordering: true, // Enable default DataTable ordering
                         info: true,
                         searching: true,
-                        order: [], // Start with no default ordering
+                        order: [[6, 'desc'], [7, 'desc']], // Default sort: Total (GW1-9) then by Points/£
                         scrollX: true,
                         columnDefs: [
-                            { targets: [0], orderable: false, width: '40px', type: 'num' }, // Rank column not sortable
-                            { targets: [1], orderable: false, width: '120px', type: 'string' }, // Name
-                            { targets: [2], orderable: false, width: '60px', type: 'string' }, // Position
-                            { targets: [3], orderable: false, width: '80px', type: 'string' }, // Team
-                            { targets: [4], orderable: false, type: 'num', width: '70px' }, // Price
-                            { targets: [5], orderable: false, type: 'num', width: '50px' }, // Form
-                            { targets: [6], orderable: false, type: 'num', width: '80px' }, // Total
-                            { targets: [7], orderable: false, type: 'num', width: '70px' }, // Points/£
-                            { targets: [8], orderable: false, width: '80px' }, // Chance of Playing
-                            { targets: [9, 10, 11, 12, 13, 14, 15, 16, 17], orderable: false, type: 'num', width: '45px' } // GW columns
+                            { targets: [0], orderable: true, width: '40px', type: 'num' }, // Rank column sortable
+                            { targets: [1], orderable: true, width: '120px', type: 'string' }, // Name
+                            { targets: [2], orderable: true, width: '60px', type: 'string' }, // Position
+                            { targets: [3], orderable: true, width: '80px', type: 'string' }, // Team
+                            { targets: [4], orderable: true, type: 'num', width: '70px' }, // Price
+                            { targets: [5], orderable: true, type: 'num', width: '50px' }, // Form
+                            { targets: [6], orderable: true, type: 'num', width: '80px' }, // Total
+                            { targets: [7], orderable: true, type: 'num', width: '70px' }, // Points/£
+                            { targets: [8], orderable: true, width: '80px' }, // Chance of Playing
+                            { targets: [9, 10, 11, 12, 13, 14, 15, 16, 17], orderable: true, type: 'num', width: '45px' } // GW columns
                         ],
                         language: {
                             search: "Search players:",
@@ -911,9 +911,11 @@ def players_table():
                             info: "Showing _START_ to _END_ of _TOTAL_ players"
                         },
                         autoWidth: false,
-                        orderClasses: false, // Disable default order classes
+                        orderClasses: true, // Enable default order classes
                         pageLength: 25,
-                        lengthMenu: [[10, 25, 50, 100], [10, 25, 50, 100]]
+                        lengthMenu: [[10, 25, 50, 100], [10, 25, 50, 100]],
+                        // Enable multi-column sorting
+                        orderMulti: true
                     });
                     
                     // Enhanced multi-column sorting functionality
@@ -942,45 +944,26 @@ def players_table():
                         });
                     }
                     
-                    // Custom header click handler for multi-column sorting
-                    $('#playersTable thead th').on('click', function(e) {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        
-                        var columnIndex = $(this).index();
-                        console.log('Header clicked:', columnIndex, 'Current sort order:', currentSortOrder);
-                        
-                        // Determine sort direction
-                        var currentDirection = 'asc';
-                        var existingSortIndex = currentSortOrder.findIndex(sort => sort[0] === columnIndex);
-                        
-                        if (existingSortIndex !== -1) {
-                            // Column already in sort order, toggle direction
-                            currentDirection = currentSortOrder[existingSortIndex][1] === 'asc' ? 'desc' : 'asc';
-                            // Update existing sort
-                            currentSortOrder[existingSortIndex] = [columnIndex, currentDirection];
-                            console.log('Updated existing sort:', columnIndex, currentDirection);
-                        } else {
-                            // Add new sort level
-                            currentSortOrder.push([columnIndex, currentDirection]);
-                            console.log('Added new sort level:', columnIndex, currentDirection);
-                        }
-                        
-                        // Limit to 5 sort levels for performance
-                        if (currentSortOrder.length > 5) {
-                            currentSortOrder = currentSortOrder.slice(0, 5);
-                        }
-                        
-                        console.log('Final sort order:', currentSortOrder);
-                        
-                        // Apply the new sort order
-                        table.order(currentSortOrder).draw();
+                    // Use DataTables built-in multi-column sorting with enhancements
+                    table.on('order.dt', function() {
+                        // Get the current sort order from DataTable
+                        currentSortOrder = table.order();
+                        console.log('DataTable order changed:', currentSortOrder);
                         
                         // Update visual indicators
                         updateSortIndicators();
                         
                         // Show sort order info
                         updateSortOrderInfo();
+                    });
+                    
+                    // Override the default click behavior to add multi-column sorting
+                    $('#playersTable thead th').on('click', function(e) {
+                        var columnIndex = $(this).index();
+                        console.log('Header clicked:', columnIndex);
+                        
+                        // Let DataTable handle the sorting, our order.dt event will catch it
+                        // This ensures compatibility with DataTable's built-in functionality
                     });
                     
                     // Function to display current sort order
