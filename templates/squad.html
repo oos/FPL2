@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>FPL Optimal Squad - GW1-9</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <style>
+        body { 
+            background-color: #f8f9fa; 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .navbar-brand { 
+            font-weight: bold; 
+            color: #2c3e50 !important; 
+        }
+        .nav-link { 
+            color: #34495e !important; 
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        .nav-link.active { 
+            background-color: #3498db !important; 
+            color: white !important; 
+            border-radius: 5px;
+            transform: scale(1.05);
+        }
+        .nav-link:hover { 
+            color: #3498db !important; 
+            transform: translateY(-2px);
+        }
+        h1, h2, h3 { 
+            color: #2c3e50; 
+            font-weight: 600; 
+            margin-bottom: 1.5rem; 
+        }
+        .summary-card { 
+            background: white; 
+            padding: 20px; 
+            border-radius: 10px; 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1); 
+            margin-bottom: 2rem;
+            transition: all 0.3s ease;
+        }
+        .summary-card:hover {
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            transform: translateY(-2px);
+        }
+        .gw-card { 
+            background: white; 
+            padding: 20px; 
+            border-radius: 10px; 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1); 
+            margin-bottom: 2rem;
+            transition: all 0.3s ease;
+        }
+        .gw-card:hover {
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+        }
+        .position-badge { 
+            font-size: 0.8em; 
+            padding: 4px 8px; 
+            border-radius: 12px; 
+            color: white; 
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        .gk { background-color: #dc3545; }
+        .def { background-color: #007bff; }
+        .mid { background-color: #28a745; }
+        .fwd { background-color: #ffc107; color: #212529; }
+        
+        .position-badge:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        
+        .nav-tabs .nav-link { 
+            color: #495057; 
+            transition: all 0.3s ease;
+        }
+        .nav-tabs .nav-link.active { 
+            color: #007bff; 
+            font-weight: 600;
+            transform: scale(1.05);
+        }
+        .nav-tabs .nav-link:hover {
+            transform: translateY(-2px);
+        }
+        
+        .points-display { 
+            font-size: 1.2em; 
+            font-weight: bold; 
+            color: #28a745; 
+            text-align: center;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin: 10px 0;
+            transition: all 0.3s ease;
+        }
+        
+        .points-display:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .player-card {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .player-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            border-color: #007bff;
+        }
+        
+        .player-card.captain {
+            border-color: #ffc107;
+            background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+        }
+        
+        .player-card.transfer-in {
+            border-color: #28a745;
+            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+        }
+        
+        .player-card.transfer-out {
+            border-color: #dc3545;
+            background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+        }
+        
+        .player-card.bench-promotion {
+            border-color: #17a2b8;
+            background: linear-gradient(135deg, #d1ecf1 0%, #bee5eb 100%);
+        }
+        
+        .player-card.bench-demotion {
+            border-color: #6c757d;
+            background: linear-gradient(135deg, #e2e3e5 0%, #d6d8db 100%);
+        }
+        
+        .status-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 0.7em;
+            padding: 4px 8px;
+            border-radius: 12px;
+            color: white;
+            font-weight: bold;
+        }
+        
+        .status-badge.captain {
+            background-color: #ffc107;
+            color: #212529;
+        }
+        
+        .status-badge.transfer-in {
+            background-color: #28a745;
+        }
+        
+        .status-badge.transfer-out {
+            background-color: #dc3545;
+        }
+        
+        .status-badge.bench-promotion {
+            background-color: #17a2b8;
+        }
+        
+        .status-badge.bench-demotion {
+            background-color: #6c757d;
+        }
+        
+        .captain-section, .transfer-section, .bench-section {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+            transition: all 0.3s ease;
+        }
+        
+        .captain-section:hover, .transfer-section:hover, .bench-section:hover {
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            transform: translateY(-2px);
+        }
+        
+        .captain-section h5, .transfer-section h5, .bench-section h5 {
+            color: #2c3e50;
+            margin-bottom: 1rem;
+        }
+        
+        .captain-change {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+            transition: all 0.3s ease;
+        }
+        
+        .captain-change:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .transfer-item {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+            transition: all 0.3s ease;
+        }
+        
+        .transfer-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .transfer-item.transfer-in {
+            border-color: #28a745;
+            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+        }
+        
+        .transfer-item.transfer-out {
+            border-color: #dc3545;
+            background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+        }
+        
+        .bench-change {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+            transition: all 0.3s ease;
+        }
+        
+        .bench-change:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .bench-change.promotion {
+            border-color: #17a2b8;
+            background: linear-gradient(135deg, #d1ecf1 0%, #bee5eb 100%);
+        }
+        
+        .bench-change.demotion {
+            border-color: #6c757d;
+            background: linear-gradient(135deg, #e2e3e5 0%, #d6d8db 100%);
+        }
+        
+        /* Enhanced UI Animations and Effects */
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        .slide-up {
+            animation: slideUp 0.3s ease-out;
+        }
+        
+        .bounce-in {
+            animation: bounceIn 0.6s ease-out;
+        }
+        
+        .scale-in {
+            animation: scaleIn 0.4s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        @keyframes bounceIn {
+            0% { transform: scale(0.3); opacity: 0; }
+            50% { transform: scale(1.05); }
+            70% { transform: scale(0.9); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        
+        @keyframes scaleIn {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+        
+        /* Enhanced Button Styles */
+        .btn {
+            transition: all 0.3s ease;
+            border-radius: 8px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+            border: none;
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%);
+            border: none;
+        }
+        
+        .btn-warning {
+            background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%);
+            border: none;
+            color: #212529;
+        }
+        
+        .btn-info {
+            background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+            border: none;
+        }
+    </style>
+</head>
+<body class="p-4">
+    <nav class="navbar navbar-expand-lg navbar-light bg-light mb-4">
+        <div class="container-fluid">
+            <span class="navbar-brand"><i class="fas fa-users"></i> FPL Tools</span>
+            <div class="navbar-nav">
+                <a class="nav-link" href="/">FDR Table</a>
+                <a class="nav-link" href="/players">Players</a>
+                <a class="nav-link active" href="/squad">Squad</a>
+            </div>
+        </div>
+    </nav>
+    
+    <div class="container-fluid">
+        <h1 class="text-center fade-in"><i class="fas fa-trophy"></i> FPL Optimal Squad - GW1-9</h1>
+        
+        <!-- Squad Summary -->
+        <div class="summary-card slide-up">
+            <h3><i class="fas fa-chart-bar"></i> Squad Summary</h3>
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="points-display">
+                        <i class="fas fa-star"></i> Total Points: <span id="totalPoints">0</span>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="points-display">
+                        <i class="fas fa-coins"></i> Squad Value: £<span id="squadValue">0.0</span>M
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="points-display">
+                        <i class="fas fa-wallet"></i> Remaining Budget: £<span id="remainingBudget">0.0</span>M
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="points-display">
+                        <i class="fas fa-users"></i> Squad Size: <span id="squadSize">0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Captain Management Section -->
+        <div class="captain-section slide-up">
+            <h5><i class="fas fa-crown"></i> Captain Management</h5>
+            <div class="row">
+                <div class="col-md-6">
+                    <h6>Current Captain</h6>
+                    <div id="currentCaptain" class="player-card captain">
+                        <!-- Captain info will be populated by JavaScript -->
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <h6>Captain Changes</h6>
+                    <div id="captainChanges">
+                        <!-- Captain changes will be populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Transfer History Section -->
+        <div class="transfer-section slide-up">
+            <h5><i class="fas fa-exchange-alt"></i> Transfer History</h5>
+            <div class="row">
+                <div class="col-md-6">
+                    <h6>Transfers In</h6>
+                    <div id="transfersIn">
+                        <!-- Transfers in will be populated by JavaScript -->
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <h6>Transfers Out</h6>
+                    <div id="transfersOut">
+                        <!-- Transfers out will be populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Bench Management Section -->
+        <div class="bench-section slide-up">
+            <h5><i class="fas fa-chair"></i> Bench Management</h5>
+            <div class="row">
+                <div class="col-md-6">
+                    <h6>Bench Promotions</h6>
+                    <div id="benchPromotions">
+                        <!-- Bench promotions will be populated by JavaScript -->
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <h6>Bench Demotions</h6>
+                    <div id="benchDemotions">
+                        <!-- Bench demotions will be populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Weekly Tabs -->
+        <ul class="nav nav-tabs" id="gwTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="gw1-tab" data-bs-toggle="tab" data-bs-target="#gw1" type="button" role="tab">
+                    <i class="fas fa-calendar-day"></i> GW1
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="gw2-tab" data-bs-toggle="tab" data-bs-target="#gw2" type="button" role="tab">
+                    <i class="fas fa-calendar-day"></i> GW2
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="gw3-tab" data-bs-toggle="tab" data-bs-target="#gw3" type="button" role="tab">
+                    <i class="fas fa-calendar-day"></i> GW3
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="gw4-tab" data-bs-toggle="tab" data-bs-target="#gw4" type="button" role="tab">
+                    <i class="fas fa-calendar-day"></i> GW4
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="gw5-tab" data-bs-toggle="tab" data-bs-target="#gw5" type="button" role="tab">
+                    <i class="fas fa-calendar-day"></i> GW5
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="gw6-tab" data-bs-toggle="tab" data-bs-target="#gw6" type="button" role="tab">
+                    <i class="fas fa-calendar-day"></i> GW6
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="gw7-tab" data-bs-toggle="tab" data-bs-target="#gw7" type="button" role="tab">
+                    <i class="fas fa-calendar-day"></i> GW7
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="gw8-tab" data-bs-toggle="tab" data-bs-target="#gw8" type="button" role="tab">
+                    <i class="fas fa-calendar-day"></i> GW8
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="gw9-tab" data-bs-toggle="tab" data-bs-target="#gw9" type="button" role="tab">
+                    <i class="fas fa-calendar-day"></i> GW9
+                </button>
+            </li>
+        </ul>
+        
+        <!-- Weekly Content -->
+        <div class="tab-content" id="gwTabContent">
+            <div class="tab-pane fade show active" id="gw1" role="tabpanel">
+                <div class="gw-card scale-in">
+                    <h3><i class="fas fa-calendar-day"></i> GW1 Squad</h3>
+                    <div class="points-display">
+                        <i class="fas fa-star"></i> GW1 Points: <span id="gw1Points">0</span>
+                    </div>
+                    <div id="gw1Players">
+                        <!-- Players will be populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+            <div class="tab-pane fade" id="gw2" role="tabpanel">
+                <div class="gw-card scale-in">
+                    <h3><i class="fas fa-calendar-day"></i> GW2 Squad</h3>
+                    <div class="points-display">
+                        <i class="fas fa-star"></i> GW2 Points: <span id="gw2Points">0</span>
+                    </div>
+                    <div id="gw2Players">
+                        <!-- Players will be populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+            <div class="tab-pane fade" id="gw3" role="tabpanel">
+                <div class="gw-card scale-in">
+                    <h3><i class="fas fa-calendar-day"></i> GW3 Squad</h3>
+                    <div class="points-display">
+                        <i class="fas fa-star"></i> GW3 Points: <span id="gw3Points">0</span>
+                    </div>
+                    <div id="gw3Players">
+                        <!-- Players will be populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+            <div class="tab-pane fade" id="gw4" role="tabpanel">
+                <div class="gw-card scale-in">
+                    <h3><i class="fas fa-calendar-day"></i> GW4 Squad</h3>
+                    <div class="points-display">
+                        <i class="fas fa-star"></i> GW4 Points: <span id="gw4Points">0</span>
+                    </div>
+                    <div id="gw4Players">
+                        <!-- Players will be populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+            <div class="tab-pane fade" id="gw5" role="tabpanel">
+                <div class="gw-card scale-in">
+                    <h3><i class="fas fa-calendar-day"></i> GW5 Squad</h3>
+                    <div class="points-display">
+                        <i class="fas fa-star"></i> GW5 Points: <span id="gw5Points">0</span>
+                    </div>
+                    <div id="gw5Players">
+                        <!-- Players will be populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+            <div class="tab-pane fade" id="gw6" role="tabpanel">
+                <div class="gw-card scale-in">
+                    <h3><i class="fas fa-calendar-day"></i> GW6 Squad</h3>
+                    <div class="points-display">
+                        <i class="fas fa-star"></i> GW6 Points: <span id="gw6Points">0</span>
+                    </div>
+                    <div id="gw6Players">
+                        <!-- Players will be populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+            <div class="tab-pane fade" id="gw7" role="tabpanel">
+                <div class="gw-card scale-in">
+                    <h3><i class="fas fa-calendar-day"></i> GW7 Squad</h3>
+                    <div class="points-display">
+                        <i class="fas fa-star"></i> GW7 Points: <span id="gw7Points">0</span>
+                    </div>
+                    <div id="gw7Players">
+                        <!-- Players will be populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+            <div class="tab-pane fade" id="gw8" role="tabpanel">
+                <div class="gw-card scale-in">
+                    <h3><i class="fas fa-calendar-day"></i> GW8 Squad</h3>
+                    <div class="points-display">
+                        <i class="fas fa-star"></i> GW8 Points: <span id="gw8Points">0</span>
+                    </div>
+                    <div id="gw8Players">
+                        <!-- Players will be populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+            <div class="tab-pane fade" id="gw9" role="tabpanel">
+                <div class="gw-card scale-in">
+                    <h3><i class="fas fa-calendar-day"></i> GW9 Squad</h3>
+                    <div class="points-display">
+                        <i class="fas fa-star"></i> GW9 Points: <span id="gw9Points">0</span>
+                    </div>
+                    <div id="gw9Players">
+                        <!-- Players will be populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        $(document).ready(function() {
+            // Simulate squad data (in a real app, this would come from an API)
+            const squadData = {
+                captain: {
+                    name: 'Erling Haaland',
+                    team: 'Man City',
+                    position: 'Forward',
+                    points: 25
+                },
+                captainChanges: [
+                    { from: 'Erling Haaland', to: 'Mohamed Salah', gameweek: 3 },
+                    { from: 'Mohamed Salah', to: 'Erling Haaland', gameweek: 6 }
+                ],
+                transfers: [
+                    { in: 'Cole Palmer', out: 'Raheem Sterling', gameweek: 4 },
+                    { in: 'Ollie Watkins', out: 'Darwin Núñez', gameweek: 7 }
+                ],
+                benchPromotions: [
+                    { player: 'Alphonse Areola', gameweek: 2, reason: 'Starting GK injured' },
+                    { player: 'Tino Livramento', gameweek: 5, reason: 'Form improvement' }
+                ],
+                benchDemotions: [
+                    { player: 'Andre Onana', gameweek: 3, reason: 'Poor form' },
+                    { player: 'Ben Chilwell', gameweek: 8, reason: 'Rotation' }
+                ],
+                totalPoints: 1250,
+                squadValue: 98.5,
+                remainingBudget: 1.5,
+                squadSize: 15
+            };
+            
+            // Populate summary information
+            $('#totalPoints').text(squadData.totalPoints);
+            $('#squadValue').text(squadData.squadValue);
+            $('#remainingBudget').text(squadData.remainingBudget);
+            $('#squadSize').text(squadData.squadSize);
+            
+            // Populate captain information
+            $('#currentCaptain').html(`
+                <div class="status-badge captain">CAPTAIN</div>
+                <h6>${squadData.captain.name}</h6>
+                <p><span class="position-badge fwd">${squadData.captain.position}</span> ${squadData.captain.team}</p>
+                <p><strong>Points: ${squadData.captain.points}</strong></p>
+            `);
+            
+            // Populate captain changes
+            squadData.captainChanges.forEach(change => {
+                $('#captainChanges').append(`
+                    <div class="captain-change">
+                        <strong>GW${change.gameweek}:</strong> ${change.from} → ${change.to}
+                    </div>
+                `);
+            });
+            
+            // Populate transfer history
+            squadData.transfers.forEach(transfer => {
+                $('#transfersIn').append(`
+                    <div class="transfer-item transfer-in">
+                        <strong>GW${transfer.gameweek}:</strong> IN: ${transfer.in}
+                    </div>
+                `);
+                $('#transfersOut').append(`
+                    <div class="transfer-item transfer-out">
+                        <strong>GW${transfer.gameweek}:</strong> OUT: ${transfer.out}
+                    </div>
+                `);
+            });
+            
+            // Populate bench management
+            squadData.benchPromotions.forEach(promotion => {
+                $('#benchPromotions').append(`
+                    <div class="bench-change promotion">
+                        <strong>GW${promotion.gameweek}:</strong> ${promotion.player}
+                        <br><small>${promotion.reason}</small>
+                    </div>
+                `);
+            });
+            
+            squadData.benchDemotions.forEach(demotion => {
+                $('#benchDemotions').append(`
+                    <div class="bench-change demotion">
+                        <strong>GW${demotion.gameweek}:</strong> ${demotion.player}
+                        <br><small>${demotion.reason}</small>
+                    </div>
+                `);
+            });
+            
+            // Simulate player data for each gameweek
+            const players = [
+                { name: 'Alphonse Areola', position: 'Goalkeeper', team: 'West Ham', points: 6 },
+                { name: 'Kieran Trippier', position: 'Defender', team: 'Newcastle', points: 8 },
+                { name: 'William Saliba', position: 'Defender', team: 'Arsenal', points: 7 },
+                { name: 'Virgil van Dijk', position: 'Defender', team: 'Liverpool', points: 6 },
+                { name: 'Destiny Udogie', position: 'Defender', team: 'Spurs', points: 5 },
+                { name: 'Mohamed Salah', position: 'Midfielder', team: 'Liverpool', points: 12 },
+                { name: 'Bukayo Saka', position: 'Midfielder', team: 'Arsenal', points: 9 },
+                { name: 'Phil Foden', position: 'Midfielder', team: 'Man City', points: 8 },
+                { name: 'Cole Palmer', position: 'Midfielder', team: 'Chelsea', points: 7 },
+                { name: 'Erling Haaland', position: 'Forward', team: 'Man City', points: 10 },
+                { name: 'Ollie Watkins', position: 'Forward', team: 'Aston Villa', points: 8 }
+            ];
+            
+            // Populate each gameweek tab
+            for (let gw = 1; gw <= 9; gw++) {
+                const gwPoints = Math.floor(Math.random() * 50) + 60; // Random points between 60-110
+                $(`#gw${gw}Points`).text(gwPoints);
+                
+                const gwPlayersContainer = $(`#gw${gw}Players`);
+                gwPlayersContainer.empty();
+                
+                players.forEach(player => {
+                    const playerPoints = Math.floor(Math.random() * 15) + 2; // Random points between 2-17
+                    const isCaptain = player.name === squadData.captain.name;
+                    const isTransferIn = squadData.transfers.some(t => t.in === player.name);
+                    const isTransferOut = squadData.transfers.some(t => t.out === player.name);
+                    const isBenchPromotion = squadData.benchPromotions.some(b => b.player === player.name);
+                    const isBenchDemotion = squadData.benchDemotions.some(b => b.player === player.name);
+                    
+                    let statusBadge = '';
+                    let cardClass = 'player-card';
+                    
+                    if (isCaptain) {
+                        statusBadge = '<div class="status-badge captain">CAPTAIN</div>';
+                        cardClass += ' captain';
+                    } else if (isTransferIn) {
+                        statusBadge = '<div class="status-badge transfer-in">TRANSFER IN</div>';
+                        cardClass += ' transfer-in';
+                    } else if (isTransferOut) {
+                        statusBadge = '<div class="status-badge transfer-out">TRANSFER OUT</div>';
+                        cardClass += ' transfer-out';
+                    } else if (isBenchPromotion) {
+                        statusBadge = '<div class="status-badge bench-promotion">BENCH PROMOTION</div>';
+                        cardClass += ' bench-promotion';
+                    } else if (isBenchDemotion) {
+                        statusBadge = '<div class="status-badge bench-demotion">BENCH DEMOTION</div>';
+                        cardClass += ' bench-demotion';
+                    }
+                    
+                    const positionClass = {
+                        'Goalkeeper': 'gk',
+                        'Defender': 'def',
+                        'Midfielder': 'mid',
+                        'Forward': 'fwd'
+                    }[player.position];
+                    
+                    gwPlayersContainer.append(`
+                        <div class="${cardClass}">
+                            ${statusBadge}
+                            <h6>${player.name}</h6>
+                            <p><span class="position-badge ${positionClass}">${player.position}</span> ${player.team}</p>
+                            <p><strong>GW${gw} Points: ${playerPoints}</strong></p>
+                        </div>
+                    `);
+                });
+            }
+        });
+    </script>
+</body>
+</html>
