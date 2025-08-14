@@ -207,21 +207,31 @@ class DatabaseManager:
     
     # Fixture operations
     def get_all_fixtures(self) -> List[Fixture]:
-        """Get all fixtures from database"""
+        """Get all fixtures from database with team names"""
         with self._get_connection() as conn:
             cursor = conn.cursor()
             cursor.execute("""
-                SELECT * FROM fixtures ORDER BY gameweek, home_team
+                SELECT f.id, ht.name as home_team, at.name as away_team, 
+                       f.home_difficulty, f.away_difficulty, f.gameweek
+                FROM fixtures f
+                JOIN teams ht ON f.home_team_id = ht.id
+                JOIN teams at ON f.away_team_id = at.id
+                ORDER BY f.gameweek, ht.name
             """)
             rows = cursor.fetchall()
             return [Fixture.from_db_row(row) for row in rows]
     
     def get_fixtures_by_gameweek(self, gameweek: int) -> List[Fixture]:
-        """Get fixtures by gameweek"""
+        """Get fixtures by gameweek with team names"""
         with self._get_connection() as conn:
             cursor = conn.cursor()
             cursor.execute("""
-                SELECT * FROM fixtures WHERE gameweek = ? ORDER BY home_team
+                SELECT f.id, ht.name as home_team, at.name as away_team, 
+                       f.home_difficulty, f.away_difficulty, f.gameweek
+                FROM fixtures f
+                JOIN teams ht ON f.home_team_id = ht.id
+                JOIN teams at ON f.away_team_id = at.id
+                WHERE f.gameweek = ? ORDER BY ht.name
             """, (gameweek,))
             rows = cursor.fetchall()
             return [Fixture.from_db_row(row) for row in rows]
@@ -233,10 +243,10 @@ class DatabaseManager:
                 cursor = conn.cursor()
                 cursor.execute("""
                     INSERT OR REPLACE INTO fixtures (
-                        id, home_team, away_team, home_difficulty, away_difficulty, gameweek
+                        id, home_team_id, away_team_id, home_difficulty, away_difficulty, gameweek
                     ) VALUES (?, ?, ?, ?, ?, ?)
                 """, (
-                    fixture.id, fixture.home_team, fixture.away_team,
+                    fixture.id, fixture.home_team_id, fixture.away_team_id,
                     fixture.home_difficulty, fixture.away_difficulty, fixture.gameweek
                 ))
                 conn.commit()

@@ -433,33 +433,35 @@
             let playersData = [];
             let currentTable = null;
             
-            // Fetch players data from API
-            fetch('/api/players')
-                .then(response => response.json())
-                .then(data => {
-                    playersData = data;
-                    
-                    // Populate team filter dropdown
-                    const teams = [...new Set(data.map(p => p.team))].sort();
-                    teams.forEach(team => {
-                        $('#teamFilter').append(`<option value="${team}">${team}</option>`);
-                    });
-                    
-                    // Initialize DataTable
-                    initializeDataTable();
-                    
-                    // Set up event handlers
-                    setupEventHandlers();
-                    
-                    // Update views dropdown
-                    updateViewsDropdown();
-                })
-                .catch(error => {
-                    console.error('Error fetching players data:', error);
-                    $('#playersTable tbody').html('<tr><td colspan="17" class="text-center text-danger">Error loading data</td></tr>');
-                });
+            // Use players data from template (like the original implementation)
+            const playersData = {{ players|tojson }};
+            console.log('Players data loaded from template:', playersData.length, 'players');
+            console.log('Sample player:', playersData[0]);
+            
+            // Populate team filter dropdown
+            const teams = [...new Set(playersData.map(p => p.team))].sort();
+            teams.forEach(team => {
+                $('#teamFilter').append(`<option value="${team}">${team}</option>`);
+            });
+            
+            // Initialize DataTable
+            initializeDataTable();
+            
+            // Set up event handlers
+            setupEventHandlers();
+            
+            // Update views dropdown
+            updateViewsDropdown();
             
             function initializeDataTable() {
+                console.log('Initializing DataTable with', playersData.length, 'players');
+                console.log('First player data:', playersData[0]);
+                
+                // Destroy existing table if it exists
+                if (currentTable) {
+                    currentTable.destroy();
+                }
+                
                 currentTable = $('#playersTable').DataTable({
                     data: playersData,
                     columns: [

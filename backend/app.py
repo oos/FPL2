@@ -35,17 +35,22 @@ def create_app(config_name='default'):
         players = db_manager.get_all_players()
         teams = db_manager.get_all_teams()
         
+        # Convert Player objects to dictionaries for template
+        players_data = [player.to_dict() for player in players]
+        
         # Get unique positions and teams for dropdowns
         positions = ['Goalkeeper', 'Defender', 'Midfielder', 'Forward']
         team_names = [team.name for team in teams]
         
-        return render_template('players.html', players=players, team_names=team_names)
+        return render_template('players.html', players=players_data, team_names=team_names)
     
     # Squad page route
     @app.route('/squad')
     def squad_page():
         """Serve the original squad page"""
         return render_template('squad.html')
+    
+
     
     # Legacy API routes for backward compatibility
     @app.route('/api/players', methods=['GET'])
