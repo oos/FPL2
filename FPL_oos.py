@@ -25,145 +25,156 @@ def fetch_fpl_data():
         print(f"Error fetching FPL data: {e}")
         return {}, {}, []
 
-# Fetch player data from FPL API
-def fetch_players_data():
-    """Fetch player data from FPL API"""
+# Fetch player data from unified database
+def create_and_populate_players_table(conn):
+    """Create and populate the players table with hardcoded data"""
     try:
-        response = requests.get("https://fantasy.premierleague.com/api/bootstrap-static/")
-        if response.status_code == 200:
-            data = response.json()
-            players = data.get("elements", [])
-            teams = data.get("teams", [])
-            
-            # Create team mapping
-            team_map = {t["id"]: t["name"] for t in teams}
-            
-            # Process players data
-            players_data = []
-            for player in players:
-                if player.get("status") == "a":  # Only active players
-                    player_info = {
-                        "id": player.get("id"),
-                        "name": player.get("web_name", ""),
-                        "full_name": player.get("first_name", "") + " " + player.get("second_name", ""),
-                        "position": player.get("element_type"),
-                        "team": team_map.get(player.get("team"), "Unknown"),
-                        "price": player.get("now_cost", 0) / 10.0,  # Convert from 0.1M units
-                        "total_points": player.get("total_points", 0),
-                        "form": float(player.get("form", "0.0")),
-                        "points_per_game": player.get("points_per_game", "0.0"),
-                        "selected_by_percent": player.get("selected_by_percent", "0.0"),
-                        "transfers_in": player.get("transfers_in", 0),
-                        "transfers_out": player.get("transfers_out", 0),
-                        "influence": player.get("influence", "0.0"),
-                        "creativity": player.get("creativity", "0.0"),
-                        "threat": player.get("threat", "0.0"),
-                        "ict_index": player.get("ict_index", "0.0"),
-                        "chance_of_playing_next_round": player.get("chance_of_playing_next_round") or 100,
-                        "news": player.get("news", ""),
-                        "injury_status": player.get("news", "No injury concerns")
-                    }
-                    
-                    # Add position names
-                    position_names = {1: "Goalkeeper", 2: "Defender", 3: "Midfielder", 4: "Forward"}
-                    player_info["position_name"] = position_names.get(player_info["position"], "Unknown")
-                    
-                    # Calculate expected points for GW1-9 (simplified calculation)
-                    base_points = float(player_info["points_per_game"]) if player_info["points_per_game"] != "0.0" else 4.0
-                    player_info["gw1_9_points"] = [round(base_points * (0.8 + 0.4 * (i % 3)), 1) for i in range(9)]
-                    player_info["total_gw1_9"] = sum(player_info["gw1_9_points"])
-                    
-                    # Calculate efficiency metrics
-                    player_info["points_per_million"] = player_info["total_gw1_9"] / player_info["price"] if player_info["price"] > 0 else 0
-                    
-                    players_data.append(player_info)
-            
-            # Add the additional top 100 players with their specific expected points
-            additional_players = get_additional_top_players()
-            players_data.extend(additional_players)
-            
-            return players_data
-        else:
-            print(f"Error fetching players data: {response.status_code}")
-            return []
+        # Drop existing table to clear all data
+        conn.execute("DROP TABLE IF EXISTS players")
+        
+        # Create players table with all required fields
+        conn.execute("""
+            CREATE TABLE players (
+                id INTEGER PRIMARY KEY,
+                name TEXT,
+                position_name TEXT,
+                team TEXT,
+                price REAL,
+                availability TEXT,
+                uncertainty_percent TEXT,
+                overall_total REAL,
+                gw1_points REAL,
+                gw2_points REAL,
+                gw3_points REAL,
+                gw4_points REAL,
+                gw5_points REAL,
+                gw6_points REAL,
+                gw7_points REAL,
+                gw8_points REAL,
+                gw9_points REAL,
+                points_per_million REAL,
+                chance_of_playing_next_round INTEGER
+            )
+        """)
+        
+        # Get the hardcoded data
+        hardcoded_players = get_additional_top_players()
+        
+        # Insert all players
+        for player in hardcoded_players:
+            conn.execute("""
+                INSERT INTO players (id, name, position_name, team, price, availability, uncertainty_percent, overall_total, 
+                                   gw1_points, gw2_points, gw3_points, gw4_points, gw5_points, gw6_points, gw7_points, gw8_points, gw9_points,
+                                   points_per_million, chance_of_playing_next_round)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """, (
+                player.get("id"),
+                player.get("name"),
+                player.get("position_name"),
+                player.get("team"),
+                player.get("price"),
+                "Available",  # Default availability
+                player.get("ownership", "24%"),  # Use ownership as uncertainty_percent
+                player.get("total_gw1_9"),
+                player.get("gw1_9_points", [0.0] * 9)[0],  # GW1
+                player.get("gw1_9_points", [0.0] * 9)[1],  # GW2
+                player.get("gw1_9_points", [0.0] * 9)[2],  # GW3
+                player.get("gw1_9_points", [0.0] * 9)[3],  # GW4
+                player.get("gw1_9_points", [0.0] * 9)[4],  # GW5
+                player.get("gw1_9_points", [0.0] * 9)[5],  # GW6
+                player.get("gw1_9_points", [0.0] * 9)[6],  # GW7
+                player.get("gw1_9_points", [0.0] * 9)[7],  # GW8
+                player.get("gw1_9_points", [0.0] * 9)[8],  # GW9
+                player.get("points_per_million"),
+                player.get("chance_of_playing_next_round", 100)
+            ))
+        
+        conn.commit()
+        print(f"Players table cleared and populated with {len(hardcoded_players)} players")
+        
     except Exception as e:
-        print(f"Error fetching players data: {e}")
+        print(f"Error creating players table: {e}")
+
+def fetch_players_data():
+    """Fetch player data from unified database"""
+    try:
+        import sqlite3
+        conn = sqlite3.connect("fpl_oos.db")
+        
+        # Force recreate the players table to clear all data
+        print("Forcing recreation of players table to clear all data...")
+        conn.execute("DROP TABLE IF EXISTS players")
+        create_and_populate_players_table(conn)
+        
+        # Read players data from database
+        cursor = conn.execute("""
+            SELECT id, name, position_name, team, price, availability, uncertainty_percent, overall_total,
+                   gw1_points, gw2_points, gw3_points, gw4_points, gw5_points, gw6_points, gw7_points, gw8_points, gw9_points,
+                   points_per_million, chance_of_playing_next_round
+            FROM players
+            ORDER BY overall_total DESC
+        """)
+        
+        players_data = []
+        for row in cursor.fetchall():
+            # Reconstruct gw1_9_points array from individual GW fields
+            gw1_9_points = [row[8], row[9], row[10], row[11], row[12], row[13], row[14], row[15], row[16]]
+            
+            player = {
+                "id": row[0],
+                "name": row[1],
+                "position_name": row[2],
+                "team": row[3],
+                "price": row[4],
+                "availability": row[5],
+                "uncertainty_percent": row[6],
+                "total_gw1_9": row[7],
+                "gw1_9_points": gw1_9_points,
+                "points_per_million": row[17],
+                "chance_of_playing_next_round": row[18],
+                "ownership": row[6]  # Use uncertainty_percent as ownership for compatibility
+            }
+            players_data.append(player)
+        
+        conn.close()
+        
+        print(f"Loaded {len(players_data)} players from unified database")
+        
+        # Debug: Check for duplicates
+        names = [p["name"] for p in players_data]
+        salah_count = names.count("M.Salah")
+        print(f"Salah entries found: {salah_count}")
+        
+        if salah_count > 1:
+            print("Duplicate Salah entries found in database:")
+            for i, p in enumerate(players_data):
+                if p["name"] == "M.Salah":
+                    print(f"  Entry {i}: {p}")
+        
+        return players_data
+        
+    except Exception as e:
+        print(f"Error loading players data: {e}")
         return []
 
 def get_additional_top_players():
-    """Get the additional top 400 players with their specific expected points"""
+    """Get the complete list of players with their specific expected points from the provided data"""
+    # For now, just return M.Salah as a test
     return [
-        # Top 20 players (existing)
-        {"id": 1001, "name": "M.Salah", "position_name": "Midfielder", "team": "Liverpool", "price": 14.5, "form": 0.0, "gw1_9_points": [6.7, 6.1, 5.6, 7.0, 6.6, 5.7, 5.7, 7.4, 6.2], "total_gw1_9": 57.0, "points_per_million": 3.93, "chance_of_playing_next_round": 100, "ownership": "24%"},
-        {"id": 1002, "name": "Haaland", "position_name": "Forward", "team": "Man City", "price": 14.0, "form": 0.0, "gw1_9_points": [5.1, 6.3, 5.1, 5.8, 3.8, 6.6, 4.8, 5.1, 4.4], "total_gw1_9": 47.0, "points_per_million": 3.36, "chance_of_playing_next_round": 100},
-        {"id": 1003, "name": "Palmer", "position_name": "Midfielder", "team": "Chelsea", "price": 10.5, "form": 0.0, "gw1_9_points": [5.1, 4.9, 5.5, 4.6, 4.3, 5.9, 4.4, 4.3, 6.7], "total_gw1_9": 45.8, "points_per_million": 4.36, "chance_of_playing_next_round": 100},
-        {"id": 1004, "name": "Watkins", "position_name": "Forward", "team": "Aston Villa", "price": 9.0, "form": 0.0, "gw1_9_points": [5.2, 4.6, 4.8, 4.1, 5.7, 5.2, 6.6, 4.5, 4.1], "total_gw1_9": 44.9, "points_per_million": 4.99, "chance_of_playing_next_round": 100},
-        {"id": 1005, "name": "Isak", "position_name": "Forward", "team": "Newcastle", "price": 10.5, "form": 0.0, "gw1_9_points": [4.4, 4.5, 5.8, 5.7, 4.7, 4.1, 5.4, 4.7, 5.4], "total_gw1_9": 44.6, "points_per_million": 4.25, "chance_of_playing_next_round": 100},
-        {"id": 1006, "name": "Wood", "position_name": "Forward", "team": "Nott'm Forest", "price": 7.5, "form": 0.0, "gw1_9_points": [4.8, 3.9, 5.2, 3.2, 4.8, 5.8, 3.9, 4.6, 4.0], "total_gw1_9": 40.3, "points_per_million": 5.37, "chance_of_playing_next_round": 100},
-        {"id": 1007, "name": "Eze", "position_name": "Midfielder", "team": "Crystal Palace", "price": 7.5, "form": 0.0, "gw1_9_points": [4.1, 4.8, 4.0, 5.8, 4.4, 4.2, 4.0, 4.9, 3.4], "total_gw1_9": 39.4, "points_per_million": 5.25, "chance_of_playing_next_round": 100},
-        {"id": 1008, "name": "Saka", "position_name": "Midfielder", "team": "Arsenal", "price": 10.0, "form": 0.0, "gw1_9_points": [3.9, 5.9, 3.3, 4.8, 3.4, 3.7, 4.6, 3.6, 4.5], "total_gw1_9": 37.8, "points_per_million": 3.78, "chance_of_playing_next_round": 100},
-        {"id": 1009, "name": "Evanilson", "position_name": "Forward", "team": "Fulham", "price": 7.0, "form": 0.0, "gw1_9_points": [3.4, 4.6, 3.9, 4.2, 4.3, 4.7, 4.0, 3.6, 4.2], "total_gw1_9": 36.9, "points_per_million": 5.27, "chance_of_playing_next_round": 100},
-        {"id": 1010, "name": "Wissa", "position_name": "Forward", "team": "Brentford", "price": 7.5, "form": 0.0, "gw1_9_points": [3.8, 4.4, 4.7, 4.0, 3.7, 4.5, 3.8, 4.1, 3.7], "total_gw1_9": 36.6, "points_per_million": 4.88, "chance_of_playing_next_round": 100},
-        {"id": 1011, "name": "B.Fernandes", "position_name": "Midfielder", "team": "Man Utd", "price": 9.0, "form": 0.0, "gw1_9_points": [3.4, 3.7, 4.9, 3.1, 4.1, 3.8, 5.3, 2.9, 4.1], "total_gw1_9": 35.4, "points_per_million": 3.93, "chance_of_playing_next_round": 100},
-        {"id": 1012, "name": "Virgil", "position_name": "Defender", "team": "Liverpool", "price": 6.0, "form": 0.0, "gw1_9_points": [4.2, 3.2, 3.5, 4.4, 4.6, 3.7, 3.3, 4.4, 3.8], "total_gw1_9": 35.1, "points_per_million": 5.85, "chance_of_playing_next_round": 100},
-        {"id": 1013, "name": "Gibbs-White", "position_name": "Midfielder", "team": "Nott'm Forest", "price": 7.5, "form": 0.0, "gw1_9_points": [4.3, 3.5, 4.4, 2.9, 4.2, 5.2, 3.4, 3.9, 3.4], "total_gw1_9": 35.1, "points_per_million": 4.68, "chance_of_playing_next_round": 100},
-        {"id": 1014, "name": "Strand Larsen", "position_name": "Forward", "team": "Wolves", "price": 6.5, "form": 0.0, "gw1_9_points": [3.2, 3.5, 3.7, 3.4, 5.1, 3.5, 3.8, 4.3, 4.4], "total_gw1_9": 34.8, "points_per_million": 5.35, "chance_of_playing_next_round": 100},
-        {"id": 1015, "name": "Rice", "position_name": "Midfielder", "team": "Arsenal", "price": 6.5, "form": 0.0, "gw1_9_points": [3.7, 5.0, 3.1, 4.1, 3.4, 3.5, 4.1, 3.6, 4.0], "total_gw1_9": 34.4, "points_per_million": 5.29, "chance_of_playing_next_round": 100},
-        {"id": 1016, "name": "Rogers", "position_name": "Midfielder", "team": "Aston Villa", "price": 7.0, "form": 0.0, "gw1_9_points": [1.1, 4.0, 4.2, 3.7, 4.4, 4.2, 5.2, 3.7, 3.3], "total_gw1_9": 33.7, "points_per_million": 4.81, "chance_of_playing_next_round": 100},
-        {"id": 1017, "name": "Sánchez", "position_name": "Goalkeeper", "team": "Chelsea", "price": 5.0, "form": 0.0, "gw1_9_points": [4.0, 3.7, 4.0, 3.5, 3.7, 3.9, 3.3, 3.3, 4.3], "total_gw1_9": 33.7, "points_per_million": 6.74, "chance_of_playing_next_round": 100},
-        {"id": 1018, "name": "Welbeck", "position_name": "Forward", "team": "Brighton", "price": 6.5, "form": 0.0, "gw1_9_points": [4.1, 3.3, 3.6, 3.4, 4.1, 3.3, 4.0, 4.2, 3.5], "total_gw1_9": 33.5, "points_per_million": 5.15, "chance_of_playing_next_round": 100},
-        {"id": 1019, "name": "Mac Allister", "position_name": "Midfielder", "team": "Liverpool", "price": 6.5, "form": 0.0, "gw1_9_points": [4.0, 3.5, 3.2, 4.0, 3.9, 3.6, 3.2, 4.1, 3.7], "total_gw1_9": 33.4, "points_per_million": 5.14, "chance_of_playing_next_round": 100},
-        {"id": 1020, "name": "Petrović", "position_name": "Goalkeeper", "team": "Chelsea", "price": 4.5, "form": 0.0, "gw1_9_points": [3.4, 3.9, 3.3, 4.0, 3.5, 3.8, 3.8, 3.9, 3.8], "total_gw1_9": 33.3, "points_per_million": 7.40, "chance_of_playing_next_round": 100},
-        
-        # Next 100 players (11.9 - 6.0 range)
-        {"id": 1021, "name": "Rodon", "position_name": "Defender", "team": "Leeds", "price": 4.0, "form": 0.0, "gw1_9_points": [2.8, 1.3, 1.8, 1.9, 1.8, 2.3, 1.8, 1.8, 2.3], "total_gw1_9": 11.9, "points_per_million": 2.98, "chance_of_playing_next_round": 100},
-        {"id": 1022, "name": "Lucas Pires", "position_name": "Defender", "team": "Bournemouth", "price": 4.0, "form": 0.0, "gw1_9_points": [1.6, 3.0, 1.9, 1.6, 2.3, 1.4, 1.6, 2.3, 1.4], "total_gw1_9": 11.9, "points_per_million": 2.98, "chance_of_playing_next_round": 100},
-        {"id": 1023, "name": "Livramento", "position_name": "Defender", "team": "Newcastle", "price": 5.0, "form": 0.0, "gw1_9_points": [1.7, 1.6, 2.5, 2.3, 1.9, 1.9, 1.7, 1.6, 2.5], "total_gw1_9": 11.8, "points_per_million": 2.36, "chance_of_playing_next_round": 100},
-        {"id": 1024, "name": "Bogle", "position_name": "Defender", "team": "Sheffield Utd", "price": 4.5, "form": 0.0, "gw1_9_points": [2.8, 1.0, 1.9, 1.8, 1.9, 2.3, 2.8, 1.0, 1.9], "total_gw1_9": 11.8, "points_per_million": 2.62, "chance_of_playing_next_round": 100},
-        {"id": 1025, "name": "Tavernier", "position_name": "Midfielder", "team": "Bournemouth", "price": 5.5, "form": 0.0, "gw1_9_points": [2.3, 2.0, 1.5, 1.9, 2.0, 2.0, 2.3, 2.0, 1.5], "total_gw1_9": 11.8, "points_per_million": 2.15, "chance_of_playing_next_round": 100},
-        {"id": 1026, "name": "Munetsi", "position_name": "Midfielder", "team": "Luton", "price": 5.5, "form": 0.0, "gw1_9_points": [1.8, 1.7, 2.2, 1.6, 2.6, 1.8, 1.8, 1.7, 2.2], "total_gw1_9": 11.8, "points_per_million": 2.15, "chance_of_playing_next_round": 100},
-        {"id": 1027, "name": "Wieffer", "position_name": "Midfielder", "team": "Brighton", "price": 5.0, "form": 0.0, "gw1_9_points": [2.3, 2.2, 1.7, 1.9, 2.0, 1.6, 2.3, 2.2, 1.7], "total_gw1_9": 11.8, "points_per_million": 2.36, "chance_of_playing_next_round": 100},
-        {"id": 1028, "name": "Merino", "position_name": "Midfielder", "team": "Real Sociedad", "price": 6.0, "form": 0.0, "gw1_9_points": [1.8, 2.6, 1.6, 2.1, 1.7, 1.8, 1.8, 2.6, 1.6], "total_gw1_9": 11.7, "points_per_million": 1.95, "chance_of_playing_next_round": 100},
-        {"id": 1029, "name": "Shaw", "position_name": "Defender", "team": "Man Utd", "price": 4.5, "form": 0.0, "gw1_9_points": [1.8, 2.0, 2.6, 1.5, 1.8, 1.7, 1.8, 2.0, 2.6], "total_gw1_9": 11.4, "points_per_million": 2.53, "chance_of_playing_next_round": 100},
-        {"id": 1030, "name": "Trafford", "position_name": "Goalkeeper", "team": "Burnley", "price": 5.0, "form": 0.0, "gw1_9_points": [1.9, 1.5, 1.4, 2.7, 1.3, 2.6, 1.9, 1.5, 1.4], "total_gw1_9": 11.4, "points_per_million": 2.28, "chance_of_playing_next_round": 100},
-        
-        # Continue with more players...
-        {"id": 1031, "name": "Areola", "position_name": "Goalkeeper", "team": "West Ham", "price": 4.5, "form": 0.0, "gw1_9_points": [1.4, 2.4, 1.9, 1.3, 2.1, 2.3, 1.4, 2.4, 1.9], "total_gw1_9": 11.3, "points_per_million": 2.51, "chance_of_playing_next_round": 100},
-        {"id": 1032, "name": "Byram", "position_name": "Defender", "team": "Leeds", "price": 4.0, "form": 0.0, "gw1_9_points": [2.7, 1.1, 1.7, 1.7, 1.7, 2.2, 2.7, 1.1, 1.7], "total_gw1_9": 11.0, "points_per_million": 2.75, "chance_of_playing_next_round": 100},
-        {"id": 1033, "name": "J.Ramsey", "position_name": "Midfielder", "team": "Aston Villa", "price": 5.5, "form": 0.0, "gw1_9_points": [2.0, 1.8, 1.8, 1.6, 1.9, 1.9, 2.0, 1.8, 1.8], "total_gw1_9": 11.0, "points_per_million": 2.00, "chance_of_playing_next_round": 100},
-        {"id": 1034, "name": "Onyeka", "position_name": "Midfielder", "team": "Brentford", "price": 5.0, "form": 0.0, "gw1_9_points": [2.2, 1.6, 1.8, 1.8, 1.8, 1.8, 2.2, 1.6, 1.8], "total_gw1_9": 11.0, "points_per_million": 2.20, "chance_of_playing_next_round": 100},
-        {"id": 1035, "name": "Maatsen", "position_name": "Defender", "team": "Chelsea", "price": 4.5, "form": 0.0, "gw1_9_points": [2.0, 1.6, 2.1, 1.6, 1.7, 1.9, 2.0, 1.6, 2.1], "total_gw1_9": 10.9, "points_per_million": 2.42, "chance_of_playing_next_round": 100},
-        
-        # Continue with more players (11.0 - 6.0 range)
-        {"id": 1036, "name": "Kayode", "position_name": "Defender", "team": "Crystal Palace", "price": 4.5, "form": 0.0, "gw1_9_points": [1.5, 1.6, 1.8, 1.7, 1.6, 2.3, 1.5, 1.6, 1.8], "total_gw1_9": 10.5, "points_per_million": 2.33, "chance_of_playing_next_round": 100},
-        {"id": 1037, "name": "Adingra", "position_name": "Midfielder", "team": "Brighton", "price": 5.5, "form": 0.0, "gw1_9_points": [1.8, 1.8, 1.9, 1.8, 1.7, 1.5, 1.8, 1.8, 1.9], "total_gw1_9": 10.5, "points_per_million": 1.91, "chance_of_playing_next_round": 100},
-        {"id": 1038, "name": "Xhaka", "position_name": "Midfielder", "team": "Bayer Leverkusen", "price": 5.0, "form": 0.0, "gw1_9_points": [1.9, 1.9, 1.7, 1.6, 1.9, 1.4, 1.9, 1.9, 1.7], "total_gw1_9": 10.4, "points_per_million": 2.08, "chance_of_playing_next_round": 100},
-        {"id": 1039, "name": "Kiwior", "position_name": "Defender", "team": "Arsenal", "price": 5.5, "form": 0.0, "gw1_9_points": [1.7, 2.2, 1.4, 1.9, 1.7, 1.5, 1.7, 2.2, 1.4], "total_gw1_9": 10.4, "points_per_million": 1.89, "chance_of_playing_next_round": 100},
-        {"id": 1040, "name": "Garnacho", "position_name": "Midfielder", "team": "Man Utd", "price": 6.5, "form": 0.0, "gw1_9_points": [1.5, 1.7, 2.2, 1.4, 1.8, 1.8, 1.5, 1.7, 2.2], "total_gw1_9": 10.4, "points_per_million": 1.60, "chance_of_playing_next_round": 100},
-        
-        # Players with 10.4 - 6.0 range
-        {"id": 1041, "name": "Adama", "position_name": "Midfielder", "team": "Fulham", "price": 5.5, "form": 0.0, "gw1_9_points": [1.8, 1.9, 1.3, 2.0, 1.9, 1.5, 1.8, 1.9, 1.3], "total_gw1_9": 10.4, "points_per_million": 1.89, "chance_of_playing_next_round": 100},
-        {"id": 1042, "name": "Yates", "position_name": "Midfielder", "team": "Nott'm Forest", "price": 5.0, "form": 0.0, "gw1_9_points": [2.1, 1.6, 2.0, 1.4, 1.6, 1.7, 2.1, 1.6, 2.0], "total_gw1_9": 10.4, "points_per_million": 2.08, "chance_of_playing_next_round": 100},
-        {"id": 1043, "name": "Isidor", "position_name": "Forward", "team": "Lille", "price": 5.5, "form": 0.0, "gw1_9_points": [1.9, 1.8, 1.8, 1.5, 1.7, 1.6, 1.9, 1.8, 1.8], "total_gw1_9": 10.3, "points_per_million": 1.87, "chance_of_playing_next_round": 100},
-        {"id": 1044, "name": "Christie", "position_name": "Midfielder", "team": "Bournemouth", "price": 5.0, "form": 0.0, "gw1_9_points": [0.0, 0.9, 2.4, 2.4, 2.2, 2.4, 0.0, 0.9, 2.4], "total_gw1_9": 10.3, "points_per_million": 2.06, "chance_of_playing_next_round": 100},
-        {"id": 1045, "name": "N.Gonzalez", "position_name": "Midfielder", "team": "Fiorentina", "price": 6.0, "form": 0.0, "gw1_9_points": [1.9, 2.1, 1.5, 1.7, 1.4, 1.8, 1.9, 2.1, 1.5], "total_gw1_9": 10.3, "points_per_million": 1.72, "chance_of_playing_next_round": 100},
-        
-        # Continue with more players...
-        {"id": 1100, "name": "Nypan", "position_name": "Midfielder", "team": "Unknown", "price": 5.0, "form": 0.0, "gw1_9_points": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "total_gw1_9": 0.0, "points_per_million": 0.0, "chance_of_playing_next_round": 100},
-        {"id": 1101, "name": "Harrison", "position_name": "Goalkeeper", "team": "Unknown", "price": 4.0, "form": 0.0, "gw1_9_points": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "total_gw1_9": 0.0, "points_per_million": 0.0, "chance_of_playing_next_round": 100},
-        {"id": 1102, "name": "Mee", "position_name": "Goalkeeper", "team": "Unknown", "price": 4.0, "form": 0.0, "gw1_9_points": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "total_gw1_9": 0.0, "points_per_million": 0.0, "chance_of_playing_next_round": 100},
-        {"id": 1103, "name": "Martinez", "position_name": "Defender", "team": "Unknown", "price": 5.0, "form": 0.0, "gw1_9_points": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "total_gw1_9": 0.0, "points_per_million": 0.0, "chance_of_playing_next_round": 100},
-        {"id": 1104, "name": "D.Leon", "position_name": "Defender", "team": "Unknown", "price": 4.5, "form": 0.0, "gw1_9_points": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "total_gw1_9": 0.0, "points_per_million": 0.0, "chance_of_playing_next_round": 100},
-        {"id": 1105, "name": "Rashford", "position_name": "Midfielder", "team": "Man Utd", "price": 7.0, "form": 0.0, "gw1_9_points": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "total_gw1_9": 0.0, "points_per_million": 0.0, "chance_of_playing_next_round": 100},
-        {"id": 1106, "name": "Fitzgerald", "position_name": "Midfielder", "team": "Unknown", "price": 4.5, "form": 0.0, "gw1_9_points": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "total_gw1_9": 0.0, "points_per_million": 0.0, "chance_of_playing_next_round": 100},
-        {"id": 1107, "name": "J.Fletcher", "position_name": "Midfielder", "team": "Unknown", "price": 4.5, "form": 0.0, "gw1_9_points": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "total_gw1_9": 0.0, "points_per_million": 0.0, "chance_of_playing_next_round": 100},
-        {"id": 1108, "name": "Kone", "position_name": "Midfielder", "team": "Unknown", "price": 4.5, "form": 0.0, "gw1_9_points": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "total_gw1_9": 0.0, "points_per_million": 0.0, "chance_of_playing_next_round": 100},
-        {"id": 1109, "name": "Moorhouse", "position_name": "Midfielder", "team": "Unknown", "price": 4.5, "form": 0.0, "gw1_9_points": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "total_gw1_9": 0.0, "points_per_million": 0.0, "chance_of_playing_next_round": 100},
-        {"id": 1110, "name": "Wheatley", "position_name": "Forward", "team": "Unknown", "price": 4.5, "form": 0.0, "gw1_9_points": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "total_gw1_9": 0.0, "points_per_million": 0.0, "chance_of_playing_next_round": 100},
-        
-        # Final players with 0.0 points
-        {"id": 1200, "name": "Diakité", "position_name": "Defender", "team": "Unknown", "price": 4.5, "form": 0.0, "gw1_9_points": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "total_gw1_9": 0.0, "points_per_million": 0.0, "chance_of_playing_next_round": 100}
+        {
+            "id": 1001, 
+            "name": "M.Salah", 
+            "position_name": "Midfielder", 
+            "team": "Liverpool", 
+            "price": 14.5, 
+            "gw1_9_points": [6.7, 6.1, 5.6, 7.0, 6.6, 5.7, 5.7, 7.4, 6.2], 
+            "total_gw1_9": 57.0, 
+            "points_per_million": 3.93, 
+            "chance_of_playing_next_round": 100, 
+            "ownership": "24%"
+        }
     ]
+        
 
 # Build FDR DataFrame
 def build_fdr_dataframe():
@@ -214,12 +225,12 @@ def build_fdr_dataframe():
 
     df = pd.DataFrame(rows).set_index("team")
     
-    # Save to SQLite database
+    # Save to unified database
     try:
-        conn = sqlite3.connect("fpl_fdr.db")
+        conn = sqlite3.connect("fpl_oos.db")
         df.to_sql("fdr_with_opponents", conn, if_exists="replace")
         conn.close()
-        print("FDR data saved to database successfully")
+        print("FDR data saved to unified database successfully")
     except Exception as e:
         print(f"Error saving to database: {e}")
     
@@ -644,6 +655,46 @@ def players_table():
                     font-size: 0.9em;
                 }
                 
+                /* Force DataTable column widths to match sort controls exactly */
+                #playersTable th:nth-child(1) { width: 40px !important; min-width: 40px !important; max-width: 40px !important; }
+                #playersTable th:nth-child(2) { width: 120px !important; min-width: 120px !important; max-width: 120px !important; }
+                #playersTable th:nth-child(3) { width: 60px !important; min-width: 60px !important; max-width: 60px !important; }
+                #playersTable th:nth-child(4) { width: 80px !important; min-width: 80px !important; max-width: 80px !important; }
+                #playersTable th:nth-child(5) { width: 70px !important; min-width: 70px !important; max-width: 70px !important; }
+                #playersTable th:nth-child(6) { width: 50px !important; min-width: 50px !important; max-width: 50px !important; }
+                #playersTable th:nth-child(7) { width: 80px !important; min-width: 80px !important; max-width: 80px !important; }
+                #playersTable th:nth-child(8) { width: 70px !important; min-width: 70px !important; max-width: 70px !important; }
+                #playersTable th:nth-child(9) { width: 80px !important; min-width: 80px !important; max-width: 80px !important; }
+                #playersTable th:nth-child(10) { width: 45px !important; min-width: 45px !important; max-width: 45px !important; }
+                #playersTable th:nth-child(11) { width: 45px !important; min-width: 45px !important; max-width: 45px !important; }
+                #playersTable th:nth-child(12) { width: 45px !important; min-width: 45px !important; max-width: 45px !important; }
+                #playersTable th:nth-child(13) { width: 45px !important; min-width: 45px !important; max-width: 45px !important; }
+                #playersTable th:nth-child(14) { width: 45px !important; min-width: 45px !important; max-width: 45px !important; }
+                #playersTable th:nth-child(15) { width: 45px !important; min-width: 45px !important; max-width: 45px !important; }
+                #playersTable th:nth-child(16) { width: 45px !important; min-width: 45px !important; max-width: 45px !important; }
+                #playersTable th:nth-child(17) { width: 45px !important; min-width: 45px !important; max-width: 45px !important; }
+                #playersTable th:nth-child(18) { width: 45px !important; min-width: 45px !important; max-width: 45px !important; }
+                
+                /* Ensure sort controls table columns match exactly */
+                .sort-controls-table th:nth-child(1) { width: 40px !important; min-width: 40px !important; max-width: 40px !important; }
+                .sort-controls-table th:nth-child(2) { width: 120px !important; min-width: 120px !important; max-width: 120px !important; }
+                .sort-controls-table th:nth-child(3) { width: 60px !important; min-width: 60px !important; max-width: 60px !important; }
+                .sort-controls-table th:nth-child(4) { width: 80px !important; min-width: 80px !important; max-width: 80px !important; }
+                .sort-controls-table th:nth-child(5) { width: 70px !important; min-width: 70px !important; max-width: 70px !important; }
+                .sort-controls-table th:nth-child(6) { width: 50px !important; min-width: 50px !important; max-width: 50px !important; }
+                .sort-controls-table th:nth-child(7) { width: 80px !important; min-width: 80px !important; max-width: 80px !important; }
+                .sort-controls-table th:nth-child(8) { width: 70px !important; min-width: 70px !important; max-width: 70px !important; }
+                .sort-controls-table th:nth-child(9) { width: 80px !important; min-width: 80px !important; max-width: 80px !important; }
+                .sort-controls-table th:nth-child(10) { width: 45px !important; min-width: 45px !important; max-width: 45px !important; }
+                .sort-controls-table th:nth-child(11) { width: 45px !important; min-width: 45px !important; max-width: 45px !important; }
+                .sort-controls-table th:nth-child(12) { width: 45px !important; min-width: 45px !important; max-width: 45px !important; }
+                .sort-controls-table th:nth-child(13) { width: 45px !important; min-width: 45px !important; max-width: 45px !important; }
+                .sort-controls-table th:nth-child(14) { width: 45px !important; min-width: 45px !important; max-width: 45px !important; }
+                .sort-controls-table th:nth-child(15) { width: 45px !important; min-width: 45px !important; max-width: 45px !important; }
+                .sort-controls-table th:nth-child(16) { width: 45px !important; min-width: 45px !important; max-width: 45px !important; }
+                .sort-controls-table th:nth-child(17) { width: 45px !important; min-width: 45px !important; max-width: 45px !important; }
+                .sort-controls-table th:nth-child(18) { width: 45px !important; min-width: 45px !important; max-width: 45px !important; }
+                
                 /* Enhanced sorting styles */
                 .sort-level {
                     display: inline-block;
@@ -904,78 +955,78 @@ def players_table():
                 <!-- Sort Controls - Positioned directly above the table -->
                 <div class="mb-2">
                     <div class="table-responsive">
-                        <table class="table table-sm table-bordered" style="width: 100%; margin-bottom: 0;">
+                        <table class="table table-sm table-bordered sort-controls-table" style="width: 100%; margin-bottom: 0;">
                             <thead>
                                 <tr>
-                                    <th style="width: 40px; text-align: center; padding: 2px;">
+                                    <th style="text-align: center; padding: 2px;">
                                         <button class="btn btn-sm btn-outline-primary" onclick="addSortLevel(0, 'asc')" style="width: 20px; height: 20px; padding: 0; font-size: 10px;">↑</button>
                                         <button class="btn btn-sm btn-outline-secondary" onclick="addSortLevel(0, 'desc')" style="width: 20px; height: 20px; padding: 0; font-size: 10px;">↓</button>
                                     </th>
-                                    <th style="width: 120px; text-align: center; padding: 2px;">
+                                    <th style="text-align: center; padding: 2px;">
                                         <button class="btn btn-sm btn-outline-primary" onclick="addSortLevel(1, 'asc')" style="width: 20px; height: 20px; padding: 0; font-size: 10px;">↑</button>
                                         <button class="btn btn-sm btn-outline-secondary" onclick="addSortLevel(1, 'desc')" style="width: 20px; height: 20px; padding: 0; font-size: 10px;">↓</button>
                                     </th>
-                                    <th style="width: 60px; text-align: center; padding: 2px;">
+                                    <th style="text-align: center; padding: 2px;">
                                         <button class="btn btn-sm btn-outline-primary" onclick="addSortLevel(2, 'asc')" style="width: 20px; height: 20px; padding: 0; font-size: 10px;">↑</button>
                                         <button class="btn btn-sm btn-outline-secondary" onclick="addSortLevel(2, 'desc')" style="width: 20px; height: 20px; padding: 0; font-size: 10px;">↓</button>
                                     </th>
-                                    <th style="width: 80px; text-align: center; padding: 2px;">
+                                    <th style="text-align: center; padding: 2px;">
                                         <button class="btn btn-sm btn-outline-primary" onclick="addSortLevel(3, 'asc')" style="width: 20px; height: 20px; padding: 0; font-size: 10px;">↑</button>
                                         <button class="btn btn-sm btn-outline-secondary" onclick="addSortLevel(3, 'desc')" style="width: 20px; height: 20px; padding: 0; font-size: 10px;">↓</button>
                                     </th>
-                                    <th style="width: 70px; text-align: center; padding: 2px;">
+                                    <th style="text-align: center; padding: 2px;">
                                         <button class="btn btn-sm btn-outline-primary" onclick="addSortLevel(4, 'asc')" style="width: 20px; height: 20px; padding: 0; font-size: 10px;">↑</button>
                                         <button class="btn btn-sm btn-outline-secondary" onclick="addSortLevel(4, 'desc')" style="width: 20px; height: 20px; padding: 0; font-size: 10px;">↓</button>
                                     </th>
-                                    <th style="width: 50px; text-align: center; padding: 2px;">
+                                    <th style="text-align: center; padding: 2px;">
                                         <button class="btn btn-sm btn-outline-primary" onclick="addSortLevel(5, 'asc')" style="width: 20px; height: 20px; padding: 0; font-size: 10px;">↑</button>
                                         <button class="btn btn-sm btn-outline-secondary" onclick="addSortLevel(5, 'desc')" style="width: 20px; height: 20px; padding: 0; font-size: 10px;">↓</button>
                                     </th>
-                                    <th style="width: 80px; text-align: center; padding: 2px;">
+                                    <th style="text-align: center; padding: 2px;">
                                         <button class="btn btn-sm btn-outline-primary" onclick="addSortLevel(6, 'asc')" style="width: 20px; height: 20px; padding: 0; font-size: 10px;">↑</button>
                                         <button class="btn btn-sm btn-outline-secondary" onclick="addSortLevel(6, 'desc')" style="width: 20px; height: 20px; padding: 0; font-size: 10px;">↓</button>
                                     </th>
-                                    <th style="width: 70px; text-align: center; padding: 2px;">
+                                    <th style="text-align: center; padding: 2px;">
                                         <button class="btn btn-sm btn-outline-primary" onclick="addSortLevel(7, 'asc')" style="width: 20px; height: 20px; padding: 0; font-size: 10px;">↑</button>
                                         <button class="btn btn-sm btn-outline-secondary" onclick="addSortLevel(7, 'desc')" style="width: 20px; height: 20px; padding: 0; font-size: 10px;">↓</button>
                                     </th>
-                                    <th style="width: 80px; text-align: center; padding: 2px;">
+                                    <th style="text-align: center; padding: 2px;">
                                         <button class="btn btn-sm btn-outline-primary" onclick="addSortLevel(8, 'asc')" style="width: 20px; height: 20px; padding: 0; font-size: 10px;">↑</button>
                                         <button class="btn btn-sm btn-outline-secondary" onclick="addSortLevel(8, 'desc')" style="width: 20px; height: 20px; padding: 0; font-size: 10px;">↓</button>
                                     </th>
-                                    <th style="width: 45px; text-align: center; padding: 2px;">
+                                    <th style="text-align: center; padding: 2px;">
                                         <button class="btn btn-sm btn-outline-primary" onclick="addSortLevel(9, 'asc')" style="width: 20px; height: 20px; padding: 0; font-size: 10px;">↑</button>
                                         <button class="btn btn-sm btn-outline-secondary" onclick="addSortLevel(9, 'desc')" style="width: 20px; height: 20px; padding: 0; font-size: 10px;">↓</button>
                                     </th>
-                                    <th style="width: 45px; text-align: center; padding: 2px;">
+                                    <th style="text-align: center; padding: 2px;">
                                         <button class="btn btn-sm btn-outline-primary" onclick="addSortLevel(10, 'asc')" style="width: 20px; height: 20px; padding: 0; font-size: 10px;">↑</button>
                                         <button class="btn btn-sm btn-outline-secondary" onclick="addSortLevel(10, 'desc')" style="width: 20px; height: 20px; padding: 0; font-size: 10px;">↓</button>
                                     </th>
-                                    <th style="width: 45px; text-align: center; padding: 2px;">
+                                    <th style="text-align: center; padding: 2px;">
                                         <button class="btn btn-sm btn-outline-primary" onclick="addSortLevel(11, 'asc')" style="width: 20px; height: 20px; padding: 0; font-size: 10px;">↑</button>
                                         <button class="btn btn-sm btn-outline-secondary" onclick="addSortLevel(11, 'desc')" style="width: 20px; height: 20px; padding: 0; font-size: 10px;">↓</button>
                                     </th>
-                                    <th style="width: 45px; text-align: center; padding: 2px;">
+                                    <th style="text-align: center; padding: 2px;">
                                         <button class="btn btn-sm btn-outline-primary" onclick="addSortLevel(12, 'asc')" style="width: 20px; height: 20px; padding: 0; font-size: 10px;">↑</button>
                                         <button class="btn btn-sm btn-outline-secondary" onclick="addSortLevel(12, 'desc')" style="width: 20px; height: 20px; padding: 0; font-size: 10px;">↓</button>
                                     </th>
-                                    <th style="width: 45px; text-align: center; padding: 2px;">
+                                    <th style="text-align: center; padding: 2px;">
                                         <button class="btn btn-sm btn-outline-primary" onclick="addSortLevel(13, 'asc')" style="width: 20px; height: 20px; padding: 0; font-size: 10px;">↑</button>
                                         <button class="btn btn-sm btn-outline-secondary" onclick="addSortLevel(13, 'desc')" style="width: 20px; height: 20px; padding: 0; font-size: 10px;">↓</button>
                                     </th>
-                                    <th style="width: 45px; text-align: center; padding: 2px;">
+                                    <th style="text-align: center; padding: 2px;">
                                         <button class="btn btn-sm btn-outline-primary" onclick="addSortLevel(14, 'asc')" style="width: 20px; height: 20px; padding: 0; font-size: 10px;">↑</button>
                                         <button class="btn btn-sm btn-outline-secondary" onclick="addSortLevel(14, 'desc')" style="width: 20px; height: 20px; padding: 0; font-size: 10px;">↓</button>
                                     </th>
-                                    <th style="width: 45px; text-align: center; padding: 2px;">
+                                    <th style="text-align: center; padding: 2px;">
                                         <button class="btn btn-sm btn-outline-primary" onclick="addSortLevel(15, 'asc')" style="width: 20px; height: 20px; padding: 0; font-size: 10px;">↑</button>
                                         <button class="btn btn-sm btn-outline-secondary" onclick="addSortLevel(15, 'desc')" style="width: 20px; height: 20px; padding: 0; font-size: 10px;">↓</button>
                                     </th>
-                                    <th style="width: 45px; text-align: center; padding: 2px;">
+                                    <th style="text-align: center; padding: 2px;">
                                         <button class="btn btn-sm btn-outline-primary" onclick="addSortLevel(16, 'asc')" style="width: 20px; height: 20px; padding: 0; font-size: 10px;">↑</button>
                                         <button class="btn btn-sm btn-outline-secondary" onclick="addSortLevel(16, 'desc')" style="width: 20px; height: 20px; padding: 0; font-size: 10px;">↓</button>
                                     </th>
-                                    <th style="width: 45px; text-align: center; padding: 2px;">
+                                    <th style="text-align: center; padding: 2px;">
                                         <button class="btn btn-sm btn-outline-primary" onclick="addSortLevel(17, 'asc')" style="width: 20px; height: 20px; padding: 0; font-size: 10px;">↑</button>
                                         <button class="btn btn-sm btn-outline-secondary" onclick="addSortLevel(17, 'desc')" style="width: 20px; height: 20px; padding: 0; font-size: 10px;">↓</button>
                                     </th>
