@@ -154,6 +154,39 @@
             border: none;
         }
         
+        /* Special styling for the combined sort button */
+        #sortByValueThenPoints {
+            background: linear-gradient(135deg, #6f42c1 0%, #5a32a3 100%) !important;
+            border: none;
+            position: relative;
+        }
+        
+        #sortByValueThenPoints:hover {
+            background: linear-gradient(135deg, #5a32a3 0%, #4a2a8a 100%) !important;
+            transform: translateY(-2px);
+        }
+        
+        /* Tooltip for keyboard shortcut */
+        .btn[title] {
+            position: relative;
+        }
+        
+        .btn[title]:hover::after {
+            content: attr(title);
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 12px;
+            white-space: nowrap;
+            z-index: 1000;
+            margin-bottom: 5px;
+        }
+        
         /* Enhanced DataTables Styling */
         .dataTables_wrapper .dataTables_length,
         .dataTables_wrapper .dataTables_filter,
@@ -486,8 +519,11 @@
                         <button id="sortByPoints" class="btn btn-info me-2">
                             <i class="fas fa-sort-numeric-down"></i> Sort by Points
                         </button>
-                        <button id="sortByValue" class="btn btn-info">
+                        <button id="sortByValue" class="btn btn-info me-2">
                             <i class="fas fa-sort-numeric-down"></i> Sort by Value
+                        </button>
+                        <button id="sortByValueThenPoints" class="btn btn-info" title="Keyboard shortcut: Ctrl+V">
+                            <i class="fas fa-sort-amount-down"></i> Sort by Value+Points
                         </button>
                     </div>
                 </div>
@@ -562,9 +598,42 @@
                 }
             });
             
+            // Create default "Value + Points" view if it doesn't exist
+            createDefaultValuePointsView();
+            
             function forceCenterAlignment() {
                 // Force center alignment for all table cells
                 $('#playersTable td, #playersTable th').css('text-align', 'center');
+            }
+            
+            function createDefaultValuePointsView() {
+                // Check if default view already exists
+                const savedViews = JSON.parse(localStorage.getItem('fplPlayerViews') || '{}');
+                if (!savedViews['Value + Points (Default)']) {
+                    // Create default view with Points/£ + Total Points sorting
+                    const defaultView = {
+                        name: 'Value + Points (Default)',
+                        description: 'Points/£ + Total Points',
+                        filters: {
+                            position: '',
+                            team: '',
+                            maxPrice: '',
+                            minChance: '',
+                            minPointsPerMillion: '',
+                            minTotalPoints: '',
+                            minForm: '',
+                            minOwnership: ''
+                        },
+                        sorting: [[5, 'desc'], [6, 'desc']], // Points/£ then Total Points
+                        pageLength: 25,
+                        search: '',
+                        timestamp: new Date().toISOString()
+                    };
+                    
+                    savedViews['Value + Points (Default)'] = defaultView;
+                    localStorage.setItem('fplPlayerViews', JSON.stringify(savedViews));
+                    console.log('Created default "Value + Points" view');
+                }
             }
             
             function initializeDataTable() {
@@ -662,6 +731,26 @@
                     forceCenterAlignment();
                     showNotification('Sorted by Points per Million (descending)', 'info');
                 });
+                
+                // New combined sort button
+                $('#sortByValueThenPoints').on('click', function() {
+                    // Sort by Points/£ first (descending), then by Total Points (descending)
+                    currentTable.order([
+                        [5, 'desc'],  // Points/£ column (index 5)
+                        [6, 'desc']   // Total Points column (index 6)
+                    ]).draw();
+                    forceCenterAlignment();
+                    showNotification('Sorted by Points/£ (desc) then Total Points (desc)', 'info');
+                });
+                
+                // Keyboard shortcut for Value + Points sorting (Ctrl+V)
+                $(document).on('keydown', function(e) {
+                    if (e.ctrlKey && e.key === 'v') {
+                        e.preventDefault();
+                        $('#sortByValueThenPoints').click();
+                        showNotification('Keyboard shortcut: Ctrl+V for Value + Points sorting', 'info');
+                    }
+                });
             }
             
             function saveView() {
@@ -671,8 +760,23 @@
                     return;
                 }
                 
+                // Get current sorting state
+                const currentSorting = currentTable.order();
+                let sortDescription = 'Default';
+                
+                // Determine sort description for better view identification
+                if (currentSorting.length === 1) {
+                    if (currentSorting[0][0] === 5) sortDescription = 'Points/£';
+                    else if (currentSorting[0][0] === 6) sortDescription = 'Total Points';
+                } else if (currentSorting.length === 2) {
+                    if (currentSorting[0][0] === 5 && currentSorting[1][0] === 6) {
+                        sortDescription = 'Points/£ + Total Points';
+                    }
+                }
+                
                 const view = {
                     name: viewName,
+                    description: sortDescription,
                     filters: {
                         position: $('#positionFilter').val(),
                         team: $('#teamFilter').val(),
@@ -683,9 +787,10 @@
                         minForm: $('#minFormFilter').val(),
                         minOwnership: $('#minOwnershipFilter').val()
                     },
-                    sorting: currentTable.order(),
+                    sorting: currentSorting,
                     pageLength: currentTable.page.len(),
-                    search: currentTable.search()
+                    search: currentTable.search(),
+                    timestamp: new Date().toISOString()
                 };
                 
                 // Save to localStorage
@@ -693,7 +798,7 @@
                 savedViews[viewName] = view;
                 localStorage.setItem('fplPlayerViews', JSON.stringify(savedViews));
                 
-                showNotification(`View "${viewName}" saved successfully!`, 'success');
+                showNotification(`View "${viewName}" (${sortDescription}) saved successfully!`, 'success');
                 $('#viewName').val('');
                 updateViewsDropdown();
             }
@@ -751,7 +856,11 @@
                 
                 $('#loadView').empty().append('<option value="">Select a saved view...</option>');
                 viewNames.forEach(name => {
-                    $('#loadView').append(`<option value="${name}">${name}</option>`);
+                    const view = savedViews[name];
+                    const description = view.description || 'Default';
+                    const timestamp = view.timestamp ? new Date(view.timestamp).toLocaleDateString() : '';
+                    const displayText = `${name} (${description})${timestamp ? ' - ' + timestamp : ''}`;
+                    $('#loadView').append(`<option value="${name}" title="${displayText}">${displayText}</option>`);
                 });
             }
             
