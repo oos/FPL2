@@ -556,6 +556,9 @@
                 $('#teamFilter').append(`<option value="${team}">${team}</option>`);
             });
             
+            // Create default "Value + Points" view if it doesn't exist
+            createDefaultValuePointsView();
+            
             // Initialize DataTable
             initializeDataTable();
             
@@ -574,17 +577,18 @@
                 }
             });
             
-            // Create default "Value + Points" view if it doesn't exist
-            createDefaultValuePointsView();
-            
             function forceCenterAlignment() {
                 // Force center alignment for all table cells
                 $('#playersTable td, #playersTable th').css('text-align', 'center');
             }
             
             function createDefaultValuePointsView() {
+                console.log('Creating default value points view...');
+                
                 // Check if default view already exists
                 const savedViews = JSON.parse(localStorage.getItem('fplPlayerViews') || '{}');
+                console.log('Current saved views:', savedViews);
+                
                 if (!savedViews['Best Value Players']) {
                     // Create default view with Points/£ + Total Points sorting
                     const defaultView = {
@@ -608,7 +612,9 @@
                     
                     savedViews['Best Value Players'] = defaultView;
                     localStorage.setItem('fplPlayerViews', JSON.stringify(savedViews));
-                    console.log('Created default "Best Value Players" view');
+                    console.log('Created default "Best Value Players" view:', defaultView);
+                } else {
+                    console.log('Default view already exists');
                 }
             }
             
@@ -844,6 +850,9 @@
                 const savedViews = JSON.parse(localStorage.getItem('fplPlayerViews') || '{}');
                 const viewNames = Object.keys(savedViews);
                 
+                console.log('Updating dropdown with saved views:', savedViews);
+                console.log('View names found:', viewNames);
+                
                 $('#loadView').empty().append('<option value="">Select a view or sorting option...</option>');
                 
                 // Add quick sorting options at the top
@@ -865,6 +874,8 @@
                     });
                     $('#loadView').append('</optgroup>');
                 }
+                
+                console.log('Dropdown updated. Total options:', $('#loadView option').length);
             }
             
             function applyFilters() {
