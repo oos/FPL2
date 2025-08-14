@@ -657,21 +657,105 @@
                             }
                         },
                         { data: 'team', className: 'text-center' },
-                        { data: 'price', className: 'text-center' },
-                        { data: 'chance_of_playing_next_round', className: 'text-center' },
-                        { data: 'points_per_million', className: 'text-center' },
+                        { 
+                            data: 'price', 
+                            className: 'text-center',
+                            render: function(data) {
+                                return '£' + parseFloat(data || 0).toFixed(1) + 'M';
+                            }
+                        },
+                        { 
+                            data: 'chance_of_playing_next_round', 
+                            className: 'text-center',
+                            render: function(data) {
+                                return parseFloat(data || 0).toFixed(1) + '%';
+                            }
+                        },
+                        { 
+                            data: 'points_per_million', 
+                            className: 'text-center',
+                            render: function(data) {
+                                return parseFloat(data || 0).toFixed(1);
+                            }
+                        },
                         { data: 'total_points', className: 'text-center' },
-                        { data: 'form', className: 'text-center' },
-                        { data: 'ownership', className: 'text-center' },
-                        { data: 'gw1_points', className: 'text-center' },
-                        { data: 'gw2_points', className: 'text-center' },
-                        { data: 'gw3_points', className: 'text-center' },
-                        { data: 'gw4_points', className: 'text-center' },
-                        { data: 'gw5_points', className: 'text-center' },
-                        { data: 'gw6_points', className: 'text-center' },
-                        { data: 'gw7_points', className: 'text-center' },
-                        { data: 'gw8_points', className: 'text-center' },
-                        { data: 'gw9_points', className: 'text-center' }
+                        { 
+                            data: 'form', 
+                            className: 'text-center',
+                            render: function(data) {
+                                return parseFloat(data || 0).toFixed(1);
+                            }
+                        },
+                        { 
+                            data: 'ownership', 
+                            className: 'text-center',
+                            render: function(data) {
+                                return parseFloat(data || 0).toFixed(1) + '%';
+                            }
+                        },
+                        { 
+                            data: 'gw1_points', 
+                            className: 'text-center',
+                            render: function(data) {
+                                return parseFloat(data || 0).toFixed(1);
+                            }
+                        },
+                        { 
+                            data: 'gw2_points', 
+                            className: 'text-center',
+                            render: function(data) {
+                                return parseFloat(data || 0).toFixed(1);
+                            }
+                        },
+                        { 
+                            data: 'gw3_points', 
+                            className: 'text-center',
+                            render: function(data) {
+                                return parseFloat(data || 0).toFixed(1);
+                            }
+                        },
+                        { 
+                            data: 'gw4_points', 
+                            className: 'text-center',
+                            render: function(data) {
+                                return parseFloat(data || 0).toFixed(1);
+                            }
+                        },
+                        { 
+                            data: 'gw5_points', 
+                            className: 'text-center',
+                            render: function(data) {
+                                return parseFloat(data || 0).toFixed(1);
+                            }
+                        },
+                        { 
+                            data: 'gw6_points', 
+                            className: 'text-center',
+                            render: function(data) {
+                                return parseFloat(data || 0).toFixed(1);
+                            }
+                        },
+                        { 
+                            data: 'gw7_points', 
+                            className: 'text-center',
+                            render: function(data) {
+                                return parseFloat(data || 0).toFixed(1);
+                            }
+                        },
+                        { 
+                            data: 'gw8_points', 
+                            className: 'text-center',
+                            render: function(data) {
+                                return parseFloat(data || 0).toFixed(1);
+                            }
+                        },
+                        { 
+                            data: 'gw9_points', 
+                            className: 'text-center',
+                            render: function(data) {
+                                return parseFloat(data || 0).toFixed(1);
+                            }
+                        }
                     ],
                     order: [[6, 'desc']], // Sort by total points by default
                     pageLength: 25,
