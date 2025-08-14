@@ -154,37 +154,21 @@
             border: none;
         }
         
-        /* Special styling for the combined sort button */
-        #sortByValueThenPoints {
-            background: linear-gradient(135deg, #6f42c1 0%, #5a32a3 100%) !important;
-            border: none;
-            position: relative;
+        /* Enhanced dropdown styling for optgroups */
+        .form-select optgroup {
+            font-weight: bold;
+            color: #495057;
+            background-color: #f8f9fa;
         }
         
-        #sortByValueThenPoints:hover {
-            background: linear-gradient(135deg, #5a32a3 0%, #4a2a8a 100%) !important;
-            transform: translateY(-2px);
+        .form-select option {
+            padding: 8px 12px;
         }
         
-        /* Tooltip for keyboard shortcut */
-        .btn[title] {
-            position: relative;
-        }
-        
-        .btn[title]:hover::after {
-            content: attr(title);
-            position: absolute;
-            bottom: 100%;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(0,0,0,0.8);
-            color: white;
-            padding: 5px 10px;
-            border-radius: 5px;
-            font-size: 12px;
-            white-space: nowrap;
-            z-index: 1000;
-            margin-bottom: 5px;
+        /* Keyboard shortcut tooltip for dropdown */
+        .form-select:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 0 0.2rem rgba(0,123,255,0.25);
         }
         
         /* Enhanced DataTables Styling */
@@ -436,9 +420,9 @@
                     <input type="text" id="viewName" class="form-control" placeholder="Enter view name">
                 </div>
                 <div class="col-md-4">
-                    <label for="loadView" class="form-label">Load Saved View:</label>
+                    <label for="loadView" class="form-label">Load View or Quick Sort:</label>
                     <select id="loadView" class="form-select">
-                        <option value="">Select a saved view...</option>
+                        <option value="">Select a view or sorting option...</option>
                     </select>
                 </div>
                 <div class="col-md-4">
@@ -516,15 +500,7 @@
                 <div class="col-md-4">
                     <label class="form-label">&nbsp;</label>
                     <div>
-                        <button id="sortByPoints" class="btn btn-info me-2">
-                            <i class="fas fa-sort-numeric-down"></i> Sort by Points
-                        </button>
-                        <button id="sortByValue" class="btn btn-info me-2">
-                            <i class="fas fa-sort-numeric-down"></i> Sort by Value
-                        </button>
-                        <button id="sortByValueThenPoints" class="btn btn-info" title="Keyboard shortcut: Ctrl+V">
-                            <i class="fas fa-sort-amount-down"></i> Sort by Value+Points
-                        </button>
+                        <!-- Sort buttons removed - now available in dropdown -->
                     </div>
                 </div>
             </div>
@@ -609,10 +585,10 @@
             function createDefaultValuePointsView() {
                 // Check if default view already exists
                 const savedViews = JSON.parse(localStorage.getItem('fplPlayerViews') || '{}');
-                if (!savedViews['Value + Points (Default)']) {
+                if (!savedViews['Best Value Players']) {
                     // Create default view with Points/£ + Total Points sorting
                     const defaultView = {
-                        name: 'Value + Points (Default)',
+                        name: 'Best Value Players',
                         description: 'Points/£ + Total Points',
                         filters: {
                             position: '',
@@ -630,9 +606,9 @@
                         timestamp: new Date().toISOString()
                     };
                     
-                    savedViews['Value + Points (Default)'] = defaultView;
+                    savedViews['Best Value Players'] = defaultView;
                     localStorage.setItem('fplPlayerViews', JSON.stringify(savedViews));
-                    console.log('Created default "Value + Points" view');
+                    console.log('Created default "Best Value Players" view');
                 }
             }
             
@@ -719,35 +695,14 @@
                     clearFilters();
                 });
                 
-                // Sort buttons
-                $('#sortByPoints').on('click', function() {
-                    currentTable.order([6, 'desc']).draw();
-                    forceCenterAlignment();
-                    showNotification('Sorted by Total Points (descending)', 'info');
-                });
-                
-                $('#sortByValue').on('click', function() {
-                    currentTable.order([5, 'desc']).draw();
-                    forceCenterAlignment();
-                    showNotification('Sorted by Points per Million (descending)', 'info');
-                });
-                
-                // New combined sort button
-                $('#sortByValueThenPoints').on('click', function() {
-                    // Sort by Points/£ first (descending), then by Total Points (descending)
-                    currentTable.order([
-                        [5, 'desc'],  // Points/£ column (index 5)
-                        [6, 'desc']   // Total Points column (index 6)
-                    ]).draw();
-                    forceCenterAlignment();
-                    showNotification('Sorted by Points/£ (desc) then Total Points (desc)', 'info');
-                });
+                // Sort buttons removed - now handled by dropdown
                 
                 // Keyboard shortcut for Value + Points sorting (Ctrl+V)
                 $(document).on('keydown', function(e) {
                     if (e.ctrlKey && e.key === 'v') {
                         e.preventDefault();
-                        $('#sortByValueThenPoints').click();
+                        $('#loadView').val('sort_value_points');
+                        handleQuickSort('sort_value_points');
                         showNotification('Keyboard shortcut: Ctrl+V for Value + Points sorting', 'info');
                     }
                 });
@@ -806,10 +761,17 @@
             function loadView() {
                 const viewName = $('#loadView').val();
                 if (!viewName) {
-                    showNotification('Please select a view to load', 'info');
+                    showNotification('Please select a view or sorting option', 'info');
                     return;
                 }
                 
+                // Handle quick sorting options
+                if (viewName.startsWith('sort_')) {
+                    handleQuickSort(viewName);
+                    return;
+                }
+                
+                // Handle saved views
                 const savedViews = JSON.parse(localStorage.getItem('fplPlayerViews') || '{}');
                 const view = savedViews[viewName];
                 
@@ -850,18 +812,59 @@
                 showNotification(`View "${viewName}" loaded successfully!`, 'success');
             }
             
+            function handleQuickSort(sortType) {
+                switch(sortType) {
+                    case 'sort_points':
+                        currentTable.order([6, 'desc']).draw();
+                        forceCenterAlignment();
+                        showNotification('Sorted by Total Points (High to Low)', 'success');
+                        break;
+                    case 'sort_value':
+                        currentTable.order([5, 'desc']).draw();
+                        forceCenterAlignment();
+                        showNotification('Sorted by Points/£ (High to Low)', 'success');
+                        break;
+                    case 'sort_value_points':
+                        currentTable.order([
+                            [5, 'desc'],  // Points/£ column (index 5)
+                            [6, 'desc']   // Total Points column (index 6)
+                        ]).draw();
+                        forceCenterAlignment();
+                        showNotification('Sorted by Value + Points (Best Value First)', 'success');
+                        break;
+                    default:
+                        showNotification('Unknown sorting option', 'error');
+                }
+                
+                // Reset dropdown to default
+                $('#loadView').val('');
+            }
+            
             function updateViewsDropdown() {
                 const savedViews = JSON.parse(localStorage.getItem('fplPlayerViews') || '{}');
                 const viewNames = Object.keys(savedViews);
                 
-                $('#loadView').empty().append('<option value="">Select a saved view...</option>');
-                viewNames.forEach(name => {
-                    const view = savedViews[name];
-                    const description = view.description || 'Default';
-                    const timestamp = view.timestamp ? new Date(view.timestamp).toLocaleDateString() : '';
-                    const displayText = `${name} (${description})${timestamp ? ' - ' + timestamp : ''}`;
-                    $('#loadView').append(`<option value="${name}" title="${displayText}">${displayText}</option>`);
-                });
+                $('#loadView').empty().append('<option value="">Select a view or sorting option...</option>');
+                
+                // Add quick sorting options at the top
+                $('#loadView').append('<optgroup label="Quick Sorting Options">');
+                $('#loadView').append('<option value="sort_points">📊 Sort by Total Points (High to Low)</option>');
+                $('#loadView').append('<option value="sort_value">💰 Sort by Points/£ (High to Low)</option>');
+                $('#loadView').append('<option value="sort_value_points">🎯 Sort by Value + Points (Best Value First)</option>');
+                $('#loadView').append('</optgroup>');
+                
+                // Add saved views if any exist
+                if (viewNames.length > 0) {
+                    $('#loadView').append('<optgroup label="Saved Views">');
+                    viewNames.forEach(name => {
+                        const view = savedViews[name];
+                        const description = view.description || 'Default';
+                        const timestamp = view.timestamp ? new Date(view.timestamp).toLocaleDateString() : '';
+                        const displayText = `${name} (${description})${timestamp ? ' - ' + timestamp : ''}`;
+                        $('#loadView').append(`<option value="${name}" title="${displayText}">${displayText}</option>`);
+                    });
+                    $('#loadView').append('</optgroup>');
+                }
             }
             
             function applyFilters() {
