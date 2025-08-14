@@ -50,7 +50,7 @@ def fetch_players_data():
                         "team": team_map.get(player.get("team"), "Unknown"),
                         "price": player.get("now_cost", 0) / 10.0,  # Convert from 0.1M units
                         "total_points": player.get("total_points", 0),
-                        "form": player.get("form", "0.0"),
+                        "form": float(player.get("form", "0.0")),
                         "points_per_game": player.get("points_per_game", "0.0"),
                         "selected_by_percent": player.get("selected_by_percent", "0.0"),
                         "transfers_in": player.get("transfers_in", 0),
@@ -93,26 +93,26 @@ def fetch_players_data():
 def get_additional_top_players():
     """Get the additional top 100 players with their specific expected points"""
     return [
-        {"id": 1001, "name": "M.Salah", "position_name": "Midfielder", "team": "Liverpool", "price": 14.5, "form": "0.0", "gw1_9_points": [6.7, 6.1, 5.6, 7.0, 6.6, 5.7, 5.7, 7.4, 6.2], "total_gw1_9": 57.0, "points_per_million": 3.93, "chance_of_playing_next_round": 100},
-        {"id": 1002, "name": "Haaland", "position_name": "Forward", "team": "Man City", "price": 14.0, "form": "0.0", "gw1_9_points": [5.1, 6.3, 5.1, 5.8, 3.8, 6.6, 4.8, 5.1, 4.4], "total_gw1_9": 47.0, "points_per_million": 3.36, "chance_of_playing_next_round": 100},
-        {"id": 1003, "name": "Palmer", "position_name": "Midfielder", "team": "Chelsea", "price": 10.5, "form": "0.0", "gw1_9_points": [5.1, 4.9, 5.5, 4.6, 4.3, 5.9, 4.4, 4.3, 6.7], "total_gw1_9": 45.8, "points_per_million": 4.36, "chance_of_playing_next_round": 100},
-        {"id": 1004, "name": "Watkins", "position_name": "Forward", "team": "Aston Villa", "price": 9.0, "form": "0.0", "gw1_9_points": [5.2, 4.6, 4.8, 4.1, 5.7, 5.2, 6.6, 4.5, 4.1], "total_gw1_9": 44.9, "points_per_million": 4.99, "chance_of_playing_next_round": 100},
-        {"id": 1005, "name": "Isak", "position_name": "Forward", "team": "Newcastle", "price": 10.5, "form": "0.0", "gw1_9_points": [4.4, 4.5, 5.8, 5.7, 4.7, 4.1, 5.4, 4.7, 5.4], "total_gw1_9": 44.6, "points_per_million": 4.25, "chance_of_playing_next_round": 100},
-        {"id": 1006, "name": "Wood", "position_name": "Forward", "team": "Nott'm Forest", "price": 7.5, "form": "0.0", "gw1_9_points": [4.8, 3.9, 5.2, 3.2, 4.8, 5.8, 3.9, 4.6, 4.0], "total_gw1_9": 40.3, "points_per_million": 5.37, "chance_of_playing_next_round": 100},
-        {"id": 1007, "name": "Eze", "position_name": "Midfielder", "team": "Crystal Palace", "price": 7.5, "form": "0.0", "gw1_9_points": [4.1, 4.8, 4.0, 5.8, 4.4, 4.2, 4.0, 4.9, 3.4], "total_gw1_9": 39.4, "points_per_million": 5.25, "chance_of_playing_next_round": 100},
-        {"id": 1008, "name": "Saka", "position_name": "Midfielder", "team": "Arsenal", "price": 10.0, "form": "0.0", "gw1_9_points": [3.9, 5.9, 3.3, 4.8, 3.4, 3.7, 4.6, 3.6, 4.5], "total_gw1_9": 37.8, "points_per_million": 3.78, "chance_of_playing_next_round": 100},
-        {"id": 1009, "name": "Evanilson", "position_name": "Forward", "team": "Fulham", "price": 7.0, "form": "0.0", "gw1_9_points": [3.4, 4.6, 3.9, 4.2, 4.3, 4.7, 4.0, 3.6, 4.2], "total_gw1_9": 36.9, "points_per_million": 5.27, "chance_of_playing_next_round": 100},
-        {"id": 1010, "name": "Wissa", "position_name": "Forward", "team": "Brentford", "price": 7.5, "form": "0.0", "gw1_9_points": [3.8, 4.4, 4.7, 4.0, 3.7, 4.5, 3.8, 4.1, 3.7], "total_gw1_9": 36.6, "points_per_million": 4.88, "chance_of_playing_next_round": 100},
-        {"id": 1011, "name": "B.Fernandes", "position_name": "Midfielder", "team": "Man Utd", "price": 9.0, "form": "0.0", "gw1_9_points": [3.4, 3.7, 4.9, 3.1, 4.1, 3.8, 5.3, 2.9, 4.1], "total_gw1_9": 35.4, "points_per_million": 3.93, "chance_of_playing_next_round": 100},
-        {"id": 1012, "name": "Virgil", "position_name": "Defender", "team": "Liverpool", "price": 6.0, "form": "0.0", "gw1_9_points": [4.2, 3.2, 3.5, 4.4, 4.6, 3.7, 3.3, 4.4, 3.8], "total_gw1_9": 35.1, "points_per_million": 5.85, "chance_of_playing_next_round": 100},
-        {"id": 1013, "name": "Gibbs-White", "position_name": "Midfielder", "team": "Nott'm Forest", "price": 7.5, "form": "0.0", "gw1_9_points": [4.3, 3.5, 4.4, 2.9, 4.2, 5.2, 3.4, 3.9, 3.4], "total_gw1_9": 35.1, "points_per_million": 4.68, "chance_of_playing_next_round": 100},
-        {"id": 1014, "name": "Strand Larsen", "position_name": "Forward", "team": "Wolves", "price": 6.5, "form": "0.0", "gw1_9_points": [3.2, 3.5, 3.7, 3.4, 5.1, 3.5, 3.8, 4.3, 4.4], "total_gw1_9": 34.8, "points_per_million": 5.35, "chance_of_playing_next_round": 100},
-        {"id": 1015, "name": "Rice", "position_name": "Midfielder", "team": "Arsenal", "price": 6.5, "form": "0.0", "gw1_9_points": [3.7, 5.0, 3.1, 4.1, 3.4, 3.5, 4.1, 3.6, 4.0], "total_gw1_9": 34.4, "points_per_million": 5.29, "chance_of_playing_next_round": 100},
-        {"id": 1016, "name": "Rogers", "position_name": "Midfielder", "team": "Aston Villa", "price": 7.0, "form": "0.0", "gw1_9_points": [1.1, 4.0, 4.2, 3.7, 4.4, 4.2, 5.2, 3.7, 3.3], "total_gw1_9": 33.7, "points_per_million": 4.81, "chance_of_playing_next_round": 100},
-        {"id": 1017, "name": "Sánchez", "position_name": "Goalkeeper", "team": "Chelsea", "price": 5.0, "form": "0.0", "gw1_9_points": [4.0, 3.7, 4.0, 3.5, 3.7, 3.9, 3.3, 3.3, 4.3], "total_gw1_9": 33.7, "points_per_million": 6.74, "chance_of_playing_next_round": 100},
-        {"id": 1018, "name": "Welbeck", "position_name": "Forward", "team": "Brighton", "price": 6.5, "form": "0.0", "gw1_9_points": [4.1, 3.3, 3.6, 3.4, 4.1, 3.3, 4.0, 4.2, 3.5], "total_gw1_9": 33.5, "points_per_million": 5.15, "chance_of_playing_next_round": 100},
-        {"id": 1019, "name": "Mac Allister", "position_name": "Midfielder", "team": "Liverpool", "price": 6.5, "form": "0.0", "gw1_9_points": [4.0, 3.5, 3.2, 4.0, 3.9, 3.6, 3.2, 4.1, 3.7], "total_gw1_9": 33.4, "points_per_million": 5.14, "chance_of_playing_next_round": 100},
-        {"id": 1020, "name": "Petrović", "position_name": "Goalkeeper", "team": "Chelsea", "price": 4.5, "form": "0.0", "gw1_9_points": [3.4, 3.9, 3.3, 4.0, 3.5, 3.8, 3.8, 3.9, 3.8], "total_gw1_9": 33.3, "points_per_million": 7.40, "chance_of_playing_next_round": 100}
+        {"id": 1001, "name": "M.Salah", "position_name": "Midfielder", "team": "Liverpool", "price": 14.5, "form": 0.0, "gw1_9_points": [6.7, 6.1, 5.6, 7.0, 6.6, 5.7, 5.7, 7.4, 6.2], "total_gw1_9": 57.0, "points_per_million": 3.93, "chance_of_playing_next_round": 100},
+        {"id": 1002, "name": "Haaland", "position_name": "Forward", "team": "Man City", "price": 14.0, "form": 0.0, "gw1_9_points": [5.1, 6.3, 5.1, 5.8, 3.8, 6.6, 4.8, 5.1, 4.4], "total_gw1_9": 47.0, "points_per_million": 3.36, "chance_of_playing_next_round": 100},
+        {"id": 1003, "name": "Palmer", "position_name": "Midfielder", "team": "Chelsea", "price": 10.5, "form": 0.0, "gw1_9_points": [5.1, 4.9, 5.5, 4.6, 4.3, 5.9, 4.4, 4.3, 6.7], "total_gw1_9": 45.8, "points_per_million": 4.36, "chance_of_playing_next_round": 100},
+        {"id": 1004, "name": "Watkins", "position_name": "Forward", "team": "Aston Villa", "price": 9.0, "form": 0.0, "gw1_9_points": [5.2, 4.6, 4.8, 4.1, 5.7, 5.2, 6.6, 4.5, 4.1], "total_gw1_9": 44.9, "points_per_million": 4.99, "chance_of_playing_next_round": 100},
+        {"id": 1005, "name": "Isak", "position_name": "Forward", "team": "Newcastle", "price": 10.5, "form": 0.0, "gw1_9_points": [4.4, 4.5, 5.8, 5.7, 4.7, 4.1, 5.4, 4.7, 5.4], "total_gw1_9": 44.6, "points_per_million": 4.25, "chance_of_playing_next_round": 100},
+        {"id": 1006, "name": "Wood", "position_name": "Forward", "team": "Nott'm Forest", "price": 7.5, "form": 0.0, "gw1_9_points": [4.8, 3.9, 5.2, 3.2, 4.8, 5.8, 3.9, 4.6, 4.0], "total_gw1_9": 40.3, "points_per_million": 5.37, "chance_of_playing_next_round": 100},
+        {"id": 1007, "name": "Eze", "position_name": "Midfielder", "team": "Crystal Palace", "price": 7.5, "form": 0.0, "gw1_9_points": [4.1, 4.8, 4.0, 5.8, 4.4, 4.2, 4.0, 4.9, 3.4], "total_gw1_9": 39.4, "points_per_million": 5.25, "chance_of_playing_next_round": 100},
+        {"id": 1008, "name": "Saka", "position_name": "Midfielder", "team": "Arsenal", "price": 10.0, "form": 0.0, "gw1_9_points": [3.9, 5.9, 3.3, 4.8, 3.4, 3.7, 4.6, 3.6, 4.5], "total_gw1_9": 37.8, "points_per_million": 3.78, "chance_of_playing_next_round": 100},
+        {"id": 1009, "name": "Evanilson", "position_name": "Forward", "team": "Fulham", "price": 7.0, "form": 0.0, "gw1_9_points": [3.4, 4.6, 3.9, 4.2, 4.3, 4.7, 4.0, 3.6, 4.2], "total_gw1_9": 36.9, "points_per_million": 5.27, "chance_of_playing_next_round": 100},
+        {"id": 1010, "name": "Wissa", "position_name": "Forward", "team": "Brentford", "price": 7.5, "form": 0.0, "gw1_9_points": [3.8, 4.4, 4.7, 4.0, 3.7, 4.5, 3.8, 4.1, 3.7], "total_gw1_9": 36.6, "points_per_million": 4.88, "chance_of_playing_next_round": 100},
+        {"id": 1011, "name": "B.Fernandes", "position_name": "Midfielder", "team": "Man Utd", "price": 9.0, "form": 0.0, "gw1_9_points": [3.4, 3.7, 4.9, 3.1, 4.1, 3.8, 5.3, 2.9, 4.1], "total_gw1_9": 35.4, "points_per_million": 3.93, "chance_of_playing_next_round": 100},
+        {"id": 1012, "name": "Virgil", "position_name": "Defender", "team": "Liverpool", "price": 6.0, "form": 0.0, "gw1_9_points": [4.2, 3.2, 3.5, 4.4, 4.6, 3.7, 3.3, 4.4, 3.8], "total_gw1_9": 35.1, "points_per_million": 5.85, "chance_of_playing_next_round": 100},
+        {"id": 1013, "name": "Gibbs-White", "position_name": "Midfielder", "team": "Nott'm Forest", "price": 7.5, "form": 0.0, "gw1_9_points": [4.3, 3.5, 4.4, 2.9, 4.2, 5.2, 3.4, 3.9, 3.4], "total_gw1_9": 35.1, "points_per_million": 4.68, "chance_of_playing_next_round": 100},
+        {"id": 1014, "name": "Strand Larsen", "position_name": "Forward", "team": "Wolves", "price": 6.5, "form": 0.0, "gw1_9_points": [3.2, 3.5, 3.7, 3.4, 5.1, 3.5, 3.8, 4.3, 4.4], "total_gw1_9": 34.8, "points_per_million": 5.35, "chance_of_playing_next_round": 100},
+        {"id": 1015, "name": "Rice", "position_name": "Midfielder", "team": "Arsenal", "price": 6.5, "form": 0.0, "gw1_9_points": [3.7, 5.0, 3.1, 4.1, 3.4, 3.5, 4.1, 3.6, 4.0], "total_gw1_9": 34.4, "points_per_million": 5.29, "chance_of_playing_next_round": 100},
+        {"id": 1016, "name": "Rogers", "position_name": "Midfielder", "team": "Aston Villa", "price": 7.0, "form": 0.0, "gw1_9_points": [1.1, 4.0, 4.2, 3.7, 4.4, 4.2, 5.2, 3.7, 3.3], "total_gw1_9": 33.7, "points_per_million": 4.81, "chance_of_playing_next_round": 100},
+        {"id": 1017, "name": "Sánchez", "position_name": "Goalkeeper", "team": "Chelsea", "price": 5.0, "form": 0.0, "gw1_9_points": [4.0, 3.7, 4.0, 3.5, 3.7, 3.9, 3.3, 3.3, 4.3], "total_gw1_9": 33.7, "points_per_million": 6.74, "chance_of_playing_next_round": 100},
+        {"id": 1018, "name": "Welbeck", "position_name": "Forward", "team": "Brighton", "price": 6.5, "form": 0.0, "gw1_9_points": [4.1, 3.3, 3.6, 3.4, 4.1, 3.3, 4.0, 4.2, 3.5], "total_gw1_9": 33.5, "points_per_million": 5.15, "chance_of_playing_next_round": 100},
+        {"id": 1019, "name": "Mac Allister", "position_name": "Midfielder", "team": "Liverpool", "price": 6.5, "form": 0.0, "gw1_9_points": [4.0, 3.5, 3.2, 4.0, 3.9, 3.6, 3.2, 4.1, 3.7], "total_gw1_9": 33.4, "points_per_million": 5.14, "chance_of_playing_next_round": 100},
+        {"id": 1020, "name": "Petrović", "position_name": "Goalkeeper", "team": "Chelsea", "price": 4.5, "form": 0.0, "gw1_9_points": [3.4, 3.9, 3.3, 4.0, 3.5, 3.8, 3.8, 3.9, 3.8], "total_gw1_9": 33.3, "points_per_million": 7.40, "chance_of_playing_next_round": 100}
     ]
 
 # Build FDR DataFrame
@@ -654,19 +654,35 @@ def players_table():
             
             <script>
                 $(document).ready(function() {
+                    // Custom sorting for numbers with potential string values
+                    $.extend($.fn.dataTable.ext.type.order, {
+                        "num-pre": function (a) {
+                            var x = String(a).replace(/[\d,]/g, '');
+                            var y = String(a).replace(/[^\d,.-]/g, '');
+                            var z = y.replace(/,/g, '');
+                            return ((x == '-') ? -1 : 1) * parseFloat(z);
+                        },
+                        "num-asc": function (a, b) {
+                            return ((a < b) ? -1 : ((a > b) ? 1 : 0));
+                        },
+                        "num-desc": function (a, b) {
+                            return ((a < b) ? 1 : ((a > b) ? -1 : 0));
+                        }
+                    });
+                    
                     $('#playersTable').DataTable({
                         paging: true,
                         pageLength: 25,
                         ordering: true,
                         info: true,
                         searching: true,
-                        order: [[6, 'desc']], // Sort by Total (GW1-9) by default
+                        order: [[6, 'desc'], [7, 'desc']], // Sort by Total (GW1-9) then by Points/£
                         scrollX: true,
                         columnDefs: [
                             { targets: [0], orderable: false, width: '40px' }, // Rank column not sortable
-                            { targets: [1], orderable: true, width: '120px' }, // Name
-                            { targets: [2], orderable: true, width: '60px' }, // Position
-                            { targets: [3], orderable: true, width: '80px' }, // Team
+                            { targets: [1], orderable: true, width: '120px', type: 'string' }, // Name
+                            { targets: [2], orderable: true, width: '60px', type: 'string' }, // Position
+                            { targets: [3], orderable: true, width: '80px', type: 'string' }, // Team
                             { targets: [4], orderable: true, type: 'num', width: '70px' }, // Price
                             { targets: [5], orderable: true, type: 'num', width: '50px' }, // Form
                             { targets: [6], orderable: true, type: 'num', width: '80px' }, // Total
@@ -679,7 +695,10 @@ def players_table():
                             lengthMenu: "Show _MENU_ players per page",
                             info: "Showing _START_ to _END_ of _TOTAL_ players"
                         },
-                        autoWidth: false
+                        autoWidth: false,
+                        orderClasses: true,
+                        pageLength: 25,
+                        lengthMenu: [[10, 25, 50, 100], [10, 25, 50, 100]]
                     });
                 });
             </script>
