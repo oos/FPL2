@@ -634,6 +634,41 @@ def players_table():
             <div class="container-fluid">
                 <h1 class="mb-4">FPL Players - Expected Points (GW1-9)</h1>
                 
+                <!-- Filters Section -->
+                <div class="row mb-4">
+                    <div class="col-md-3">
+                        <label for="positionFilter" class="form-label">Position:</label>
+                        <select id="positionFilter" class="form-select">
+                            <option value="">All Positions</option>
+                            <option value="Goalkeeper">Goalkeeper</option>
+                            <option value="Defender">Defender</option>
+                            <option value="Midfielder">Midfielder</option>
+                            <option value="Forward">Forward</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="teamFilter" class="form-label">Team:</label>
+                        <select id="teamFilter" class="form-select">
+                            <option value="">All Teams</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="priceFilter" class="form-label">Max Price (£M):</label>
+                        <input type="number" id="priceFilter" class="form-control" placeholder="e.g., 10.0" step="0.1" min="0">
+                    </div>
+                    <div class="col-md-3">
+                        <label for="chanceFilter" class="form-label">Min Chance of Playing (%):</label>
+                        <input type="number" id="chanceFilter" class="form-control" placeholder="e.g., 75" min="0" max="100">
+                    </div>
+                </div>
+                
+                <div class="row mb-3">
+                    <div class="col-12">
+                        <button id="clearFilters" class="btn btn-outline-secondary btn-sm">Clear All Filters</button>
+                        <span id="filterInfo" class="ms-3 text-muted"></span>
+                    </div>
+                </div>
+                
                 <div class="table-responsive">
                     <table id="playersTable" class="table table-striped table-bordered">
                         <thead>
@@ -720,7 +755,14 @@ def players_table():
                         }
                     });
                     
-                    $('#playersTable').DataTable({
+                    // Populate team filter dropdown
+                    var teams = [...new Set({{ players|map(attribute='team')|list|tojson }}.map(p => p.team))].sort();
+                    var teamSelect = $('#teamFilter');
+                    teams.forEach(function(team) {
+                        teamSelect.append($('<option></option>').val(team).text(team));
+                    });
+                    
+                    var table = $('#playersTable').DataTable({
                         paging: true,
                         pageLength: 25,
                         ordering: true,
@@ -729,7 +771,7 @@ def players_table():
                         order: [[6, 'desc'], [7, 'desc']], // Sort by Total (GW1-9) then by Points/£
                         scrollX: true,
                         columnDefs: [
-                            { targets: [0], orderable: false, width: '40px' }, // Rank column not sortable
+                            { targets: [0], orderable: true, width: '40px', type: 'num' }, // Rank column now sortable
                             { targets: [1], orderable: true, width: '120px', type: 'string' }, // Name
                             { targets: [2], orderable: true, width: '60px', type: 'string' }, // Position
                             { targets: [3], orderable: true, width: '80px', type: 'string' }, // Team
@@ -737,7 +779,7 @@ def players_table():
                             { targets: [5], orderable: true, type: 'num', width: '50px' }, // Form
                             { targets: [6], orderable: true, type: 'num', width: '80px' }, // Total
                             { targets: [7], orderable: true, type: 'num', width: '70px' }, // Points/£
-                            { targets: [8], orderable: false, width: '80px' }, // Chance of Playing not sortable
+                            { targets: [8], orderable: true, width: '80px' }, // Chance of Playing now sortable
                             { targets: [9, 10, 11, 12, 13, 14, 15, 16, 17], orderable: true, type: 'num', width: '45px' } // GW columns
                         ],
                         language: {
@@ -749,6 +791,82 @@ def players_table():
                         orderClasses: true,
                         pageLength: 25,
                         lengthMenu: [[10, 25, 50, 100], [10, 25, 50, 100]]
+                    });
+                    
+                    // Custom filtering function
+                    function customFilter() {
+                        table.draw();
+                    }
+                    
+                    // Position filter
+                    $('#positionFilter').on('change', function() {
+                        var position = $(this).val();
+                        $.fn.dataTable.ext.search.push(function(settings, data, dataIndex) {
+                            if (position === '') return true;
+                            return data[2].includes(position);
+                        });
+                        customFilter();
+                    });
+                    
+                    // Team filter
+                    $('#teamFilter').on('change', function() {
+                        var team = $(this).val();
+                        $.fn.dataTable.ext.search.push(function(settings, data, dataIndex) {
+                            if (team === '') return true;
+                            return data[3] === team;
+                        });
+                        customFilter();
+                    });
+                    
+                    // Price filter
+                    $('#priceFilter').on('input', function() {
+                        var maxPrice = parseFloat($(this).val());
+                        if (isNaN(maxPrice)) return;
+                        
+                        $.fn.dataTable.ext.search.push(function(settings, data, dataIndex) {
+                            var price = parseFloat(data[4].replace('£', '').replace('M', ''));
+                            return price <= maxPrice;
+                        });
+                        customFilter();
+                    });
+                    
+                    // Chance of playing filter
+                    $('#chanceFilter').on('input', function() {
+                        var minChance = parseInt($(this).val());
+                        if (isNaN(minChance)) return;
+                        
+                        $.fn.dataTable.ext.search.push(function(settings, data, dataIndex) {
+                            var chanceText = data[8];
+                            var chance = parseInt(chanceText.match(/\d+/)[0]);
+                            return chance >= minChance;
+                        });
+                        customFilter();
+                    });
+                    
+                    // Clear all filters
+                    $('#clearFilters').on('click', function() {
+                        $('#positionFilter').val('');
+                        $('#teamFilter').val('');
+                        $('#priceFilter').val('');
+                        $('#chanceFilter').val('');
+                        $.fn.dataTable.ext.search.splice(0, $.fn.dataTable.ext.search.length);
+                        table.draw();
+                        updateFilterInfo();
+                    });
+                    
+                    // Update filter info
+                    function updateFilterInfo() {
+                        var visibleRows = table.rows({search: 'applied'}).count();
+                        var totalRows = table.rows().count();
+                        $('#filterInfo').text('Showing ' + visibleRows + ' of ' + totalRows + ' players');
+                    }
+                    
+                    // Initial filter info
+                    updateFilterInfo();
+                    
+                    // Update filter info after filtering
+                    table.on('draw', function() {
+                        updateFilterInfo();
                     });
                 });
             </script>
