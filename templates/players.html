@@ -58,7 +58,7 @@
         .table th { 
             white-space: normal !important; 
             word-wrap: break-word !important;
-            max-width: 80px !important;
+            max-width: none !important;
             font-size: 0.85em;
             padding: 8px 4px;
             text-align: center;
@@ -162,6 +162,27 @@
             margin: 10px 0;
         }
         
+        /* Ensure DataTables controls use full width */
+        .dataTables_wrapper .dataTables_length,
+        .dataTables_wrapper .dataTables_filter {
+            display: inline-block;
+            width: 50%;
+        }
+        
+        .dataTables_wrapper .dataTables_length {
+            text-align: left;
+        }
+        
+        .dataTables_wrapper .dataTables_filter {
+            text-align: right;
+        }
+        
+        .dataTables_wrapper .dataTables_info,
+        .dataTables_wrapper .dataTables_paginate {
+            width: 100%;
+            text-align: center;
+        }
+        
         /* Ensure DataTables cells maintain center alignment */
         .dataTables_wrapper .dataTable td,
         .dataTables_wrapper .dataTable th {
@@ -180,6 +201,65 @@
         .dataTables_wrapper table.dataTable td,
         .dataTables_wrapper table.dataTable th {
             text-align: center !important;
+        }
+        
+        /* Make table full width */
+        .table-responsive {
+            width: 100% !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+        
+        #playersTable {
+            width: 100% !important;
+            margin: 0 !important;
+        }
+        
+        .dataTables_wrapper {
+            width: 100% !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+        
+        .dataTables_wrapper .dataTable {
+            width: 100% !important;
+            margin: 0 !important;
+        }
+        
+        /* Ensure table stretches to full container width */
+        .container-fluid {
+            padding-left: 15px !important;
+            padding-right: 15px !important;
+        }
+        
+        .row {
+            margin-left: 0 !important;
+            margin-right: 0 !important;
+        }
+        
+        .col-md-12 {
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+        }
+        
+        /* Ensure main container uses full width */
+        .main-content {
+            width: 100% !important;
+            max-width: none !important;
+            margin: 0 !important;
+            padding: 0 15px !important;
+        }
+        
+        /* Remove any max-width constraints */
+        .container, .container-fluid {
+            max-width: none !important;
+        }
+        
+        /* Ensure table wrapper takes full width */
+        .table-wrapper {
+            width: 100% !important;
+            margin: 0 !important;
+            padding: 0 !important;
         }
         
         .dataTables_wrapper .dataTables_paginate .paginate_button {
@@ -311,7 +391,7 @@
         </div>
     </nav>
     
-    <div class="container-fluid">
+    <div class="container-fluid main-content">
         <h1 class="text-center fade-in"><i class="fas fa-users"></i> FPL Players - Expected Points (GW1-9)</h1>
         
         <!-- Save & Load Views Section -->
@@ -415,7 +495,7 @@
         </div>
         
         <!-- Players Table -->
-        <div class="table-responsive scale-in">
+        <div class="table-responsive scale-in table-wrapper">
             <table id="playersTable" class="table table-striped table-hover">
                 <thead>
                     <tr>
@@ -473,6 +553,15 @@
             // Update views dropdown
             updateViewsDropdown();
             
+            // Handle window resize to maintain full width
+            $(window).on('resize', function() {
+                if (currentTable) {
+                    currentTable.columns.adjust();
+                    $('#playersTable').css('width', '100%');
+                    $('.dataTables_wrapper').css('width', '100%');
+                }
+            });
+            
             function forceCenterAlignment() {
                 // Force center alignment for all table cells
                 $('#playersTable td, #playersTable th').css('text-align', 'center');
@@ -528,6 +617,14 @@
                     initComplete: function() {
                         // Force center alignment after DataTables initializes
                         forceCenterAlignment();
+                        
+                        // Ensure table uses full width
+                        $('#playersTable').css('width', '100%');
+                        $('.dataTables_wrapper').css('width', '100%');
+                        $('.dataTables_wrapper .dataTable').css('width', '100%');
+                        
+                        // Adjust column widths for better distribution
+                        currentTable.columns.adjust();
                     }
                 });
             }
