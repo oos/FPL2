@@ -5,6 +5,7 @@ A clean, focused Flask application for displaying Fantasy Premier League Fixture
 ## Features
 
 - **FDR Table**: Complete fixture difficulty ratings for all 20 Premier League teams across 38 gameweeks
+- **Players Table**: Comprehensive player data with expected points for GW1-9, pricing, form, and more
 - **Color Coding**: Visual representation of fixture difficulty (1=Very Easy to 5=Very Hard)
 - **Opponent Information**: Shows which team each team plays in each gameweek
 - **Interactive Filters**: Filter by gameweek range and team name
@@ -47,6 +48,11 @@ A clean, focused Flask application for displaying Fantasy Premier League Fixture
    - **Team Filter**: Search for specific teams (e.g., "Arsenal", "Chelsea")
    - **Apply Filters**: Click the "Apply Filters" button to update the view
 
+4. **Access the Players table**:
+   - Navigate to the "Players" tab in the navigation
+   - View comprehensive player data including expected points, pricing, and form
+   - Sort by any column and search for specific players
+
 ## FDR Color Legend
 
 - 🟢 **1 - Very Easy** (Dark Green): Favorable fixtures
@@ -58,6 +64,7 @@ A clean, focused Flask application for displaying Fantasy Premier League Fixture
 ## API Endpoints
 
 - **`/`**: Main FDR table page
+- **`/players`**: Players table with comprehensive FPL player data
 - **`/health`**: Health check endpoint (returns JSON status)
 
 ## Data Source
