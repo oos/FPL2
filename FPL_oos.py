@@ -1040,18 +1040,8 @@ def players_table():
                         });
                     }
                     
-                    // Use DataTables built-in multi-column sorting with enhancements
-                    table.on('order.dt', function() {
-                        // Get the current sort order from DataTable
-                        currentSortOrder = table.order();
-                        console.log('DataTable order changed:', currentSortOrder);
-                        
-                        // Update visual indicators
-                        updateSortIndicators();
-                        
-                        // Show sort order info
-                        updateSortOrderInfo();
-                    });
+                    // Remove the order.dt event listener to prevent conflicts with manual sorting
+                    // We'll handle all sorting manually through our click handlers
                     
                     // Override the default click behavior to add multi-column sorting
                     $('#playersTable thead th').on('click', function(e) {
@@ -1069,12 +1059,20 @@ def players_table():
                         
                         // Apply the new sort order
                         table.order(currentSortOrder).draw();
+                        
+                        // Update visual indicators manually
+                        updateSortIndicators();
+                        updateSortOrderInfo();
                     });
                     
                     // Function to remove a specific sort column
                     window.removeSortPill = function(columnIndex) {
                         currentSortOrder = currentSortOrder.filter(sort => sort[0] !== columnIndex);
                         table.order(currentSortOrder).draw();
+                        
+                        // Update visual indicators manually
+                        updateSortIndicators();
+                        updateSortOrderInfo();
                     };
                     
                     // Function to display current sort order
