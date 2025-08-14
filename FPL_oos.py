@@ -758,6 +758,31 @@ def players_table():
                 .sort-pill.desc {
                     background: linear-gradient(135deg, #dc3545, #c82333);
                 }
+                
+                /* Sort level number styling */
+                .sort-level-number {
+                    position: absolute;
+                    bottom: -20px;
+                    left: 50%;
+                    transform: translateX(-50%);
+                    background: #007bff;
+                    color: white;
+                    border-radius: 50%;
+                    width: 20px;
+                    height: 20px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-size: 10px;
+                    font-weight: bold;
+                    box-shadow: 0 2px 4px rgba(0,123,255,0.3);
+                    z-index: 10;
+                }
+                
+                /* Ensure headers have relative positioning for absolute positioning of numbers */
+                #playersTable thead th {
+                    position: relative;
+                }
             </style>
         </head>
         <body class="p-4">
@@ -828,7 +853,7 @@ def players_table():
                         <span id="filterInfo" class="ms-3 text-muted"></span>
                         <div class="mt-2">
                             <small class="text-muted">
-                                <strong>Sorting:</strong> Click column headers to sort • Each click adds a new sort level • Remove individual sorts with the X button
+                                <strong>Sorting:</strong> Click column headers to add sort levels • Each click adds to existing sorts • Numbers show sort order • Remove individual sorts with X button
                             </small>
                         </div>
                         <div id="sortPills" class="mt-2 d-flex flex-wrap gap-1">
@@ -979,8 +1004,9 @@ def players_table():
                     
                     // Function to update sort indicators and create sort pills
                     function updateSortIndicators() {
-                        // Remove all existing sort indicators
+                        // Remove all existing sort indicators and level numbers
                         $('#playersTable thead th').removeClass('sorting_asc sorting_desc').addClass('sorting');
+                        $('.sort-level-number').remove();
                         
                         // Clear existing sort pills
                         $('#sortPills').empty();
@@ -996,6 +1022,9 @@ def players_table():
                             } else {
                                 header.removeClass('sorting').addClass('sorting_desc');
                             }
+                            
+                            // Add sort level number under the header
+                            header.append('<div class="sort-level-number">' + (index + 1) + '</div>');
                             
                             // Create sort pill
                             var columnNames = ['Rank', 'Player Name', 'Pos', 'Team', 'Price', 'Form', 'Total (GW1-9)', 'Points/£', 'Chance of Playing', 'GW1', 'GW2', 'GW3', 'GW4', 'GW5', 'GW6', 'GW7', 'GW8', 'GW9'];
@@ -1029,18 +1058,9 @@ def players_table():
                         var columnIndex = $(this).index();
                         console.log('Header clicked:', columnIndex);
                         
-                        // Add this column to the sort order
-                        var existingIndex = currentSortOrder.findIndex(sort => sort[0] === columnIndex);
+                        // Always add this column as a new sort level
                         var newDirection = 'asc';
-                        
-                        if (existingIndex !== -1) {
-                            // Column already exists, toggle direction
-                            newDirection = currentSortOrder[existingIndex][1] === 'asc' ? 'desc' : 'asc';
-                            currentSortOrder[existingIndex][1] = newDirection;
-                        } else {
-                            // Add new column to sort order
-                            currentSortOrder.push([columnIndex, newDirection]);
-                        }
+                        currentSortOrder.push([columnIndex, newDirection]);
                         
                         // Limit to 5 sort levels for performance
                         if (currentSortOrder.length > 5) {
