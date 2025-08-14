@@ -673,14 +673,28 @@ def players_table():
                     cursor: pointer;
                     position: relative;
                     transition: background-color 0.2s ease;
+                    user-select: none;
                 }
                 
                 #playersTable thead th:hover {
                     background-color: #f8f9fa;
+                    box-shadow: inset 0 0 0 2px #007bff;
                 }
                 
                 #playersTable thead th.sorting:hover {
                     background-color: #e9ecef;
+                }
+                
+                /* Make it clear headers are clickable */
+                #playersTable thead th::after {
+                    content: '↕';
+                    position: absolute;
+                    right: 8px;
+                    top: 50%;
+                    transform: translateY(-50%);
+                    color: #6c757d;
+                    font-size: 12px;
+                    opacity: 0.6;
                 }
                 
                 /* Sort order info styling */
@@ -874,22 +888,22 @@ def players_table():
                     var table = $('#playersTable').DataTable({
                         paging: true,
                         pageLength: 25,
-                        ordering: true,
+                        ordering: false, // Disable default DataTable ordering
                         info: true,
                         searching: true,
-                        order: [[6, 'desc'], [7, 'desc']], // Default sort: Total (GW1-9) then by Points/£
+                        order: [], // Start with no default ordering
                         scrollX: true,
                         columnDefs: [
-                            { targets: [0], orderable: true, width: '40px', type: 'num' }, // Rank column now sortable
-                            { targets: [1], orderable: true, width: '120px', type: 'string' }, // Name
-                            { targets: [2], orderable: true, width: '60px', type: 'string' }, // Position
-                            { targets: [3], orderable: true, width: '80px', type: 'string' }, // Team
-                            { targets: [4], orderable: true, type: 'num', width: '70px' }, // Price
-                            { targets: [5], orderable: true, type: 'num', width: '50px' }, // Form
-                            { targets: [6], orderable: true, type: 'num', width: '80px' }, // Total
-                            { targets: [7], orderable: true, type: 'num', width: '70px' }, // Points/£
-                            { targets: [8], orderable: true, width: '80px' }, // Chance of Playing now sortable
-                            { targets: [9, 10, 11, 12, 13, 14, 15, 16, 17], orderable: true, type: 'num', width: '45px' } // GW columns
+                            { targets: [0], orderable: false, width: '40px', type: 'num' }, // Rank column not sortable
+                            { targets: [1], orderable: false, width: '120px', type: 'string' }, // Name
+                            { targets: [2], orderable: false, width: '60px', type: 'string' }, // Position
+                            { targets: [3], orderable: false, width: '80px', type: 'string' }, // Team
+                            { targets: [4], orderable: false, type: 'num', width: '70px' }, // Price
+                            { targets: [5], orderable: false, type: 'num', width: '50px' }, // Form
+                            { targets: [6], orderable: false, type: 'num', width: '80px' }, // Total
+                            { targets: [7], orderable: false, type: 'num', width: '70px' }, // Points/£
+                            { targets: [8], orderable: false, width: '80px' }, // Chance of Playing
+                            { targets: [9, 10, 11, 12, 13, 14, 15, 16, 17], orderable: false, type: 'num', width: '45px' } // GW columns
                         ],
                         language: {
                             search: "Search players:",
@@ -897,7 +911,7 @@ def players_table():
                             info: "Showing _START_ to _END_ of _TOTAL_ players"
                         },
                         autoWidth: false,
-                        orderClasses: true,
+                        orderClasses: false, // Disable default order classes
                         pageLength: 25,
                         lengthMenu: [[10, 25, 50, 100], [10, 25, 50, 100]]
                     });
@@ -931,8 +945,10 @@ def players_table():
                     // Custom header click handler for multi-column sorting
                     $('#playersTable thead th').on('click', function(e) {
                         e.preventDefault();
+                        e.stopPropagation();
                         
                         var columnIndex = $(this).index();
+                        console.log('Header clicked:', columnIndex, 'Current sort order:', currentSortOrder);
                         
                         // Determine sort direction
                         var currentDirection = 'asc';
@@ -943,15 +959,19 @@ def players_table():
                             currentDirection = currentSortOrder[existingSortIndex][1] === 'asc' ? 'desc' : 'asc';
                             // Update existing sort
                             currentSortOrder[existingSortIndex] = [columnIndex, currentDirection];
+                            console.log('Updated existing sort:', columnIndex, currentDirection);
                         } else {
                             // Add new sort level
                             currentSortOrder.push([columnIndex, currentDirection]);
+                            console.log('Added new sort level:', columnIndex, currentDirection);
                         }
                         
                         // Limit to 5 sort levels for performance
                         if (currentSortOrder.length > 5) {
                             currentSortOrder = currentSortOrder.slice(0, 5);
                         }
+                        
+                        console.log('Final sort order:', currentSortOrder);
                         
                         // Apply the new sort order
                         table.order(currentSortOrder).draw();
@@ -1062,6 +1082,12 @@ def players_table():
                     
                     // Initialize the load view dropdown
                     updateLoadViewDropdown();
+                    
+                    // Set default sort order
+                    currentSortOrder = [[6, 'desc'], [7, 'desc']]; // Total (GW1-9) then by Points/£
+                    table.order(currentSortOrder).draw();
+                    updateSortIndicators();
+                    updateSortOrderInfo();
                     
                     // Custom filtering function
                     function customFilter() {
