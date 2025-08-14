@@ -866,9 +866,10 @@ def calculate_weekly_transfers(squad, gw_index):
     # Get previous GW optimal team
     prev_xi, prev_bench = get_optimal_team_for_gw(squad, gw_index - 1)
     
-    # Find players coming in and out
-    transfers_in = [p for p in current_xi if p not in prev_xi]
-    transfers_out = [p for p in prev_xi if p not in current_xi]
+    # Find players coming in and out of the STARTING XI only
+    # (not bench-to-starting XI moves, which are just team selection changes)
+    transfers_in = [p for p in current_xi if p not in prev_xi and p not in prev_bench]
+    transfers_out = [p for p in prev_xi if p not in current_xi and p not in current_bench]
     
     return transfers_in, transfers_out
 
@@ -891,6 +892,12 @@ def squad_page():
             starting_xi, bench = get_optimal_team_for_gw(squad, gw)
             transfers_in, transfers_out = calculate_weekly_transfers(squad, gw)
             
+            # Calculate bench promotions (players moved from bench to starting XI)
+            bench_promotions = []
+            if gw > 0:  # GW1 has no previous week
+                prev_xi, prev_bench = get_optimal_team_for_gw(squad, gw - 1)
+                bench_promotions = [p for p in starting_xi if p in prev_bench]
+            
             gw_points = sum(player["gw1_9_points"][gw] for player in starting_xi)
             total_points += gw_points
             
@@ -900,6 +907,7 @@ def squad_page():
                 "bench": bench,
                 "transfers_in": transfers_in,
                 "transfers_out": transfers_out,
+                "bench_promotions": bench_promotions,
                 "points": gw_points,
                 "formation": get_formation(starting_xi)
             })
@@ -1051,6 +1059,9 @@ def squad_page():
                                 </div>
                                 <div class="col-md-4">
                                     <h4>Transfers: {{ gw.transfers_in|length }} IN, {{ gw.transfers_out|length }} OUT</h4>
+                                    {% if gw.bench_promotions|length > 0 %}
+                                    <small class="text-info">{{ gw.bench_promotions|length }} promoted from bench</small>
+                                    {% endif %}
                                 </div>
                             </div>
                             
@@ -1078,9 +1089,11 @@ def squad_page():
                                             </div>
                                         </div>
                                         {% if player in gw.transfers_in %}
-                                        <small class="text-success"><i class="fas fa-arrow-up"></i> TRANSFER IN</small>
+                                        <small class="text-success"><i class="fas fa-plus-circle"></i> TRANSFER IN (New to Squad)</small>
                                         {% elif player in gw.transfers_out %}
-                                        <small class="text-danger"><i class="fas fa-arrow-down"></i> TRANSFER OUT</small>
+                                        <small class="text-danger"><i class="fas fa-minus-circle"></i> TRANSFER OUT (Removed from Squad)</small>
+                                        {% elif player in gw.bench_promotions %}
+                                        <small class="text-info"><i class="fas fa-arrow-up"></i> Promoted from Bench</small>
                                         {% endif %}
                                     </div>
                                 </div>
