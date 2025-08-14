@@ -760,42 +760,220 @@ def players_table():
         return f"Error generating players table: {str(e)}"
 
 def optimize_squad_for_gw1_9():
-    """Optimize squad for maximum points across GW1-9 while following FPL rules"""
-    players_data = fetch_players_data()
+    """Use the alternative strategy with budget-compliant squad and weekly transfers"""
+    # This is the alternative strategy provided by the user
+    # It's budget-compliant and shows realistic FPL management
     
-    if not players_data:
-        return None
+    # Define the strategy data
+    strategy_data = {
+        1: {  # GW1
+            "starting_xi": [
+                {"name": "Sánchez", "position": "Goalkeeper", "team": "Chelsea", "price": 5.0, "points": 4.0, "captain": False},
+                {"name": "Virgil", "position": "Defender", "team": "Liverpool", "price": 6.0, "points": 4.2, "captain": False},
+                {"name": "Mepham", "position": "Defender", "team": "Bournemouth", "price": 4.0, "points": 3.0, "captain": False},
+                {"name": "Muñoz", "position": "Defender", "team": "Crystal Palace", "price": 5.5, "points": 2.9, "captain": False},
+                {"name": "Palmer", "position": "Midfielder", "team": "Chelsea", "price": 10.5, "points": 5.1, "captain": False},
+                {"name": "Eze", "position": "Midfielder", "team": "Crystal Palace", "price": 7.5, "points": 4.1, "captain": False},
+                {"name": "Mac Allister", "position": "Midfielder", "team": "Liverpool", "price": 6.5, "points": 4.0, "captain": False},
+                {"name": "Rice", "position": "Midfielder", "team": "Arsenal", "price": 6.5, "points": 3.7, "captain": False},
+                {"name": "Watkins", "position": "Forward", "team": "Aston Villa", "price": 9.0, "points": 10.4, "captain": True},
+                {"name": "Wood", "position": "Forward", "team": "Nottingham Forest", "price": 7.5, "points": 4.8, "captain": False},
+                {"name": "Evanilson", "position": "Forward", "team": "Manchester United", "price": 7.0, "points": 3.4, "captain": False}
+            ],
+            "bench": [
+                {"name": "Petrović", "position": "Goalkeeper", "team": "Chelsea", "price": 4.5, "points": 3.4, "captain": False},
+                {"name": "Lacroix", "position": "Defender", "team": "Wolves", "price": 5.0, "points": 2.8, "captain": False},
+                {"name": "Richards", "position": "Defender", "team": "Nottingham Forest", "price": 4.5, "points": 2.6, "captain": False},
+                {"name": "Tonali", "position": "Midfielder", "team": "Newcastle", "price": 5.5, "points": 3.2, "captain": False}
+            ]
+        },
+        2: {  # GW2
+            "starting_xi": [
+                {"name": "Sánchez", "position": "Goalkeeper", "team": "Chelsea", "price": 5.0, "points": 3.7, "captain": False},
+                {"name": "Muñoz", "position": "Defender", "team": "Crystal Palace", "price": 5.5, "points": 4.2, "captain": False},
+                {"name": "Mepham", "position": "Defender", "team": "Bournemouth", "price": 4.0, "points": 3.5, "captain": False},
+                {"name": "Virgil", "position": "Defender", "team": "Liverpool", "price": 6.0, "points": 3.2, "captain": False},
+                {"name": "M.Salah", "position": "Midfielder", "team": "Liverpool", "price": 14.5, "points": 12.2, "captain": True},
+                {"name": "Rice", "position": "Midfielder", "team": "Arsenal", "price": 6.5, "points": 5.0, "captain": False},
+                {"name": "Eze", "position": "Midfielder", "team": "Crystal Palace", "price": 7.5, "points": 4.8, "captain": False},
+                {"name": "Mac Allister", "position": "Midfielder", "team": "Liverpool", "price": 6.5, "points": 3.5, "captain": False},
+                {"name": "Watkins", "position": "Forward", "team": "Aston Villa", "price": 9.0, "points": 4.6, "captain": False},
+                {"name": "Evanilson", "position": "Forward", "team": "Manchester United", "price": 7.0, "points": 4.6, "captain": False},
+                {"name": "Wood", "position": "Forward", "team": "Nottingham Forest", "price": 7.5, "points": 3.9, "captain": False}
+            ],
+            "bench": [
+                {"name": "Petrović", "position": "Goalkeeper", "team": "Chelsea", "price": 4.5, "points": 3.9, "captain": False},
+                {"name": "Lacroix", "position": "Defender", "team": "Wolves", "price": 5.0, "points": 3.6, "captain": False},
+                {"name": "Richards", "position": "Defender", "team": "Nottingham Forest", "price": 4.5, "points": 3.5, "captain": False},
+                {"name": "Palmer", "position": "Midfielder", "team": "Chelsea", "price": 10.5, "points": 4.9, "captain": False, "status": "OUT"},
+                {"name": "Tonali", "position": "Midfielder", "team": "Newcastle", "price": 5.5, "points": 3.3, "captain": False}
+            ],
+            "transfers": {"in": ["M.Salah"], "out": ["Palmer"]}
+        },
+        3: {  # GW3
+            "starting_xi": [
+                {"name": "Sánchez", "position": "Goalkeeper", "team": "Chelsea", "price": 5.0, "points": 4.0, "captain": False},
+                {"name": "Virgil", "position": "Defender", "team": "Liverpool", "price": 6.0, "points": 3.5, "captain": False},
+                {"name": "Muñoz", "position": "Defender", "team": "Crystal Palace", "price": 5.5, "points": 3.2, "captain": False},
+                {"name": "Mepham", "position": "Defender", "team": "Bournemouth", "price": 4.0, "points": 3.0, "captain": False},
+                {"name": "M.Salah", "position": "Midfielder", "team": "Liverpool", "price": 14.5, "points": 11.2, "captain": True},
+                {"name": "Eze", "position": "Midfielder", "team": "Crystal Palace", "price": 7.5, "points": 4.0, "captain": False},
+                {"name": "Mac Allister", "position": "Midfielder", "team": "Liverpool", "price": 6.5, "points": 3.2, "captain": False},
+                {"name": "Rice", "position": "Midfielder", "team": "Arsenal", "price": 6.5, "points": 3.1, "captain": False},
+                {"name": "Wood", "position": "Forward", "team": "Nottingham Forest", "price": 7.5, "points": 5.2, "captain": False},
+                {"name": "Watkins", "position": "Forward", "team": "Aston Villa", "price": 9.0, "points": 4.8, "captain": False},
+                {"name": "Evanilson", "position": "Forward", "team": "Manchester United", "price": 7.0, "points": 3.9, "captain": False}
+            ],
+            "bench": [
+                {"name": "Petrović", "position": "Goalkeeper", "team": "Chelsea", "price": 4.5, "points": 3.3, "captain": False},
+                {"name": "Lacroix", "position": "Defender", "team": "Wolves", "price": 5.0, "points": 3.0, "captain": False},
+                {"name": "Richards", "position": "Defender", "team": "Nottingham Forest", "price": 4.5, "points": 2.9, "captain": False},
+                {"name": "Rogers", "position": "Midfielder", "team": "Aston Villa", "price": 7.0, "points": 4.2, "captain": False},
+                {"name": "Tonali", "position": "Midfielder", "team": "Newcastle", "price": 5.5, "points": 3.7, "captain": False, "status": "OUT"}
+            ],
+            "transfers": {"in": ["Rogers"], "out": ["Tonali"]}
+        },
+        4: {  # GW4
+            "starting_xi": [
+                {"name": "Sánchez", "position": "Goalkeeper", "team": "Chelsea", "price": 5.0, "points": 3.5, "captain": False},
+                {"name": "Muñoz", "position": "Defender", "team": "Crystal Palace", "price": 5.5, "points": 5.3, "captain": False},
+                {"name": "Virgil", "position": "Defender", "team": "Liverpool", "price": 6.0, "points": 4.4, "captain": False},
+                {"name": "Mepham", "position": "Defender", "team": "Bournemouth", "price": 4.0, "points": 3.5, "captain": False},
+                {"name": "M.Salah", "position": "Midfielder", "team": "Liverpool", "price": 14.5, "points": 14.0, "captain": True},
+                {"name": "Eze", "position": "Midfielder", "team": "Crystal Palace", "price": 7.5, "points": 5.8, "captain": False},
+                {"name": "Rice", "position": "Midfielder", "team": "Arsenal", "price": 6.5, "points": 4.1, "captain": False},
+                {"name": "Mac Allister", "position": "Midfielder", "team": "Liverpool", "price": 6.5, "points": 4.0, "captain": False},
+                {"name": "Evanilson", "position": "Forward", "team": "Manchester United", "price": 7.0, "points": 4.2, "captain": False},
+                {"name": "Watkins", "position": "Forward", "team": "Aston Villa", "price": 9.0, "points": 4.1, "captain": False},
+                {"name": "Wood", "position": "Forward", "team": "Nottingham Forest", "price": 7.5, "points": 3.2, "captain": False}
+            ],
+            "bench": [
+                {"name": "Petrović", "position": "Goalkeeper", "team": "Chelsea", "price": 4.5, "points": 4.0, "captain": False},
+                {"name": "Lacroix", "position": "Defender", "team": "Wolves", "price": 5.0, "points": 4.8, "captain": False},
+                {"name": "Richards", "position": "Defender", "team": "Nottingham Forest", "price": 4.5, "points": 4.5, "captain": False, "status": "OUT"},
+                {"name": "Tosin", "position": "Defender", "team": "Chelsea", "price": 4.5, "points": 3.1, "captain": False},
+                {"name": "Rogers", "position": "Midfielder", "team": "Aston Villa", "price": 7.0, "points": 3.7, "captain": False}
+            ],
+            "transfers": {"in": ["Tosin"], "out": ["Richards"]}
+        },
+        5: {  # GW5
+            "starting_xi": [
+                {"name": "Sánchez", "position": "Goalkeeper", "team": "Chelsea", "price": 5.0, "points": 3.7, "captain": False},
+                {"name": "Virgil", "position": "Defender", "team": "Liverpool", "price": 6.0, "points": 4.6, "captain": False},
+                {"name": "Milenković", "position": "Defender", "team": "Nottingham Forest", "price": 5.5, "points": 4.1, "captain": False},
+                {"name": "Mepham", "position": "Defender", "team": "Bournemouth", "price": 4.0, "points": 2.9, "captain": False},
+                {"name": "M.Salah", "position": "Midfielder", "team": "Liverpool", "price": 14.5, "points": 13.2, "captain": True},
+                {"name": "Eze", "position": "Midfielder", "team": "Crystal Palace", "price": 7.5, "points": 4.4, "captain": False},
+                {"name": "Mac Allister", "position": "Midfielder", "team": "Liverpool", "price": 6.5, "points": 3.9, "captain": False},
+                {"name": "Rice", "position": "Midfielder", "team": "Arsenal", "price": 6.5, "points": 3.4, "captain": False},
+                {"name": "Watkins", "position": "Forward", "team": "Aston Villa", "price": 9.0, "points": 5.7, "captain": False},
+                {"name": "Wood", "position": "Forward", "team": "Nottingham Forest", "price": 7.5, "points": 4.8, "captain": False},
+                {"name": "Evanilson", "position": "Forward", "team": "Manchester United", "price": 7.0, "points": 4.3, "captain": False}
+            ],
+            "bench": [
+                {"name": "Petrović", "position": "Goalkeeper", "team": "Chelsea", "price": 4.5, "points": 3.5, "captain": False},
+                {"name": "Muñoz", "position": "Defender", "team": "Crystal Palace", "price": 5.5, "points": 3.7, "captain": False, "status": "OUT"},
+                {"name": "Lacroix", "position": "Defender", "team": "Wolves", "price": 5.0, "points": 3.4, "captain": False},
+                {"name": "Tosin", "position": "Defender", "team": "Chelsea", "price": 4.5, "points": 2.9, "captain": False},
+                {"name": "Rogers", "position": "Midfielder", "team": "Aston Villa", "price": 7.0, "points": 4.4, "captain": False}
+            ],
+            "transfers": {"in": ["Milenković"], "out": ["Muñoz"]}
+        },
+        6: {  # GW6
+            "starting_xi": [
+                {"name": "Martinez", "position": "Goalkeeper", "team": "Aston Villa", "price": 5.0, "points": 3.9, "captain": False},
+                {"name": "Milenković", "position": "Defender", "team": "Nottingham Forest", "price": 5.5, "points": 4.7, "captain": False},
+                {"name": "Virgil", "position": "Defender", "team": "Liverpool", "price": 6.0, "points": 3.7, "captain": False},
+                {"name": "Mepham", "position": "Defender", "team": "Bournemouth", "price": 4.0, "points": 3.6, "captain": False},
+                {"name": "M.Salah", "position": "Midfielder", "team": "Liverpool", "price": 14.5, "points": 5.7, "captain": False},
+                {"name": "Eze", "position": "Midfielder", "team": "Crystal Palace", "price": 7.5, "points": 4.2, "captain": False},
+                {"name": "Mac Allister", "position": "Midfielder", "team": "Liverpool", "price": 6.5, "points": 3.6, "captain": False},
+                {"name": "Rice", "position": "Midfielder", "team": "Arsenal", "price": 6.5, "points": 3.5, "captain": False},
+                {"name": "Wood", "position": "Forward", "team": "Nottingham Forest", "price": 7.5, "points": 11.6, "captain": True},
+                {"name": "Watkins", "position": "Forward", "team": "Aston Villa", "price": 9.0, "points": 5.2, "captain": False},
+                {"name": "Evanilson", "position": "Forward", "team": "Manchester United", "price": 7.0, "points": 4.7, "captain": False}
+            ],
+            "bench": [
+                {"name": "Sánchez", "position": "Goalkeeper", "team": "Chelsea", "price": 5.0, "points": 3.9, "captain": False, "status": "OUT"},
+                {"name": "Petrović", "position": "Goalkeeper", "team": "Chelsea", "price": 4.5, "points": 3.8, "captain": False},
+                {"name": "Tosin", "position": "Defender", "team": "Chelsea", "price": 4.5, "points": 3.5, "captain": False},
+                {"name": "Lacroix", "position": "Defender", "team": "Wolves", "price": 5.0, "points": 3.3, "captain": False},
+                {"name": "Rogers", "position": "Midfielder", "team": "Aston Villa", "price": 7.0, "points": 4.2, "captain": False}
+            ],
+            "transfers": {"in": ["Martinez"], "out": ["Sánchez"]}
+        },
+        7: {  # GW7
+            "starting_xi": [
+                {"name": "Martinez", "position": "Goalkeeper", "team": "Aston Villa", "price": 5.0, "points": 4.4, "captain": False},
+                {"name": "Muñoz", "position": "Defender", "team": "Crystal Palace", "price": 5.5, "points": 3.9, "captain": False},
+                {"name": "Mepham", "position": "Defender", "team": "Bournemouth", "price": 4.0, "points": 3.4, "captain": False},
+                {"name": "Virgil", "position": "Defender", "team": "Liverpool", "price": 6.0, "points": 3.3, "captain": False},
+                {"name": "M.Salah", "position": "Midfielder", "team": "Liverpool", "price": 14.5, "points": 5.7, "captain": False},
+                {"name": "Rice", "position": "Midfielder", "team": "Arsenal", "price": 6.5, "points": 4.1, "captain": False},
+                {"name": "Eze", "position": "Midfielder", "team": "Crystal Palace", "price": 7.5, "points": 4.0, "captain": False},
+                {"name": "Mac Allister", "position": "Midfielder", "team": "Liverpool", "price": 6.5, "points": 3.2, "captain": False},
+                {"name": "Watkins", "position": "Forward", "team": "Aston Villa", "price": 9.0, "points": 13.2, "captain": True},
+                {"name": "Evanilson", "position": "Forward", "team": "Manchester United", "price": 7.0, "points": 4.0, "captain": False},
+                {"name": "Wood", "position": "Forward", "team": "Nottingham Forest", "price": 7.5, "points": 3.9, "captain": False}
+            ],
+            "bench": [
+                {"name": "Petrović", "position": "Goalkeeper", "team": "Chelsea", "price": 4.5, "points": 3.8, "captain": False},
+                {"name": "Lacroix", "position": "Defender", "team": "Wolves", "price": 5.0, "points": 3.9, "captain": False},
+                {"name": "Tosin", "position": "Defender", "team": "Chelsea", "price": 4.5, "points": 2.7, "captain": False},
+                {"name": "Milenković", "position": "Defender", "team": "Nottingham Forest", "price": 5.5, "points": 2.7, "captain": False, "status": "OUT"},
+                {"name": "Rogers", "position": "Midfielder", "team": "Aston Villa", "price": 7.0, "points": 5.2, "captain": False}
+            ],
+            "transfers": {"in": ["Muñoz"], "out": ["Milenković"]}
+        },
+        8: {  # GW8
+            "starting_xi": [
+                {"name": "Martinez", "position": "Goalkeeper", "team": "Aston Villa", "price": 5.0, "points": 3.0, "captain": False},
+                {"name": "Virgil", "position": "Defender", "team": "Liverpool", "price": 6.0, "points": 4.4, "captain": False},
+                {"name": "Muñoz", "position": "Defender", "team": "Crystal Palace", "price": 5.5, "points": 4.3, "captain": False},
+                {"name": "Mepham", "position": "Defender", "team": "Bournemouth", "price": 4.0, "points": 3.1, "captain": False},
+                {"name": "M.Salah", "position": "Midfielder", "team": "Liverpool", "price": 14.5, "points": 14.8, "captain": True},
+                {"name": "Eze", "position": "Midfielder", "team": "Crystal Palace", "price": 7.5, "points": 4.9, "captain": False},
+                {"name": "Mac Allister", "position": "Midfielder", "team": "Liverpool", "price": 6.5, "points": 4.1, "captain": False},
+                {"name": "Rice", "position": "Midfielder", "team": "Arsenal", "price": 6.5, "points": 3.6, "captain": False},
+                {"name": "Wood", "position": "Forward", "team": "Nottingham Forest", "price": 7.5, "points": 4.6, "captain": False},
+                {"name": "Watkins", "position": "Forward", "team": "Aston Villa", "price": 9.0, "points": 4.5, "captain": False},
+                {"name": "Strand Larsen", "position": "Forward", "team": "Brighton", "price": 6.5, "points": 4.3, "captain": False}
+            ],
+            "bench": [
+                {"name": "Petrović", "position": "Goalkeeper", "team": "Chelsea", "price": 4.5, "points": 3.9, "captain": False},
+                {"name": "Lacroix", "position": "Defender", "team": "Wolves", "price": 5.0, "points": 3.7, "captain": False},
+                {"name": "Tosin", "position": "Defender", "team": "Chelsea", "price": 4.5, "points": 2.7, "captain": False},
+                {"name": "Rogers", "position": "Midfielder", "team": "Aston Villa", "price": 7.0, "points": 3.7, "captain": False},
+                {"name": "Evanilson", "position": "Forward", "team": "Manchester United", "price": 7.0, "points": 3.6, "captain": False, "status": "OUT"}
+            ],
+            "transfers": {"in": ["Strand Larsen"], "out": ["Evanilson"]}
+        },
+        9: {  # GW9
+            "starting_xi": [
+                {"name": "Martinez", "position": "Goalkeeper", "team": "Aston Villa", "price": 5.0, "points": 3.6, "captain": False},
+                {"name": "Cucurella", "position": "Defender", "team": "Chelsea", "price": 6.0, "points": 4.5, "captain": False},
+                {"name": "Virgil", "position": "Defender", "team": "Liverpool", "price": 6.0, "points": 3.8, "captain": False},
+                {"name": "Mepham", "position": "Defender", "team": "Bournemouth", "price": 4.0, "points": 3.3, "captain": False},
+                {"name": "M.Salah", "position": "Midfielder", "team": "Liverpool", "price": 14.5, "points": 12.4, "captain": True},
+                {"name": "Rice", "position": "Midfielder", "team": "Arsenal", "price": 6.5, "points": 4.0, "captain": False},
+                {"name": "Mac Allister", "position": "Midfielder", "team": "Liverpool", "price": 6.5, "points": 3.7, "captain": False},
+                {"name": "Eze", "position": "Midfielder", "team": "Crystal Palace", "price": 7.5, "points": 3.4, "captain": False},
+                {"name": "Strand Larsen", "position": "Forward", "team": "Brighton", "price": 6.5, "points": 4.4, "captain": False},
+                {"name": "Watkins", "position": "Forward", "team": "Aston Villa", "price": 9.0, "points": 4.1, "captain": False},
+                {"name": "Wood", "position": "Forward", "team": "Nottingham Forest", "price": 7.5, "points": 4.0, "captain": False}
+            ],
+            "bench": [
+                {"name": "Petrović", "position": "Goalkeeper", "team": "Chelsea", "price": 4.5, "points": 3.8, "captain": False},
+                {"name": "Tosin", "position": "Defender", "team": "Chelsea", "price": 4.5, "points": 4.4, "captain": False},
+                {"name": "Lacroix", "position": "Defender", "team": "Wolves", "price": 5.0, "points": 3.0, "captain": False},
+                {"name": "Muñoz", "position": "Defender", "team": "Crystal Palace", "price": 5.5, "points": 2.7, "captain": False, "status": "OUT"},
+                {"name": "Rogers", "position": "Midfielder", "team": "Aston Villa", "price": 7.0, "points": 3.3, "captain": False}
+            ],
+            "transfers": {"in": ["Cucurella"], "out": ["Muñoz"]}
+        }
+    }
     
-    # Sort players by total GW1-9 points (descending)
-    players_data.sort(key=lambda x: x["total_gw1_9"], reverse=True)
-    
-    # Initialize squad with best 15 players following FPL rules
-    squad = []
-    team_counts = {}
-    position_counts = {"Goalkeeper": 0, "Defender": 0, "Midfielder": 0, "Forward": 0}
-    
-    for player in players_data:
-        # Check if we can add this player
-        if len(squad) >= 15:
-            break
-            
-        # Check position limits
-        if position_counts[player["position_name"]] >= get_position_limit(player["position_name"]):
-            continue
-            
-        # Check team limits (max 3 per team)
-        if team_counts.get(player["team"], 0) >= 3:
-            continue
-            
-        # Add player to squad
-        squad.append(player)
-        position_counts[player["position_name"]] += 1
-        team_counts[player["team"]] = team_counts.get(player["team"], 0) + 1
-    
-    # Sort squad by position for display
-    squad.sort(key=lambda x: get_position_order(x["position_name"]))
-    
-    return squad
+    return strategy_data
 
 def get_position_limit(position):
     """Get the maximum number of players allowed for a position"""
@@ -875,37 +1053,51 @@ def calculate_weekly_transfers(squad, gw_index):
 
 @app.route("/squad")
 def squad_page():
-    """Display the optimal FPL squad for GW1-9"""
+    """Display the alternative FPL strategy for GW1-9"""
     try:
-        # Get optimized squad
-        squad = optimize_squad_for_gw1_9()
+        # Get alternative strategy data
+        strategy_data = optimize_squad_for_gw1_9()
         
-        if not squad:
-            return "Error: Could not generate optimal squad. Please try again later."
+        if not strategy_data:
+            return "Error: Could not generate strategy data. Please try again later."
         
-        # Calculate weekly data
+        # Process strategy data
         weekly_data = []
         total_points = 0
         total_transfers = 0
         
-        for gw in range(9):
-            starting_xi, bench = get_optimal_team_for_gw(squad, gw)
-            transfers_in, transfers_out = calculate_weekly_transfers(squad, gw)
+        for gw in range(1, 10):  # GW1-9
+            gw_data = strategy_data[gw]
+            starting_xi = gw_data["starting_xi"]
+            bench = gw_data["bench"]
             
-            # Calculate bench promotions (players moved from bench to starting XI)
-            # and bench demotions (players moved from starting XI to bench)
-            bench_promotions = []
-            bench_demotions = []
-            if gw > 0:  # GW1 has no previous week
-                prev_xi, prev_bench = get_optimal_team_for_gw(squad, gw - 1)
-                bench_promotions = [p for p in starting_xi if p in prev_bench]
-                bench_demotions = [p for p in bench if p in prev_xi]
-            
-            gw_points = sum(player["gw1_9_points"][gw] for player in starting_xi)
+            # Calculate points for this GW
+            gw_points = sum(player["points"] for player in starting_xi)
             total_points += gw_points
             
+            # Get transfer information
+            transfers_in = gw_data.get("transfers", {}).get("in", [])
+            transfers_out = gw_data.get("transfers", {}).get("out", [])
+            
+            if gw > 1:  # GW1 has no transfers
+                total_transfers += len(transfers_in)
+            
+            # Calculate bench promotions/demotions
+            bench_promotions = []
+            bench_demotions = []
+            if gw > 1:
+                prev_gw_data = strategy_data[gw - 1]
+                prev_xi = prev_gw_data["starting_xi"]
+                prev_bench = prev_gw_data["bench"]
+                
+                # Find players promoted from bench to starting XI
+                bench_promotions = [p for p in starting_xi if p["name"] in [bp["name"] for bp in prev_bench]]
+                
+                # Find players demoted from starting XI to bench
+                bench_demotions = [p for p in bench if p["name"] in [px["name"] for px in prev_xi]]
+            
             weekly_data.append({
-                "gw": gw + 1,
+                "gw": gw,
                 "starting_xi": starting_xi,
                 "bench": bench,
                 "transfers_in": transfers_in,
@@ -913,14 +1105,13 @@ def squad_page():
                 "bench_promotions": bench_promotions,
                 "bench_demotions": bench_demotions,
                 "points": gw_points,
-                "formation": get_formation(starting_xi)
+                "formation": get_formation_from_strategy(starting_xi)
             })
-            
-            if gw > 0:  # GW1 has no transfers
-                total_transfers += len(transfers_in)
         
-        # Calculate total squad value
-        total_value = sum(player["price"] for player in squad)
+        # Calculate total squad value (use GW1 as reference)
+        gw1_data = strategy_data[1]
+        all_players = gw1_data["starting_xi"] + gw1_data["bench"]
+        total_value = sum(player["price"] for player in all_players)
         remaining_budget = 100.0 - total_value
         
         return render_template_string("""
@@ -1087,22 +1278,25 @@ def squad_page():
                                             <div>
                                                 <strong>{{ player.name }}</strong>
                                                 <span class="position-badge 
-                                                    {% if player.position_name == 'Goalkeeper' %}gk
-                                                    {% elif player.position_name == 'Defender' %}def
-                                                    {% elif player.position_name == 'Midfielder' %}mid
+                                                    {% if player.position == 'Goalkeeper' %}gk
+                                                    {% elif player.position == 'Defender' %}def
+                                                    {% elif player.position == 'Midfielder' %}mid
                                                     {% else %}fwd{% endif %}">
-                                                    {{ player.position_name[:3] }}
+                                                    {{ player.position[:3] }}
                                                 </span>
                                                 <small class="text-muted">{{ player.team }}</small>
+                                                {% if player.captain %}
+                                                <span class="badge bg-warning text-dark ms-2">C</span>
+                                                {% endif %}
                                             </div>
                                             <div class="text-end">
                                                 <div>£{{ "%.1f"|format(player.price) }}M</div>
-                                                <div class="text-success">{{ "%.1f"|format(player.gw1_9_points[gw.gw-1]) }} pts</div>
+                                                <div class="text-success">{{ "%.1f"|format(player.points) }} pts</div>
                                             </div>
                                         </div>
-                                        {% if player in gw.transfers_in %}
+                                        {% if player.name in gw.transfers_in %}
                                         <small class="text-success"><i class="fas fa-plus-circle"></i> TRANSFER IN (New to Squad)</small>
-                                        {% elif player in gw.transfers_out %}
+                                        {% elif player.name in gw.transfers_out %}
                                         <small class="text-danger"><i class="fas fa-minus-circle"></i> TRANSFER OUT (Removed from Squad)</small>
                                         {% elif player in gw.bench_promotions %}
                                         <small class="text-info"><i class="fas fa-arrow-up"></i> Promoted from Bench</small>
@@ -1122,17 +1316,20 @@ def squad_page():
                                             <div>
                                                 <strong>{{ player.name }}</strong>
                                                 <span class="position-badge 
-                                                    {% if player.position_name == 'Goalkeeper' %}gk
-                                                    {% elif player.position_name == 'Defender' %}def
-                                                    {% elif player.position_name == 'Midfielder' %}mid
+                                                    {% if player.position == 'Goalkeeper' %}gk
+                                                    {% elif player.position == 'Defender' %}def
+                                                    {% elif player.position == 'Midfielder' %}mid
                                                     {% else %}fwd{% endif %}">
-                                                    {{ player.position_name[:3] }}
+                                                    {{ player.position[:3] }}
                                                 </span>
                                                 <small class="text-muted">{{ player.team }}</small>
+                                                {% if player.captain %}
+                                                <span class="badge bg-warning text-dark ms-2">C</span>
+                                                {% endif %}
                                             </div>
                                             <div class="text-end">
                                                 <div>£{{ "%.1f"|format(player.price) }}M</div>
-                                                <div class="text-muted">{{ "%.1f"|format(player.gw1_9_points[gw.gw-1]) }} pts</div>
+                                                <div class="text-muted">{{ "%.1f"|format(player.points) }} pts</div>
                                             </div>
                                         </div>
                                         {% if player in gw.bench_demotions %}
@@ -1151,11 +1348,23 @@ def squad_page():
             <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
         </body>
         </html>
-        """, squad=squad, weekly_data=weekly_data, total_points=total_points, 
+        """, weekly_data=weekly_data, total_points=total_points, 
              total_transfers=total_transfers, total_value=total_value, remaining_budget=remaining_budget)
         
     except Exception as e:
         return f"Error generating squad page: {str(e)}"
+
+def get_formation_from_strategy(starting_xi):
+    """Get formation string from starting XI in strategy format"""
+    if not starting_xi:
+        return "Unknown"
+    
+    gk_count = sum(1 for p in starting_xi if p["position"] == "Goalkeeper")
+    def_count = sum(1 for p in starting_xi if p["position"] == "Defender")
+    mid_count = sum(1 for p in starting_xi if p["position"] == "Midfielder")
+    fwd_count = sum(1 for p in starting_xi if p["position"] == "Forward")
+    
+    return f"{def_count}-{mid_count}-{fwd_count}"
 
 def get_formation(starting_xi):
     """Get formation string from starting XI"""
