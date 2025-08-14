@@ -88,11 +88,15 @@ class DatabaseManager:
             )
         """)
         
-        # Create indexes for better performance
-        cursor.execute("CREATE INDEX IF NOT EXISTS idx_players_team_id ON players(team_id)")
-        cursor.execute("CREATE INDEX IF NOT EXISTS idx_players_position ON players(position)")
-        cursor.execute("CREATE INDEX IF NOT EXISTS idx_players_team ON players(team)")
-        cursor.execute("CREATE INDEX IF NOT EXISTS idx_fixtures_gameweek ON fixtures(gameweek)")
+        # Create indexes for better performance (only if tables exist)
+        try:
+            cursor.execute("CREATE INDEX IF NOT EXISTS idx_players_team_id ON players(team_id)")
+            cursor.execute("CREATE INDEX IF NOT EXISTS idx_players_position ON players(position)")
+            cursor.execute("CREATE INDEX IF NOT EXISTS idx_players_team ON players(team)")
+            cursor.execute("CREATE INDEX IF NOT EXISTS idx_fixtures_gameweek ON fixtures(gameweek)")
+        except sqlite3.OperationalError:
+            # Tables might not exist yet, skip index creation
+            pass
         
         conn.commit()
     
