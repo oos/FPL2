@@ -868,6 +868,7 @@ def players_table():
                         <div class="mt-1">
                             <span id="sortOrderInfo" class="text-info fw-bold"></span>
                             <button id="clearSort" class="btn btn-outline-warning btn-sm ms-2">Clear Sort</button>
+                            <button id="testSort" class="btn btn-outline-info btn-sm ms-2">Test Sort</button>
                             <div class="mt-2">
                                 <input type="text" id="viewName" class="form-control form-control-sm d-inline-block" style="width: 200px;" placeholder="Enter view name...">
                                 <button id="saveView" class="btn btn-success btn-sm ms-2">Save View</button>
@@ -1058,7 +1059,8 @@ def players_table():
                     // We'll handle all sorting manually through our click handlers
                     
                     // Override the default click behavior to add multi-column sorting
-                    $('#playersTable thead th').on('click', function(e) {
+                    // Use event delegation to ensure it works even if headers are added dynamically
+                    $(document).on('click', '#playersTable thead th', function(e) {
                         var columnIndex = $(this).index();
                         console.log('Header clicked:', columnIndex);
                         console.log('Current sort order before:', JSON.stringify(currentSortOrder));
@@ -1116,17 +1118,21 @@ def players_table():
                         $('#sortOrderInfo').text(sortInfo);
                     }
                     
-                    // Initialize sort indicators
-                    console.log('Initializing sort indicators...');
-                    updateSortIndicators();
-                    updateSortOrderInfo();
-                    
-                    // Test: Add a simple sort to verify functionality
-                    console.log('Testing with initial sort...');
-                    currentSortOrder = [[6, 'desc']]; // Sort by Total (GW1-9) descending
-                    table.order(currentSortOrder).draw();
-                    updateSortIndicators();
-                    updateSortOrderInfo();
+                    // Initialize sort indicators with a delay to ensure DataTable is ready
+                    setTimeout(function() {
+                        console.log('Initializing sort indicators...');
+                        updateSortIndicators();
+                        updateSortOrderInfo();
+                        
+                        // Test: Add a simple sort to verify functionality
+                        console.log('Testing with initial sort...');
+                        currentSortOrder = [[6, 'desc']]; // Sort by Total (GW1-9) descending
+                        table.order(currentSortOrder).draw();
+                        updateSortIndicators();
+                        updateSortOrderInfo();
+                        
+                        console.log('Initialization complete');
+                    }, 1000); // Wait 1 second for DataTable to be fully ready
                     
                     // Clear sort button handler
                     $('#clearSort').on('click', function() {
@@ -1134,6 +1140,20 @@ def players_table():
                         table.order([]).draw();
                         updateSortIndicators();
                         updateSortOrderInfo();
+                    });
+                    
+                    // Test sort button handler
+                    $('#testSort').on('click', function() {
+                        console.log('Test sort button clicked');
+                        alert('Test sort button working! Current sorts: ' + currentSortOrder.length);
+                        
+                        // Add a test sort
+                        currentSortOrder.push([7, 'asc']); // Add Points/£ column
+                        table.order(currentSortOrder).draw();
+                        updateSortIndicators();
+                        updateSortOrderInfo();
+                        
+                        console.log('Test sort applied:', JSON.stringify(currentSortOrder));
                     });
                     
                     // Save view functionality
