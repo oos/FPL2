@@ -1108,7 +1108,9 @@ def players_table():
                         pageLength: 25,
                         lengthMenu: [[10, 25, 50, 100], [10, 25, 50, 100]],
                         // Enable multi-column sorting for our custom implementation
-                        orderMulti: true
+                        orderMulti: true,
+                        // Hide default DataTable controls since we have custom ones above
+                        dom: 't<"bottom"i>'
                     });
                     
                     // Enhanced multi-column sorting functionality
