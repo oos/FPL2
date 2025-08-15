@@ -786,7 +786,7 @@
                     data: playersData,
                     rowId: 'id',
                     orderCellsTop: false,
-                    searchDelay: 0,
+                    searching: false, // disable internal search; we provide our own
                     columns: [
                         { 
                             data: null,
@@ -1139,17 +1139,17 @@
                         const handleGlobalSearch = debounced(function(ev){
                             const val = $(this).val();
                             setAllSearchInputs(val);
-                            try { currentTable.search(val).draw(); } catch(_e) {}
+                            // Use ONLY the custom predicate to avoid conflicts with DataTables internal search
                             installCustomGlobalSearch(val);
                         });
                         // Bind via delegation to be robust across rerenders
-                        $(document).off('keyup.gs input.gs change.gs', '#globalSearch')
-                                   .on('keyup.gs input.gs change.gs', '#globalSearch', handleGlobalSearch);
+                        $(document).off('keyup.gs input.gs change.gs search.gs', '#globalSearch')
+                                   .on('keyup.gs input.gs change.gs search.gs', '#globalSearch', handleGlobalSearch);
                         // If DataTables default filter ever exists, bind it too
                         $(document).on('keyup.gs3 input.gs3 change.gs3', '#playersTable_filter input', handleGlobalSearch);
                         // Apply any pre-filled value immediately
                         const initial = $('#globalSearch').val() || '';
-                        if (initial) { try { currentTable.search(initial).draw(); } catch(_e) {} installCustomGlobalSearch(initial); }
+                        if (initial) { installCustomGlobalSearch(initial); }
                         $('#playersInfoInline').text(`Showing ${currentTable.page.info().recordsDisplay} of ${currentTable.page.info().recordsTotal} entries`);
                         currentTable.on('draw', function(){
                             const info = currentTable.page.info();
