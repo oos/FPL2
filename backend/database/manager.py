@@ -258,48 +258,76 @@ class DatabaseManager:
     
     # Fixture operations
     def get_all_fixtures(self) -> List[Fixture]:
-        """Get all fixtures from database with team names"""
+        """Get all fixtures from database.
+
+        Handles both cases:
+        - fixtures.home_team/away_team already store names
+        - fixtures.home_team/away_team store numeric team IDs (as text)
+        """
         with self._get_connection() as conn:
             cursor = conn.cursor()
-            cursor.execute("""
-                SELECT f.id, ht.name as home_team, at.name as away_team, 
-                       f.home_difficulty, f.away_difficulty, f.gameweek
+            cursor.execute(
+                """
+                SELECT 
+                    f.id,
+                    COALESCE(ht.name, f.home_team) AS home_team,
+                    COALESCE(at.name, f.away_team) AS away_team,
+                    f.home_difficulty,
+                    f.away_difficulty,
+                    f.gameweek
                 FROM fixtures f
-                JOIN teams ht ON f.home_team_id = ht.id
-                JOIN teams at ON f.away_team_id = at.id
-                ORDER BY f.gameweek, ht.name
-            """)
+                LEFT JOIN teams ht ON CAST(f.home_team AS INTEGER) = ht.id
+                LEFT JOIN teams at ON CAST(f.away_team AS INTEGER) = at.id
+                ORDER BY f.gameweek, home_team
+                """
+            )
             rows = cursor.fetchall()
             return [Fixture.from_db_row(row) for row in rows]
     
     def get_fixtures_by_gameweek(self, gameweek: int) -> List[Fixture]:
-        """Get fixtures by gameweek with team names"""
+        """Get fixtures by gameweek with robust team name resolution."""
         with self._get_connection() as conn:
             cursor = conn.cursor()
-            cursor.execute("""
-                SELECT f.id, ht.name as home_team, at.name as away_team, 
-                       f.home_difficulty, f.away_difficulty, f.gameweek
+            cursor.execute(
+                """
+                SELECT 
+                    f.id,
+                    COALESCE(ht.name, f.home_team) AS home_team,
+                    COALESCE(at.name, f.away_team) AS away_team,
+                    f.home_difficulty,
+                    f.away_difficulty,
+                    f.gameweek
                 FROM fixtures f
-                JOIN teams ht ON f.home_team_id = ht.id
-                JOIN teams at ON f.away_team_id = at.id
-                WHERE f.gameweek = ? ORDER BY ht.name
-            """, (gameweek,))
+                LEFT JOIN teams ht ON CAST(f.home_team AS INTEGER) = ht.id
+                LEFT JOIN teams at ON CAST(f.away_team AS INTEGER) = at.id
+                WHERE f.gameweek = ?
+                ORDER BY home_team
+                """,
+                (gameweek,),
+            )
             rows = cursor.fetchall()
             return [Fixture.from_db_row(row) for row in rows]
     
     def add_fixture(self, fixture: Fixture) -> bool:
-        """Add a new fixture to database"""
+        """Add a new fixture to database (expects team names)."""
         try:
             with self._get_connection() as conn:
                 cursor = conn.cursor()
-                cursor.execute("""
+                cursor.execute(
+                    """
                     INSERT OR REPLACE INTO fixtures (
-                        id, home_team_id, away_team_id, home_difficulty, away_difficulty, gameweek
+                        id, home_team, away_team, home_difficulty, away_difficulty, gameweek
                     ) VALUES (?, ?, ?, ?, ?, ?)
-                """, (
-                    fixture.id, fixture.home_team_id, fixture.away_team_id,
-                    fixture.home_difficulty, fixture.away_difficulty, fixture.gameweek
-                ))
+                    """,
+                    (
+                        fixture.id,
+                        fixture.home_team,
+                        fixture.away_team,
+                        fixture.home_difficulty,
+                        fixture.away_difficulty,
+                        fixture.gameweek,
+                    ),
+                )
                 conn.commit()
                 return True
         except Exception as e:

@@ -31,21 +31,21 @@
         h1, h2, h3 { 
             color: #2c3e50; 
             font-weight: 600;
-            margin-bottom: 1.5rem;
+            margin-bottom: 0.75rem;
         }
         .summary-card {
             background: white;
-            padding: 20px;
+            padding: 12px;
             border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            margin-bottom: 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+            margin-bottom: 14px;
         }
         .gw-card {
             background: white;
-            padding: 20px;
+            padding: 12px 14px;
             border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            margin-bottom: 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+            margin-bottom: 14px;
         }
         .position-badge { 
             font-size: 0.8em; 
@@ -163,6 +163,43 @@
             z-index: 10;
             position: relative;
         }
+        /* Top metrics nicer chips */
+        .gw-card .d-flex.flex-wrap.align-items-center { 
+            flex-wrap: wrap !important; 
+            gap: 6px; 
+            overflow-x: visible; 
+        }
+        .gw-card .d-flex.flex-wrap.align-items-center > h4,
+        .gw-card .d-flex.flex-wrap.align-items-center > h5 {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #f9fbfd;
+            border: 1px solid #e6eaef;
+            border-radius: 9999px;
+            padding: 2px 8px;
+            margin: 0 6px 0 0;
+            font-weight: 600;
+            font-size: 0.95rem;
+            line-height: 1.2;
+            white-space: nowrap;
+        }
+        .gw-card .d-flex.flex-wrap.align-items-center > h4 .points-display,
+        .gw-card .d-flex.flex-wrap.align-items-center > h5 .points-display { color: #28a745; }
+        .player-flags { margin-top: 6px; }
+        .flag-badge {
+            display: inline-block;
+            margin-right: 6px;
+            font-size: 0.72em;
+            font-weight: 600;
+            padding: 2px 6px;
+            border-radius: 10px;
+            white-space: nowrap;
+        }
+        .flag-in { background: #d4edda; color: #155724; border: 1px solid #28a745; }
+        .flag-out { background: #f8d7da; color: #721c24; border: 1px solid #dc3545; }
+        .flag-promoted { background: #d1ecf1; color: #0c5460; border: 1px solid #17a2b8; }
+        .flag-demoted { background: #fff3cd; color: #856404; border: 1px solid #ffc107; }
         .player-card:hover {
             transform: translateY(-5px);
             box-shadow: 0 6px 12px rgba(0,0,0,0.3);
@@ -252,7 +289,7 @@
         }
         .view-toggle {
             text-align: center;
-            margin: 20px 0;
+            margin: 10px 0 12px 0;
         }
         .view-toggle .btn-group {
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
@@ -289,14 +326,30 @@
             font-size: 0.75em;
             padding: 4px 6px;
         }
+        /* Make player/team links look like normal text but still clickable */
+        .table-view a,
+        .substitutes-section a,
+        .player-card a,
+        .transfer-summary a {
+            color: inherit !important;
+            text-decoration: none !important;
+        }
+        .table-view a:hover,
+        .substitutes-section a:hover,
+        .player-card a:hover,
+        .transfer-summary a:hover {
+            color: inherit !important;
+            text-decoration: none !important;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body class="p-4">
     <nav class="navbar navbar-expand-lg navbar-light bg-light mb-4">
         <div class="container-fluid">
-            <span class="navbar-brand">FPL Tools</span>
+            <a class="navbar-brand fw-bold text-decoration-none" href="/">FPL Tools</a>
             <div class="navbar-nav">
-                <a class="nav-link" href="/">FDR Table</a>
+                <a class="nav-link" href="/">FDR</a>
                 <a class="nav-link" href="/players">Players</a>
                 <a class="nav-link active" href="/squad">Squad</a>
             </div>
@@ -306,72 +359,52 @@
     <div class="container-fluid">
         <h1 class="text-center mb-4">FPL Optimal Squad - GW1-9</h1>
         
-        <!-- Summary Section -->
-        <div class="summary-card">
-            <div class="row">
-                <div class="col-md-3">
-                    <h4>Total Points (GW1-9)</h4>
-                    <div class="points-display" id="totalPoints">0</div>
-                </div>
-                <div class="col-md-3">
-                    <h4>Total Transfers</h4>
-                    <div class="points-display" id="totalTransfers">0</div>
-                </div>
-                <div class="col-md-3">
-                    <h4>Squad Value</h4>
-                    <div class="budget-info" id="squadValue">£0.0M</div>
-                </div>
-                <div class="col-md-3">
-                    <h4>Remaining Budget</h4>
-                    <div class="budget-info" id="remainingBudget">£0.0M</div>
-                </div>
-            </div>
-        </div>
+        <!-- Summary Section removed by request -->
         
         <!-- Weekly Tabs -->
         <ul class="nav nav-tabs" id="gwTabs" role="tablist">
             <li class="nav-item" role="presentation">
-                <button class="nav-link active" id="gw1-tab" data-bs-toggle="tab" data-bs-target="#gw1" type="button" role="tab">
+                <button class="nav-link active" id="gw1-tab" data-bs-toggle="tab" data-bs-target="#gw1" type="button" role="tab" data-gw="1">
                     GW1
                 </button>
             </li>
             <li class="nav-item" role="presentation">
-                <button class="nav-link" id="gw2-tab" data-bs-toggle="tab" data-bs-target="#gw2" type="button" role="tab">
+                <button class="nav-link" id="gw2-tab" data-bs-toggle="tab" data-bs-target="#gw2" type="button" role="tab" data-gw="2">
                     GW2
                 </button>
             </li>
             <li class="nav-item" role="presentation">
-                <button class="nav-link" id="gw3-tab" data-bs-toggle="tab" data-bs-target="#gw3" type="button" role="tab">
+                <button class="nav-link" id="gw3-tab" data-bs-toggle="tab" data-bs-target="#gw3" type="button" role="tab" data-gw="3">
                     GW3
                 </button>
             </li>
             <li class="nav-item" role="presentation">
-                <button class="nav-link" id="gw4-tab" data-bs-toggle="tab" data-bs-target="#gw4" type="button" role="tab">
+                <button class="nav-link" id="gw4-tab" data-bs-toggle="tab" data-bs-target="#gw4" type="button" role="tab" data-gw="4">
                     GW4
                 </button>
             </li>
             <li class="nav-item" role="presentation">
-                <button class="nav-link" id="gw4-tab" data-bs-toggle="tab" data-bs-target="#gw5" type="button" role="tab">
+                <button class="nav-link" id="gw5-tab" data-bs-toggle="tab" data-bs-target="#gw5" type="button" role="tab" data-gw="5">
                     GW5
                 </button>
             </li>
             <li class="nav-item" role="presentation">
-                <button class="nav-link" id="gw6-tab" data-bs-toggle="tab" data-bs-target="#gw6" type="button" role="tab">
+                <button class="nav-link" id="gw6-tab" data-bs-toggle="tab" data-bs-target="#gw6" type="button" role="tab" data-gw="6">
                     GW6
                 </button>
             </li>
             <li class="nav-item" role="presentation">
-                <button class="nav-link" id="gw7-tab" data-bs-toggle="tab" data-bs-target="#gw7" type="button" role="tab">
+                <button class="nav-link" id="gw7-tab" data-bs-toggle="tab" data-bs-target="#gw7" type="button" role="tab" data-gw="7">
                     GW7
                 </button>
             </li>
             <li class="nav-item" role="presentation">
-                <button class="nav-link" id="gw8-tab" data-bs-toggle="tab" data-bs-target="#gw8" type="button" role="tab">
+                <button class="nav-link" id="gw8-tab" data-bs-toggle="tab" data-bs-target="#gw8" type="button" role="tab" data-gw="8">
                     GW8
                 </button>
             </li>
             <li class="nav-item" role="presentation">
-                <button class="nav-link" id="gw9-tab" data-bs-toggle="tab" data-bs-target="#gw9" type="button" role="tab">
+                <button class="nav-link" id="gw9-tab" data-bs-toggle="tab" data-bs-target="#gw9" type="button" role="tab" data-gw="9">
                     GW9
                 </button>
             </li>
@@ -382,34 +415,32 @@
             <div class="tab-pane fade show active" id="gw1" role="tabpanel">
                 <div class="gw-card">
                     <div class="row mb-3">
-                        <div class="col-md-4">
+                        <div class="col-md-3">
                             <h3>GW1 - <span id="gw1Formation">4-4-2</span></h3>
                         </div>
-                        <div class="col-md-4">
-                            <h4>Expected Points: <span class="points-display" id="gw1Points">0</span></h4>
+                        <div class="col-md-6 d-flex gap-3 flex-wrap align-items-center">
+                            <h4 class="mb-0">Team Points: <span class="points-display" id="gw1Points">0</span></h4>
+                            <h5 class="mb-0">Captain: <span id="gw1Captain">-</span> (+<span id="gw1CaptainBonus">0</span>)</h5>
+                            <h5 class="mb-0">Hits: <span id="gw1Hits">0</span></h5>
+                            <h5 class="mb-0">GW Total: <span class="points-display" id="gw1Total">0</span></h5>
+                            <h5 class="mb-0">All weeks: <span class="points-display" id="gw1Cumulative">0</span></h5>
+                            <h5 class="mb-0">Squad Value: <span class="points-display" id="gw1Value">0</span></h5>
                         </div>
-                        <div class="col-md-4">
-                            <h4>Transfers: <span id="gw1TransfersIn">0</span> IN, <span id="gw1TransfersOut">0</span> OUT</h4>
-                            <div id="gw1TransferSummary" class="transfer-summary" style="display: none;">
-                                <!-- Transfer summary will be populated by JavaScript -->
+                        <div class="col-md-3 d-flex justify-content-end align-items-start">
+                            <div class="btn-group" role="group">
+                                <input type="radio" class="btn-check" name="gw1ViewTop" id="gw1TableTop" value="table" checked>
+                                <label class="btn btn-outline-primary" for="gw1TableTop">
+                                    <i class="fas fa-table"></i> Table View
+                                </label>
+                                <input type="radio" class="btn-check" name="gw1ViewTop" id="gw1PitchTop" value="pitch">
+                                <label class="btn btn-outline-primary" for="gw1PitchTop">
+                                    <i class="fas fa-futbol"></i> Pitch View
+                                </label>
                             </div>
                         </div>
                     </div>
                     
-                    <!-- View Toggle -->
-                    <div class="view-toggle mb-3">
-                        <div class="btn-group" role="group">
-                            <input type="radio" class="btn-check" name="gw1View" id="gw1Table" value="table" checked>
-                            <label class="btn btn-outline-primary" for="gw1Table">
-                                <i class="fas fa-table"></i> Table View
-                            </label>
-                            
-                            <input type="radio" class="btn-check" name="gw1View" id="gw1Pitch" value="pitch">
-                            <label class="btn btn-outline-primary" for="gw1Pitch">
-                                <i class="fas fa-futbol"></i> Pitch View
-                            </label>
-                        </div>
-                    </div>
+                    
                     
                     <!-- Compact Table View -->
                     <div id="gw1TableView" class="table-view">
@@ -468,34 +499,32 @@
             <div class="tab-pane fade" id="gw2" role="tabpanel">
                 <div class="gw-card">
                     <div class="row mb-3">
-                        <div class="col-md-4">
+                        <div class="col-md-3">
                             <h3>GW2 - <span id="gw2Formation">4-4-2</span></h3>
                         </div>
-                        <div class="col-md-4">
-                            <h4>Expected Points: <span class="points-display" id="gw2Points">0</span></h4>
+                        <div class="col-md-6 d-flex gap-3 flex-wrap align-items-center">
+                            <h4 class="mb-0">Team Points: <span class="points-display" id="gw2Points">0</span></h4>
+                            <h5 class="mb-0">Captain: <span id="gw2Captain">-</span> (+<span id="gw2CaptainBonus">0</span>)</h5>
+                            <h5 class="mb-0">Hits: <span id="gw2Hits">0</span></h5>
+                            <h5 class="mb-0">GW Total: <span class="points-display" id="gw2Total">0</span></h5>
+                            <h5 class="mb-0">All weeks: <span class="points-display" id="gw2Cumulative">0</span></h5>
+                            <h5 class="mb-0">Squad Value: <span class="points-display" id="gw2Value">0</span></h5>
                         </div>
-                        <div class="col-md-4">
-                            <h4>Transfers: <span id="gw2TransfersIn">0</span> IN, <span id="gw2TransfersOut">0</span> OUT</h4>
-                            <div id="gw2TransferSummary" class="transfer-summary" style="display: none;">
-                                <!-- Transfer summary will be populated by JavaScript -->
+                        <div class="col-md-3 d-flex justify-content-end align-items-start">
+                            <div class="btn-group" role="group">
+                                <input type="radio" class="btn-check" name="gw2ViewTop" id="gw2TableTop" value="table" checked>
+                                <label class="btn btn-outline-primary" for="gw2TableTop">
+                                    <i class="fas fa-table"></i> Table View
+                                </label>
+                                <input type="radio" class="btn-check" name="gw2ViewTop" id="gw2PitchTop" value="pitch">
+                                <label class="btn btn-outline-primary" for="gw2PitchTop">
+                                    <i class="fas fa-futbol"></i> Pitch View
+                                </label>
                             </div>
                         </div>
                     </div>
                     
-                    <!-- View Toggle -->
-                    <div class="view-toggle mb-3">
-                        <div class="btn-group" role="group">
-                            <input type="radio" class="btn-check" name="gw2View" id="gw2Table" value="table" checked>
-                            <label class="btn btn-outline-primary" for="gw2Table">
-                                <i class="fas fa-table"></i> Table View
-                            </label>
-                            
-                            <input type="radio" class="btn-check" name="gw2View" id="gw2Pitch" value="pitch">
-                            <label class="btn btn-outline-primary" for="gw2Pitch">
-                                <i class="fas fa-futbol"></i> Pitch View
-                            </label>
-                        </div>
-                    </div>
+                    
                     
                     <!-- Compact Table View -->
                     <div id="gw2TableView" class="table-view">
@@ -552,8 +581,12 @@
                         <div class="col-md-4">
                             <h3>GW3 - <span id="gw3Formation">4-4-2</span></h3>
                         </div>
-                        <div class="col-md-4">
-                            <h4>Expected Points: <span class="points-display" id="gw3Points">0</span></h4>
+                        <div class="col-md-8 d-flex gap-4 flex-wrap align-items-center">
+                            <h4 class="mb-0">Team Points: <span class="points-display" id="gw3Points">0</span></h4>
+                            <h5 class="mb-0">Captain: <span id="gw3Captain">-</span> (+<span id="gw3CaptainBonus">0</span>)</h5>
+                            <h5 class="mb-0">Hits: <span id="gw3Hits">0</span></h5>
+                            <h5 class="mb-0">GW Total: <span class="points-display" id="gw3Total">0</span></h5>
+                            <h5 class="mb-0">All weeks: <span class="points-display" id="gw3Cumulative">0</span></h5>
                         </div>
                         <div class="col-md-4">
                             <h4>Transfers: <span id="gw3TransfersIn">0</span> IN, <span id="gw3TransfersOut">0</span> OUT</h4>
@@ -563,8 +596,44 @@
                         </div>
                     </div>
                     
+                    <!-- View Toggle -->
+                    <div class="view-toggle mb-3">
+                        <div class="btn-group" role="group">
+                            <input type="radio" class="btn-check" name="gw3View" id="gw3Table" value="table" checked>
+                            <label class="btn btn-outline-primary" for="gw3Table">
+                                <i class="fas fa-table"></i> Table View
+                            </label>
+                            
+                            <input type="radio" class="btn-check" name="gw3View" id="gw3Pitch" value="pitch">
+                            <label class="btn btn-outline-primary" for="gw3Pitch">
+                                <i class="fas fa-futbol"></i> Pitch View
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <!-- Compact Table View -->
+                    <div id="gw3TableView" class="table-view">
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>Position</th>
+                                        <th>Name</th>
+                                        <th>Team</th>
+                                        <th>Price</th>
+                                        <th>GW3 Points</th>
+                                        <th>Total Points</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="gw3TableBody">
+                                    <!-- Table will be populated by JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
                     <!-- Football Formation Layout -->
-                    <div class="football-pitch">
+                    <div id="gw3PitchView" class="football-pitch" style="display: none;">
                         <div class="formation-label" id="gw3FormationLabel">4-4-2</div>
                         
                         <!-- Pitch Lines -->
@@ -597,8 +666,12 @@
                         <div class="col-md-4">
                             <h3>GW4 - <span id="gw4Formation">4-4-2</span></h3>
                         </div>
-                        <div class="col-md-4">
-                            <h4>Expected Points: <span class="points-display" id="gw4Points">0</span></h4>
+                        <div class="col-md-8 d-flex gap-4 flex-wrap align-items-center">
+                            <h4 class="mb-0">Team Points: <span class="points-display" id="gw4Points">0</span></h4>
+                            <h5 class="mb-0">Captain: <span id="gw4Captain">-</span> (+<span id="gw4CaptainBonus">0</span>)</h5>
+                            <h5 class="mb-0">Hits: <span id="gw4Hits">0</span></h5>
+                            <h5 class="mb-0">GW Total: <span class="points-display" id="gw4Total">0</span></h5>
+                            <h5 class="mb-0">All weeks: <span class="points-display" id="gw4Cumulative">0</span></h5>
                         </div>
                         <div class="col-md-4">
                             <h4>Transfers: <span id="gw4TransfersIn">0</span> IN, <span id="gw4TransfersOut">0</span> OUT</h4>
@@ -608,8 +681,44 @@
                         </div>
                     </div>
                     
+                    <!-- View Toggle -->
+                    <div class="view-toggle mb-3">
+                        <div class="btn-group" role="group">
+                            <input type="radio" class="btn-check" name="gw4View" id="gw4Table" value="table" checked>
+                            <label class="btn btn-outline-primary" for="gw4Table">
+                                <i class="fas fa-table"></i> Table View
+                            </label>
+                            
+                            <input type="radio" class="btn-check" name="gw4View" id="gw4Pitch" value="pitch">
+                            <label class="btn btn-outline-primary" for="gw4Pitch">
+                                <i class="fas fa-futbol"></i> Pitch View
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <!-- Compact Table View -->
+                    <div id="gw4TableView" class="table-view">
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>Position</th>
+                                        <th>Name</th>
+                                        <th>Team</th>
+                                        <th>Price</th>
+                                        <th>GW4 Points</th>
+                                        <th>Total Points</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="gw4TableBody">
+                                    <!-- Table will be populated by JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
                     <!-- Football Formation Layout -->
-                    <div class="football-pitch">
+                    <div id="gw4PitchView" class="football-pitch" style="display: none;">
                         <div class="formation-label" id="gw4FormationLabel">4-4-2</div>
                         
                         <!-- Pitch Lines -->
@@ -642,8 +751,12 @@
                         <div class="col-md-4">
                             <h3>GW5 - <span id="gw5Formation">4-4-2</span></h3>
                         </div>
-                        <div class="col-md-4">
-                            <h4>Expected Points: <span class="points-display" id="gw5Points">0</span></h4>
+                        <div class="col-md-8 d-flex gap-4 flex-wrap align-items-center">
+                            <h4 class="mb-0">Team Points: <span class="points-display" id="gw5Points">0</span></h4>
+                            <h5 class="mb-0">Captain: <span id="gw5Captain">-</span> (+<span id="gw5CaptainBonus">0</span>)</h5>
+                            <h5 class="mb-0">Hits: <span id="gw5Hits">0</span></h5>
+                            <h5 class="mb-0">GW Total: <span class="points-display" id="gw5Total">0</span></h5>
+                            <h5 class="mb-0">All weeks: <span class="points-display" id="gw5Cumulative">0</span></h5>
                         </div>
                         <div class="col-md-4">
                             <h4>Transfers: <span id="gw5TransfersIn">0</span> IN, <span id="gw5TransfersOut">0</span> OUT</h4>
@@ -653,8 +766,44 @@
                         </div>
                     </div>
                     
+                    <!-- View Toggle -->
+                    <div class="view-toggle mb-3">
+                        <div class="btn-group" role="group">
+                            <input type="radio" class="btn-check" name="gw5View" id="gw5Table" value="table" checked>
+                            <label class="btn btn-outline-primary" for="gw5Table">
+                                <i class="fas fa-table"></i> Table View
+                            </label>
+                            
+                            <input type="radio" class="btn-check" name="gw5View" id="gw5Pitch" value="pitch">
+                            <label class="btn btn-outline-primary" for="gw5Pitch">
+                                <i class="fas fa-futbol"></i> Pitch View
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <!-- Compact Table View -->
+                    <div id="gw5TableView" class="table-view">
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>Position</th>
+                                        <th>Name</th>
+                                        <th>Team</th>
+                                        <th>Price</th>
+                                        <th>GW5 Points</th>
+                                        <th>Total Points</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="gw5TableBody">
+                                    <!-- Table will be populated by JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
                     <!-- Football Formation Layout -->
-                    <div class="football-pitch">
+                    <div id="gw5PitchView" class="football-pitch" style="display: none;">
                         <div class="formation-label" id="gw5FormationLabel">4-4-2</div>
                         
                         <!-- Pitch Lines -->
@@ -687,8 +836,12 @@
                         <div class="col-md-4">
                             <h3>GW6 - <span id="gw6Formation">4-4-2</span></h3>
                         </div>
-                        <div class="col-md-4">
-                            <h4>Expected Points: <span class="points-display" id="gw6Points">0</span></h4>
+                        <div class="col-md-8 d-flex gap-4 flex-wrap align-items-center">
+                            <h4 class="mb-0">Team Points: <span class="points-display" id="gw6Points">0</span></h4>
+                            <h5 class="mb-0">Captain: <span id="gw6Captain">-</span> (+<span id="gw6CaptainBonus">0</span>)</h5>
+                            <h5 class="mb-0">Hits: <span id="gw6Hits">0</span></h5>
+                            <h5 class="mb-0">GW Total: <span class="points-display" id="gw6Total">0</span></h5>
+                            <h5 class="mb-0">All weeks: <span class="points-display" id="gw6Cumulative">0</span></h5>
                         </div>
                         <div class="col-md-4">
                             <h4>Transfers: <span id="gw6TransfersIn">0</span> IN, <span id="gw6TransfersOut">0</span> OUT</h4>
@@ -698,8 +851,44 @@
                         </div>
                     </div>
                     
+                    <!-- View Toggle -->
+                    <div class="view-toggle mb-3">
+                        <div class="btn-group" role="group">
+                            <input type="radio" class="btn-check" name="gw6View" id="gw6Table" value="table" checked>
+                            <label class="btn btn-outline-primary" for="gw6Table">
+                                <i class="fas fa-table"></i> Table View
+                            </label>
+                            
+                            <input type="radio" class="btn-check" name="gw6View" id="gw6Pitch" value="pitch">
+                            <label class="btn btn-outline-primary" for="gw6Pitch">
+                                <i class="fas fa-futbol"></i> Pitch View
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <!-- Compact Table View -->
+                    <div id="gw6TableView" class="table-view">
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>Position</th>
+                                        <th>Name</th>
+                                        <th>Team</th>
+                                        <th>Price</th>
+                                        <th>GW6 Points</th>
+                                        <th>Total Points</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="gw6TableBody">
+                                    <!-- Table will be populated by JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
                     <!-- Football Formation Layout -->
-                    <div class="football-pitch">
+                    <div id="gw6PitchView" class="football-pitch" style="display: none;">
                         <div class="formation-label" id="gw6FormationLabel">4-4-2</div>
                         
                         <!-- Pitch Lines -->
@@ -732,8 +921,12 @@
                         <div class="col-md-4">
                             <h3>GW7 - <span id="gw7Formation">4-4-2</span></h3>
                         </div>
-                        <div class="col-md-4">
-                            <h4>Expected Points: <span class="points-display" id="gw7Points">0</span></h4>
+                        <div class="col-md-8 d-flex gap-4 flex-wrap align-items-center">
+                            <h4 class="mb-0">Team Points: <span class="points-display" id="gw7Points">0</span></h4>
+                            <h5 class="mb-0">Captain: <span id="gw7Captain">-</span> (+<span id="gw7CaptainBonus">0</span>)</h5>
+                            <h5 class="mb-0">Hits: <span id="gw7Hits">0</span></h5>
+                            <h5 class="mb-0">GW Total: <span class="points-display" id="gw7Total">0</span></h5>
+                            <h5 class="mb-0">All weeks: <span class="points-display" id="gw7Cumulative">0</span></h5>
                         </div>
                         <div class="col-md-4">
                             <h4>Transfers: <span id="gw7TransfersIn">0</span> IN, <span id="gw7TransfersOut">0</span> OUT</h4>
@@ -743,8 +936,44 @@
                         </div>
                     </div>
                     
+                    <!-- View Toggle -->
+                    <div class="view-toggle mb-3">
+                        <div class="btn-group" role="group">
+                            <input type="radio" class="btn-check" name="gw7View" id="gw7Table" value="table" checked>
+                            <label class="btn btn-outline-primary" for="gw7Table">
+                                <i class="fas fa-table"></i> Table View
+                            </label>
+                            
+                            <input type="radio" class="btn-check" name="gw7View" id="gw7Pitch" value="pitch">
+                            <label class="btn btn-outline-primary" for="gw7Pitch">
+                                <i class="fas fa-futbol"></i> Pitch View
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <!-- Compact Table View -->
+                    <div id="gw7TableView" class="table-view">
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>Position</th>
+                                        <th>Name</th>
+                                        <th>Team</th>
+                                        <th>Price</th>
+                                        <th>GW7 Points</th>
+                                        <th>Total Points</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="gw7TableBody">
+                                    <!-- Table will be populated by JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
                     <!-- Football Formation Layout -->
-                    <div class="football-pitch">
+                    <div id="gw7PitchView" class="football-pitch" style="display: none;">
                         <div class="formation-label" id="gw7FormationLabel">4-4-2</div>
                         
                         <!-- Pitch Lines -->
@@ -777,8 +1006,12 @@
                         <div class="col-md-4">
                             <h3>GW8 - <span id="gw8Formation">4-4-2</span></h3>
                         </div>
-                        <div class="col-md-4">
-                            <h4>Expected Points: <span class="points-display" id="gw8Points">0</span></h4>
+                        <div class="col-md-8 d-flex gap-4 flex-wrap align-items-center">
+                            <h4 class="mb-0">Team Points: <span class="points-display" id="gw8Points">0</span></h4>
+                            <h5 class="mb-0">Captain: <span id="gw8Captain">-</span> (+<span id="gw8CaptainBonus">0</span>)</h5>
+                            <h5 class="mb-0">Hits: <span id="gw8Hits">0</span></h5>
+                            <h5 class="mb-0">GW Total: <span class="points-display" id="gw8Total">0</span></h5>
+                            <h5 class="mb-0">All weeks: <span class="points-display" id="gw8Cumulative">0</span></h5>
                         </div>
                         <div class="col-md-4">
                             <h4>Transfers: <span id="gw8TransfersIn">0</span> IN, <span id="gw8TransfersOut">0</span> OUT</h4>
@@ -788,8 +1021,44 @@
                         </div>
                     </div>
                     
+                    <!-- View Toggle -->
+                    <div class="view-toggle mb-3">
+                        <div class="btn-group" role="group">
+                            <input type="radio" class="btn-check" name="gw8View" id="gw8Table" value="table" checked>
+                            <label class="btn btn-outline-primary" for="gw8Table">
+                                <i class="fas fa-table"></i> Table View
+                            </label>
+                            
+                            <input type="radio" class="btn-check" name="gw8View" id="gw8Pitch" value="pitch">
+                            <label class="btn btn-outline-primary" for="gw8Pitch">
+                                <i class="fas fa-futbol"></i> Pitch View
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <!-- Compact Table View -->
+                    <div id="gw8TableView" class="table-view">
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>Position</th>
+                                        <th>Name</th>
+                                        <th>Team</th>
+                                        <th>Price</th>
+                                        <th>GW8 Points</th>
+                                        <th>Total Points</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="gw8TableBody">
+                                    <!-- Table will be populated by JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
                     <!-- Football Formation Layout -->
-                    <div class="football-pitch">
+                    <div id="gw8PitchView" class="football-pitch" style="display: none;">
                         <div class="formation-label" id="gw8FormationLabel">4-4-2</div>
                         
                         <!-- Pitch Lines -->
@@ -822,8 +1091,12 @@
                         <div class="col-md-4">
                             <h3>GW9 - <span id="gw9Formation">4-4-2</span></h3>
                         </div>
-                        <div class="col-md-4">
-                            <h4>Expected Points: <span class="points-display" id="gw9Points">0</span></h4>
+                        <div class="col-md-8 d-flex gap-4 flex-wrap align-items-center">
+                            <h4 class="mb-0">Team Points: <span class="points-display" id="gw9Points">0</span></h4>
+                            <h5 class="mb-0">Captain: <span id="gw9Captain">-</span> (+<span id="gw9CaptainBonus">0</span>)</h5>
+                            <h5 class="mb-0">Hits: <span id="gw9Hits">0</span></h5>
+                            <h5 class="mb-0">GW Total: <span class="points-display" id="gw9Total">0</span></h5>
+                            <h5 class="mb-0">All weeks: <span class="points-display" id="gw9Cumulative">0</span></h5>
                         </div>
                         <div class="col-md-4">
                             <h4>Transfers: <span id="gw9TransfersIn">0</span> IN, <span id="gw9TransfersOut">0</span> OUT</h4>
@@ -833,8 +1106,44 @@
                         </div>
                     </div>
                     
+                    <!-- View Toggle -->
+                    <div class="view-toggle mb-3">
+                        <div class="btn-group" role="group">
+                            <input type="radio" class="btn-check" name="gw9View" id="gw9Table" value="table" checked>
+                            <label class="btn btn-outline-primary" for="gw9Table">
+                                <i class="fas fa-table"></i> Table View
+                            </label>
+                            
+                            <input type="radio" class="btn-check" name="gw9View" id="gw9Pitch" value="pitch">
+                            <label class="btn btn-outline-primary" for="gw9Pitch">
+                                <i class="fas fa-futbol"></i> Pitch View
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <!-- Compact Table View -->
+                    <div id="gw9TableView" class="table-view">
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>Position</th>
+                                        <th>Name</th>
+                                        <th>Team</th>
+                                        <th>Price</th>
+                                        <th>GW9 Points</th>
+                                        <th>Total Points</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="gw9TableBody">
+                                    <!-- Table will be populated by JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
                     <!-- Football Formation Layout -->
-                    <div class="football-pitch">
+                    <div id="gw9PitchView" class="football-pitch" style="display: none;">
                         <div class="formation-label" id="gw9FormationLabel">4-4-2</div>
                         
                         <!-- Pitch Lines -->
@@ -878,40 +1187,63 @@
                 console.error('No weeklyData available');
             }
             
-            // Tab click handlers
-            $('.nav-link').on('click', function(e) {
-                e.preventDefault();
-                const gw = parseInt($(this).data('gw'));
-                updateActiveTab(gw);
+            // Tab shown handler (Bootstrap event)
+            $('button[data-bs-toggle="tab"]').on('shown.bs.tab', function (event) {
+                const targetId = $(event.target).attr('data-bs-target'); // e.g. #gw3
+                const gwMatch = targetId && targetId.match(/#gw(\d+)/);
+                const gw = gwMatch ? parseInt(gwMatch[1], 10) : null;
+                if (gw) {
+                    updateActiveTab(gw);
+                }
             });
 
-            // View toggle for GW1
-            $('#gw1Table').on('change', function() {
+            // View toggle for GW1 (top controls)
+            $('#gw1TableTop').on('change', function() {
                 if ($(this).is(':checked')) {
                     $('#gw1TableView').show();
                     $('#gw1PitchView').hide();
+                    $('#gw1TableTop').prop('checked', true);
                 }
             });
-            $('#gw1Pitch').on('change', function() {
+            $('#gw1PitchTop').on('change', function() {
                 if ($(this).is(':checked')) {
                     $('#gw1TableView').hide();
                     $('#gw1PitchView').show();
+                    $('#gw1PitchTop').prop('checked', true);
                 }
             });
             
-            // View toggle for GW2
-            $('#gw2Table').on('change', function() {
+            // View toggle for GW2 (top controls)
+            $('#gw2TableTop').on('change', function() {
                 if ($(this).is(':checked')) {
                     $('#gw2TableView').show();
                     $('#gw2PitchView').hide();
+                    $('#gw2TableTop').prop('checked', true);
                 }
             });
-            $('#gw2Pitch').on('change', function() {
+            $('#gw2PitchTop').on('change', function() {
                 if ($(this).is(':checked')) {
                     $('#gw2TableView').hide();
                     $('#gw2PitchView').show();
+                    $('#gw2PitchTop').prop('checked', true);
                 }
             });
+
+            // Generic view toggles for GW3-9
+            for (let gw = 3; gw <= 9; gw++) {
+                $(`#gw${gw}Table`).on('change', function() {
+                    if ($(this).is(':checked')) {
+                        $(`#gw${gw}TableView`).show();
+                        $(`#gw${gw}PitchView`).hide();
+                    }
+                });
+                $(`#gw${gw}Pitch`).on('change', function() {
+                    if ($(this).is(':checked')) {
+                        $(`#gw${gw}TableView`).hide();
+                        $(`#gw${gw}PitchView`).show();
+                    }
+                });
+            }
         });
         
         // Global variables accessible to all functions
@@ -941,11 +1273,17 @@
             $(`#gw${gw}FormationLabel`).text(data.formation);
             
             // Update points
-            $(`#gw${gw}Points`).text(data.points.toFixed(1));
+            $(`#gw${gw}Points`).text((data.points || 0).toFixed(1));
+            $(`#gw${gw}Captain`).text(data.captain_name || '-');
+            $(`#gw${gw}CaptainBonus`).text(((data.captain_bonus || 0)).toFixed(1));
+            $(`#gw${gw}Hits`).text(data.hits_points || 0);
+            $(`#gw${gw}Total`).text(((data.total_with_captain_and_hits || 0)).toFixed(1));
+            $(`#gw${gw}Cumulative`).text(((data.cumulative_total || 0)).toFixed(1));
             
             // Update transfers
             $(`#gw${gw}TransfersIn`).text(data.transfers_in.length);
             $(`#gw${gw}TransfersOut`).text(data.transfers_out.length);
+            renderTransferSummary(gw, data);
             
             // Update table view
             populateTableView(gw, data.starting_xi);
@@ -962,26 +1300,25 @@
             tableBody.empty();
             
             console.log(`Populating table for GW${gw} with ${players.length} players`);
-            
-            players.forEach((player, index) => {
-                const row = $('<tr>');
-                
-                // Add position badge
-                const positionClass = player.position === 'Goalkeeper' ? 'gk' : 
-                                    player.position === 'Defender' ? 'def' : 
-                                    player.position === 'Midfielder' ? 'mid' : 'fwd';
-                
-                row.html(`
-                    <td><span class="position-badge ${positionClass}">${player.position.substring(0, 3)}</span></td>
-                    <td><strong>${player.name}</strong></td>
-                    <td>${player.team}</td>
-                    <td>£${player.price}M</td>
-                    <td><span class="points-display">${player['gw' + gw + '_points'] || 0}</span></td>
-                    <td>${player.total_points || 0}</td>
-                `);
-                
-                tableBody.append(row);
-                console.log(`Added player ${player.name} to table row ${index + 1}`);
+            const order = ['Goalkeeper','Defender','Midfielder','Forward'];
+            order.forEach(pos => {
+                const group = players.filter(p => p.position === pos);
+                if (group.length === 0) return;
+                group.forEach((player, index) => {
+                    const row = $('<tr>');
+                    const positionClass = player.position === 'Goalkeeper' ? 'gk' : 
+                                        player.position === 'Defender' ? 'def' : 
+                                        player.position === 'Midfielder' ? 'mid' : 'fwd';
+                    row.html(`
+                        <td><span class="position-badge ${positionClass}">${player.position.substring(0, 3)}</span></td>
+                        <td><strong><a href="/player/${player.id}" class="text-decoration-none">${player.name}</a></strong></td>
+                        <td>${player.team_id ? `<a href=\"/team/${player.team_id}\" class=\"text-decoration-none\">${player.team}</a>` : player.team}</td>
+                        <td>£${player.price}M</td>
+                        <td><span class="points-display">${player['gw' + gw + '_points'] || 0}</span></td>
+                        <td>${player.total_points || 0}</td>
+                    `);
+                    tableBody.append(row);
+                });
             });
             
             console.log(`Table populated with ${tableBody.children().length} rows`);
@@ -1181,12 +1518,13 @@
                 </div>
             `;
             
-            if (isTransferIn) {
-                cardHtml += '<small class="text-success"><i class="fas fa-plus-circle"></i> IN</small>';
-            } else if (isTransferOut) {
-                cardHtml += '<small class="text-danger"><i class="fas fa-minus-circle"></i> OUT</small>';
-            } else if (isBenchPromotion) {
-                cardHtml += '<small class="text-info"><i class="fas fa-arrow-up"></i> ↑</small>';
+            // Visibility flags (badges)
+            const flags = [];
+            if (isTransferIn) flags.push('<span class="flag-badge flag-in"><i class="fas fa-plus-circle"></i> Transfer In</span>');
+            if (isTransferOut) flags.push('<span class="flag-badge flag-out"><i class="fas fa-minus-circle"></i> Transfer Out</span>');
+            if (isBenchPromotion) flags.push('<span class="flag-badge flag-promoted"><i class="fas fa-arrow-up"></i> Promoted from Bench</span>');
+            if (flags.length > 0) {
+                cardHtml += `<div class="player-flags">${flags.join('')}</div>`;
             }
             
             card.html(cardHtml);
@@ -1203,6 +1541,60 @@
             });
         }
         
+        function renderTransferSummary(gw, data) {
+            const container = $(`#gw${gw}TransferSummary`);
+            const transfersIn = data.transfers_in || [];
+            const transfersOut = data.transfers_out || [];
+            const mapping = data.transfer_mapping || {};
+            if ((!transfersIn || transfersIn.length === 0) && (!transfersOut || transfersOut.length === 0)) {
+                container.hide();
+                container.empty();
+                return;
+            }
+            const posBadge = (pos) => {
+                if (!pos) return '';
+                const cls = pos === 'Goalkeeper' ? 'gk' : pos === 'Defender' ? 'def' : pos === 'Midfielder' ? 'mid' : 'fwd';
+                return `<span class="position-badge ${cls} ms-2">${pos.substring(0,3)}</span>`;
+            };
+            const getPosForIn = (name) => {
+                const curr = (weeklyData.find(d => d.gw === gw) || {starting_xi:[], bench:[]});
+                const all = [...(curr.starting_xi||[]), ...(curr.bench||[])];
+                const p = all.find(x => x.name === name);
+                return p ? p.position : '';
+            };
+            const getPosForOut = (name) => {
+                if (gw <= 1) return '';
+                const prev = (weeklyData.find(d => d.gw === (gw-1)) || {starting_xi:[], bench:[]});
+                const all = [...(prev.starting_xi||[]), ...(prev.bench||[])];
+                const p = all.find(x => x.name === name);
+                return p ? p.position : '';
+            };
+            let html = '';
+            const hasMapping = Object.keys(mapping).length > 0;
+            if (hasMapping) {
+                html += '<div><strong>Transfers this GW:</strong></div>';
+                html += '<ul class="list-unstyled mb-0">';
+                Object.entries(mapping).forEach(([inName, outName]) => {
+                    html += `
+                        <li class="mb-1">
+                            <span class="badge bg-success me-2">IN</span>
+                            <strong>${inName}</strong>${posBadge(getPosForIn(inName))}
+                            <span class="mx-2 text-muted">→</span>
+                            <span class="badge bg-danger me-2">OUT</span>
+                            <span>${outName || ''}</span>${posBadge(getPosForOut(outName))}
+                        </li>`;
+                });
+                html += '</ul>';
+            } else {
+                if (transfersIn.length > 0) {
+                    html += '<div class="mb-1"><strong>IN:</strong> ' + transfersIn.map(n => `<span class=\"badge bg-success me-1\">${n}</span>${posBadge(getPosForIn(n))}`).join(' ') + '</div>';
+                }
+                if (transfersOut.length > 0) {
+                    html += '<div><strong>OUT:</strong> ' + transfersOut.map(n => `<span class=\"badge bg-danger me-1\">${n}</span>${posBadge(getPosForOut(n))}`).join(' ') + '</div>';
+                }
+            }
+            container.html(html).show();
+        }
         function createBenchCard(player, gw) {
             const card = $('<div>').addClass('col-md-6 col-lg-3 mb-2');
             
@@ -1221,6 +1613,12 @@
                                 player.position === 'Defender' ? 'def' : 
                                 player.position === 'Midfielder' ? 'mid' : 'fwd';
             
+            // Build flags for bench
+            const benchFlags = [];
+            if (isTransferIn) benchFlags.push('<span class="flag-badge flag-in"><i class="fas fa-plus-circle"></i> Transfer In</span>');
+            if (isTransferOut) benchFlags.push('<span class="flag-badge flag-out"><i class="fas fa-minus-circle"></i> Transfer Out</span>');
+            if (isBenchDemotion) benchFlags.push('<span class="flag-badge flag-demoted"><i class="fas fa-arrow-down"></i> Demoted to Bench</span>');
+
             benchPlayer.html(`
                 <div class="d-flex justify-content-between align-items-start">
                     <div>
@@ -1230,13 +1628,12 @@
                             <span class="player-price">£${player.price}M</span> | 
                             <span class="player-points">${player['gw' + gw + '_points'] || 0} pts</span>
                         </div>
+                        ${benchFlags.length > 0 ? `<div class="player-flags mt-1">${benchFlags.join('')}</div>` : ''}
                     </div>
                     <span class="position-badge ${positionClass}">
                         ${player.position.substring(0, 3)}
                     </span>
                 </div>
-                ${isTransferIn ? '<small class="text-success"><i class="fas fa-plus-circle"></i> TRANSFER IN</small>' : ''}
-                ${isBenchDemotion ? '<small class="text-danger"><i class="fas fa-minus-circle"></i> Demoted to Bench</small>' : ''}
             `);
             
             card.append(benchPlayer);
