@@ -70,6 +70,13 @@ def create_app():
         """Serve the FDR page"""
         return render_template('fdr.html')
     
+    @app.route('/teams')
+    def teams_page():
+        """List all teams with links to their pages"""
+        db_manager = current_app.db_manager
+        teams = db_manager.get_all_teams()
+        return render_template('teams.html', teams=[t.to_dict() for t in teams])
+    
     @app.route('/players')
     def players_page():
         """Serve the original players page with DataTables"""
