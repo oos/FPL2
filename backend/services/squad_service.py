@@ -196,12 +196,23 @@ class SquadService:
         )
         bench = remaining_sorted[:4]
 
+        # Captain and vice-captain for GW1 (best and next-best by GW1 points)
+        xi_sorted_for_captain = sorted(
+            starting_xi,
+            key=lambda x: (float(x.get('gw1_points', 0) or 0), float(x.get('total_points', 0) or 0)),
+            reverse=True,
+        )
+        captain_name = xi_sorted_for_captain[0].get('name') if xi_sorted_for_captain else None
+        vice_captain_name = xi_sorted_for_captain[1].get('name') if len(xi_sorted_for_captain) > 1 else None
+
         return {
             "starting_xi": starting_xi,
             "bench": bench,
             "transfers": {"in": [], "out": []},
             "points": sum(p.get('gw1_points', 0) or 0 for p in starting_xi),
-            "formation": self.get_formation(starting_xi)
+            "formation": self.get_formation(starting_xi),
+            "captain": captain_name,
+            "vice_captain": vice_captain_name,
         }
     
     def _create_optimized_gw_squad(self, prev_gw_data: Dict[str, Any], 
@@ -211,9 +222,9 @@ class SquadService:
         # Get current 15-player squad (carry over)
         current_squad = list(prev_gw_data["starting_xi"]) + list(prev_gw_data["bench"])
 
-        # Determine available free transfers with rollover (cap 5 as requested)
+        # Determine available free transfers with rollover (cap 5) and AFCON special GW16=5
         prev_free = int(prev_gw_data.get("free_transfers_remaining", 1))
-        available_free = min(5, prev_free + 1)
+        available_free = 5 if gw == 16 else min(5, prev_free + 1)
         
         # Re-optimize starting XI based on current gameweek performance
         gw_points_field = f'gw{gw}_points'
@@ -258,6 +269,15 @@ class SquadService:
         bench_candidates = [p for p in sorted_squad if p not in starting_xi]
         bench = bench_candidates[:4]
         
+        # Captain and vice-captain for this GW based on gw points
+        xi_sorted_for_captain = sorted(
+            starting_xi,
+            key=lambda x: (float(x.get(gw_points_field, 0) or 0), float(x.get('total_points', 0) or 0)),
+            reverse=True,
+        )
+        captain_name = xi_sorted_for_captain[0].get('name') if xi_sorted_for_captain else None
+        vice_captain_name = xi_sorted_for_captain[1].get('name') if len(xi_sorted_for_captain) > 1 else None
+
         return {
             "starting_xi": starting_xi,
             "bench": bench,
@@ -265,7 +285,9 @@ class SquadService:
             "hits_points": hits_points,
             "free_transfers_remaining": free_left,
             "points": sum(p.get(gw_points_field, 0) or 0 for p in starting_xi),
-            "formation": self.get_formation(starting_xi)
+            "formation": self.get_formation(starting_xi),
+            "captain": captain_name,
+            "vice_captain": vice_captain_name,
         }
 
     def _plan_transfers_for_gameweek(
