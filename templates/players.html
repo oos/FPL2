@@ -1115,10 +1115,32 @@
                             try { $('#globalSearch').val(val); } catch(_e){}
                             try { $('#playersTable_filter input').val(val); } catch(_e){}
                         };
+                        // Strong global search: combine DataTables search with a custom predicate to be bulletproof
+                        const installCustomGlobalSearch = (val) => {
+                            // Remove previous predicate
+                            $.fn.dataTable.ext.search = $.fn.dataTable.ext.search.filter(f => f._id !== 'global-search');
+                            const needle = (val || '').toString().toLowerCase().trim();
+                            if (!needle) { currentTable.draw(); return; }
+                            const pred = function(settings, _data, dataIndex){
+                                if (!settings || !settings.nTable || settings.nTable.id !== 'playersTable') return true;
+                                const row = currentTable.row(dataIndex).data() || {};
+                                const text = [
+                                    row.name, row.position, row.team, row.team_short,
+                                    row.price, row.total_points, row.form, row.ownership,
+                                    row.gw1_points, row.gw2_points, row.gw3_points, row.gw4_points,
+                                    row.gw5_points, row.gw6_points, row.gw7_points, row.gw8_points, row.gw9_points
+                                ].map(v => (v === null || v === undefined) ? '' : String(v)).join(' ').toLowerCase();
+                                return text.indexOf(needle) !== -1;
+                            };
+                            pred._id = 'global-search';
+                            $.fn.dataTable.ext.search.push(pred);
+                            currentTable.draw();
+                        };
                         const handleGlobalSearch = debounced(function(ev){
                             const val = $(this).val();
                             setAllSearchInputs(val);
-                            currentTable.search(val).draw();
+                            try { currentTable.search(val).draw(); } catch(_e) {}
+                            installCustomGlobalSearch(val);
                         });
                         // Bind via delegation to be robust across rerenders
                         $(document).off('keyup.gs input.gs change.gs', '#globalSearch')
@@ -1127,7 +1149,7 @@
                         $(document).on('keyup.gs3 input.gs3 change.gs3', '#playersTable_filter input', handleGlobalSearch);
                         // Apply any pre-filled value immediately
                         const initial = $('#globalSearch').val() || '';
-                        if (initial) { currentTable.search(initial).draw(); }
+                        if (initial) { try { currentTable.search(initial).draw(); } catch(_e) {} installCustomGlobalSearch(initial); }
                         $('#playersInfoInline').text(`Showing ${currentTable.page.info().recordsDisplay} of ${currentTable.page.info().recordsTotal} entries`);
                         currentTable.on('draw', function(){
                             const info = currentTable.page.info();
