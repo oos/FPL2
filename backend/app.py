@@ -198,6 +198,13 @@ def create_app(config_name: str | None = None):
         watch_ids = db_manager.get_watchlist_ids()
         return render_template('players.html', players=players_data, team_names=team_names, watch_ids=watch_ids)
 
+    @app.route('/players2')
+    def players2_page():
+        """Serve a simple, unmodified table of all players (no filters/customizations)."""
+        db = current_app.db_manager
+        players = [p.to_dict() for p in db.get_all_players()]
+        return render_template('players2.html', players=players)
+
     @app.route('/players/individual')
     def players_individual_redirect():
         """Redirect to a default player's page (e.g., Salah) if available."""
