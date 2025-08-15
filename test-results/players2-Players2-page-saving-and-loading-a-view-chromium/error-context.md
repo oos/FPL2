@@ -1,0 +1,4700 @@
+# Page snapshot
+
+```yaml
+- navigation:
+  - link "FPL Tools":
+    - /url: /
+  - link "Dashboard":
+    - /url: /
+  - link "FDR":
+    - /url: /fdr
+  - button "Players"
+  - link "Teams":
+    - /url: /teams
+  - link "Squad":
+    - /url: /squad
+- heading "Players2" [level=1]
+- heading "Save & Load Views" [level=5]
+- text: Select View
+- combobox "Select View":
+  - option "Select a view..."
+  - option "Best Value Players (Points/£ + xP)" [selected]
+  - option "My Custom View"
+- text: Position
+- combobox "Position":
+  - option "All" [selected]
+  - option "Goalkeeper"
+  - option "Defender"
+  - option "Midfielder"
+  - option "Forward"
+- text: Team
+- combobox "Team":
+  - option "All" [selected]
+  - option "Arsenal"
+  - option "Aston Villa"
+  - option "Bournemouth"
+  - option "Brentford"
+  - option "Brighton"
+  - option "Burnley"
+  - option "Chelsea"
+  - option "Crystal Palace"
+  - option "Everton"
+  - option "Fulham"
+  - option "Leeds"
+  - option "Liverpool"
+  - option "Man City"
+  - option "Man Utd"
+  - option "Newcastle"
+  - option "Nott'm Forest"
+  - option "Spurs"
+  - option "Sunderland"
+  - option "West Ham"
+  - option "Wolves"
+- text: Max Price (£M)
+- spinbutton "Max Price (£M)"
+- button "Clear all filters"
+- checkbox "Watchlist only"
+- text: Watchlist only Show
+- combobox "Show entries":
+  - option "10"
+  - option "25"
+  - option "50"
+  - option "100" [selected]
+- text: "entries Search:"
+- searchbox "Search:"
+- table:
+  - rowgroup:
+    - 'row "★: activate to sort column ascending Name: activate to sort column ascending Position: activate to sort column ascending Team: activate to sort column ascending Price: activate to sort column ascending Chance%: activate to sort column ascending Points/£: activate to sort column ascending TotalPoints: activate to sort column ascending Form: activate to sort column ascending Own%: activate to sort column ascending xP: activate to sort column ascending AvgxP: activate to sort column ascending GW1: activate to sort column ascending GW2: activate to sort column ascending GW3: activate to sort column ascending GW4: activate to sort column ascending GW5: activate to sort column ascending GW6: activate to sort column ascending GW7: activate to sort column ascending GW8: activate to sort column ascending GW9: activate to sort column ascending"':
+      - 'cell "★: activate to sort column ascending"': ★
+      - 'cell "Name: activate to sort column ascending"': Name
+      - 'cell "Position: activate to sort column ascending"': Position
+      - 'cell "Team: activate to sort column ascending"': Team
+      - 'cell "Price: activate to sort column ascending"': Price
+      - 'cell "Chance%: activate to sort column ascending"': Chance %
+      - 'cell "Points/£: activate to sort column ascending"': Points /£
+      - 'cell "TotalPoints: activate to sort column ascending"': Total Points
+      - 'cell "Form: activate to sort column ascending"': Form
+      - 'cell "Own%: activate to sort column ascending"': Own %
+      - 'cell "xP: activate to sort column ascending"': xP
+      - 'cell "AvgxP: activate to sort column ascending"': Avg xP
+      - 'cell "GW1: activate to sort column ascending"': GW1
+      - 'cell "GW2: activate to sort column ascending"': GW2
+      - 'cell "GW3: activate to sort column ascending"': GW3
+      - 'cell "GW4: activate to sort column ascending"': GW4
+      - 'cell "GW5: activate to sort column ascending"': GW5
+      - 'cell "GW6: activate to sort column ascending"': GW6
+      - 'cell "GW7: activate to sort column ascending"': GW7
+      - 'cell "GW8: activate to sort column ascending"': GW8
+      - 'cell "GW9: activate to sort column ascending"': GW9
+  - rowgroup:
+    - row "☆ Petrović Goa BOU £4.5M 100.0% 7.4 33.4 0.0 0.0% 33.4 3.7 3.4 LIV 5 max 4.0 3.9 WOL 2 max 4.3 3.3 TOT 3 max 4.0 4.0 BHA 3 max 4.2 3.5 NEW 3 max 4.0 3.8 LEE 2 max 3.9 3.8 FUL 3 max 4.4 3.9 CRY 3 max 4.1 3.8 NFO 3 max 4.3":
+      - cell "☆":
+        - button "☆"
+      - cell "Petrović":
+        - link "Petrović":
+          - /url: /player/20
+      - cell "Goa"
+      - cell "BOU":
+        - link "BOU":
+          - /url: /team/4
+      - cell "£4.5M"
+      - cell "100.0%"
+      - cell "7.4"
+      - cell "33.4"
+      - cell "0.0"
+      - cell "0.0%"
+      - cell "33.4"
+      - cell "3.7":
+        - strong: "3.7"
+      - cell "3.4 LIV 5 max 4.0":
+        - strong: "3.4"
+        - text: LIV 5 max 4.0
+      - cell "3.9 WOL 2 max 4.3":
+        - strong: "3.9"
+        - text: WOL 2 max 4.3
+      - cell "3.3 TOT 3 max 4.0":
+        - strong: "3.3"
+        - text: TOT 3 max 4.0
+      - cell "4.0 BHA 3 max 4.2":
+        - strong: "4.0"
+        - text: BHA 3 max 4.2
+      - cell "3.5 NEW 3 max 4.0":
+        - strong: "3.5"
+        - text: NEW 3 max 4.0
+      - cell "3.8 LEE 2 max 3.9":
+        - strong: "3.8"
+        - text: LEE 2 max 3.9
+      - cell "3.8 FUL 3 max 4.4":
+        - strong: "3.8"
+        - text: FUL 3 max 4.4
+      - cell "3.9 CRY 3 max 4.1":
+        - strong: "3.9"
+        - text: CRY 3 max 4.1
+      - cell "3.8 NFO 3 max 4.3":
+        - strong: "3.8"
+        - text: NFO 3 max 4.3
+    - row "☆ Mepham Def BOU £4.0M 100.0% 7.3 29.3 0.0 0.0% 29.3 3.3 3.0 LIV 5 max 4.2 3.5 WOL 2 max 4.7 3.0 TOT 3 max 4.1 3.5 BHA 3 max 5.3 2.9 NEW 3 max 4.6 3.6 LEE 2 max 4.7 3.4 FUL 3 max 4.3 3.1 CRY 3 max 4.4 3.3 NFO 3 max 4.5":
+      - cell "☆":
+        - button "☆"
+      - cell "Mepham":
+        - link "Mepham":
+          - /url: /player/57
+      - cell "Def"
+      - cell "BOU":
+        - link "BOU":
+          - /url: /team/4
+      - cell "£4.0M"
+      - cell "100.0%"
+      - cell "7.3"
+      - cell "29.3"
+      - cell "0.0"
+      - cell "0.0%"
+      - cell "29.3"
+      - cell "3.3":
+        - strong: "3.3"
+      - cell "3.0 LIV 5 max 4.2":
+        - strong: "3.0"
+        - text: LIV 5 max 4.2
+      - cell "3.5 WOL 2 max 4.7":
+        - strong: "3.5"
+        - text: WOL 2 max 4.7
+      - cell "3.0 TOT 3 max 4.1":
+        - strong: "3.0"
+        - text: TOT 3 max 4.1
+      - cell "3.5 BHA 3 max 5.3":
+        - strong: "3.5"
+        - text: BHA 3 max 5.3
+      - cell "2.9 NEW 3 max 4.6":
+        - strong: "2.9"
+        - text: NEW 3 max 4.6
+      - cell "3.6 LEE 2 max 4.7":
+        - strong: "3.6"
+        - text: LEE 2 max 4.7
+      - cell "3.4 FUL 3 max 4.3":
+        - strong: "3.4"
+        - text: FUL 3 max 4.3
+      - cell "3.1 CRY 3 max 4.4":
+        - strong: "3.1"
+        - text: CRY 3 max 4.4
+      - cell "3.3 NFO 3 max 4.5":
+        - strong: "3.3"
+        - text: NFO 3 max 4.5
+    - row "★ José Sá Goa WOL £4.5M 100.0% 6.8 30.4 0.0 0.0% 30.4 3.4 3.5 MCI 4 max 4.0 3.6 BOU 3 max 4.3 3.9 EVE 2 max 4.0 1.9 NEW 4 max 4.2 3.3 LEE 2 max 4.0 3.1 TOT 3 max 3.9 3.6 BHA 3 max 4.4 3.5 SUN 2 max 4.1 4.0 BUR 2 max 4.3":
+      - cell "★":
+        - button "★"
+      - cell "José Sá":
+        - link "José Sá":
+          - /url: /player/39
+      - cell "Goa"
+      - cell "WOL":
+        - link "WOL":
+          - /url: /team/20
+      - cell "£4.5M"
+      - cell "100.0%"
+      - cell "6.8"
+      - cell "30.4"
+      - cell "0.0"
+      - cell "0.0%"
+      - cell "30.4"
+      - cell "3.4":
+        - strong: "3.4"
+      - cell "3.5 MCI 4 max 4.0":
+        - strong: "3.5"
+        - text: MCI 4 max 4.0
+      - cell "3.6 BOU 3 max 4.3":
+        - strong: "3.6"
+        - text: BOU 3 max 4.3
+      - cell "3.9 EVE 2 max 4.0":
+        - strong: "3.9"
+        - text: EVE 2 max 4.0
+      - cell "1.9 NEW 4 max 4.2":
+        - strong: "1.9"
+        - text: NEW 4 max 4.2
+      - cell "3.3 LEE 2 max 4.0":
+        - strong: "3.3"
+        - text: LEE 2 max 4.0
+      - cell "3.1 TOT 3 max 3.9":
+        - strong: "3.1"
+        - text: TOT 3 max 3.9
+      - cell "3.6 BHA 3 max 4.4":
+        - strong: "3.6"
+        - text: BHA 3 max 4.4
+      - cell "3.5 SUN 2 max 4.1":
+        - strong: "3.5"
+        - text: SUN 2 max 4.1
+      - cell "4.0 BUR 2 max 4.3":
+        - strong: "4.0"
+        - text: BUR 2 max 4.3
+    - row "☆ Richards Def CRY £4.5M 100.0% 6.7 30.1 0.0 0.0% 30.1 3.3 2.6 CHE 4 max 4.2 3.5 NFO 3 max 4.7 2.9 AVL 4 max 4.1 4.5 SUN 2 max 5.3 3.3 WHU 2 max 4.6 3.1 LIV 4 max 4.7 3.7 EVE 3 max 4.3 3.7 BOU 3 max 4.4 2.8 ARS 4 max 4.5":
+      - cell "☆":
+        - button "☆"
+      - cell "Richards":
+        - link "Richards":
+          - /url: /player/43
+      - cell "Def"
+      - cell "CRY":
+        - link "CRY":
+          - /url: /team/8
+      - cell "£4.5M"
+      - cell "100.0%"
+      - cell "6.7"
+      - cell "30.1"
+      - cell "0.0"
+      - cell "0.0%"
+      - cell "30.1"
+      - cell "3.3":
+        - strong: "3.3"
+      - cell "2.6 CHE 4 max 4.2":
+        - strong: "2.6"
+        - text: CHE 4 max 4.2
+      - cell "3.5 NFO 3 max 4.7":
+        - strong: "3.5"
+        - text: NFO 3 max 4.7
+      - cell "2.9 AVL 4 max 4.1":
+        - strong: "2.9"
+        - text: AVL 4 max 4.1
+      - cell "4.5 SUN 2 max 5.3":
+        - strong: "4.5"
+        - text: SUN 2 max 5.3
+      - cell "3.3 WHU 2 max 4.6":
+        - strong: "3.3"
+        - text: WHU 2 max 4.6
+      - cell "3.1 LIV 4 max 4.7":
+        - strong: "3.1"
+        - text: LIV 4 max 4.7
+      - cell "3.7 EVE 3 max 4.3":
+        - strong: "3.7"
+        - text: EVE 3 max 4.3
+      - cell "3.7 BOU 3 max 4.4":
+        - strong: "3.7"
+        - text: BOU 3 max 4.4
+      - cell "2.8 ARS 4 max 4.5":
+        - strong: "2.8"
+        - text: ARS 4 max 4.5
+    - row "★ Sánchez Goa CHE £5.0M 100.0% 6.7 33.7 0.0 0.0% 33.7 3.7 4.0 CRY 3 max 4.0 3.7 WHU 2 max 4.3 4.0 FUL 3 max 4.0 3.5 BRE 3 max 4.2 3.7 MUN 3 max 4.0 3.9 BHA 3 max 3.9 3.3 LIV 4 max 4.4 3.3 NFO 3 max 4.1 4.3 SUN 2 max 4.3":
+      - cell "★":
+        - button "★"
+      - cell "Sánchez":
+        - link "Sánchez":
+          - /url: /player/17
+      - cell "Goa"
+      - cell "CHE":
+        - link "CHE":
+          - /url: /team/7
+      - cell "£5.0M"
+      - cell "100.0%"
+      - cell "6.7"
+      - cell "33.7"
+      - cell "0.0"
+      - cell "0.0%"
+      - cell "33.7"
+      - cell "3.7":
+        - strong: "3.7"
+      - cell "4.0 CRY 3 max 4.0":
+        - strong: "4.0"
+        - text: CRY 3 max 4.0
+      - cell "3.7 WHU 2 max 4.3":
+        - strong: "3.7"
+        - text: WHU 2 max 4.3
+      - cell "4.0 FUL 3 max 4.0":
+        - strong: "4.0"
+        - text: FUL 3 max 4.0
+      - cell "3.5 BRE 3 max 4.2":
+        - strong: "3.5"
+        - text: BRE 3 max 4.2
+      - cell "3.7 MUN 3 max 4.0":
+        - strong: "3.7"
+        - text: MUN 3 max 4.0
+      - cell "3.9 BHA 3 max 3.9":
+        - strong: "3.9"
+        - text: BHA 3 max 3.9
+      - cell "3.3 LIV 4 max 4.4":
+        - strong: "3.3"
+        - text: LIV 4 max 4.4
+      - cell "3.3 NFO 3 max 4.1":
+        - strong: "3.3"
+        - text: NFO 3 max 4.1
+      - cell "4.3 SUN 2 max 4.3":
+        - strong: "4.3"
+        - text: SUN 2 max 4.3
+    - row "☆ Verbruggen Goa BHA £4.5M 100.0% 6.7 30.1 0.0 0.0% 30.1 3.3 3.6 FUL 3 max 4.0 3.8 EVE 3 max 4.3 3.2 MCI 4 max 4.0 3.5 BOU 3 max 4.2 3.4 TOT 3 max 4.0 2.8 CHE 4 max 3.9 3.3 WOL 3 max 4.4 3.1 NEW 3 max 4.1 3.4 MUN 3 max 4.3":
+      - cell "☆":
+        - button "☆"
+      - cell "Verbruggen":
+        - link "Verbruggen":
+          - /url: /player/42
+      - cell "Goa"
+      - cell "BHA":
+        - link "BHA":
+          - /url: /team/6
+      - cell "£4.5M"
+      - cell "100.0%"
+      - cell "6.7"
+      - cell "30.1"
+      - cell "0.0"
+      - cell "0.0%"
+      - cell "30.1"
+      - cell "3.3":
+        - strong: "3.3"
+      - cell "3.6 FUL 3 max 4.0":
+        - strong: "3.6"
+        - text: FUL 3 max 4.0
+      - cell "3.8 EVE 3 max 4.3":
+        - strong: "3.8"
+        - text: EVE 3 max 4.3
+      - cell "3.2 MCI 4 max 4.0":
+        - strong: "3.2"
+        - text: MCI 4 max 4.0
+      - cell "3.5 BOU 3 max 4.2":
+        - strong: "3.5"
+        - text: BOU 3 max 4.2
+      - cell "3.4 TOT 3 max 4.0":
+        - strong: "3.4"
+        - text: TOT 3 max 4.0
+      - cell "2.8 CHE 4 max 3.9":
+        - strong: "2.8"
+        - text: CHE 4 max 3.9
+      - cell "3.3 WOL 3 max 4.4":
+        - strong: "3.3"
+        - text: WOL 3 max 4.4
+      - cell "3.1 NEW 3 max 4.1":
+        - strong: "3.1"
+        - text: NEW 3 max 4.1
+      - cell "3.4 MUN 3 max 4.3":
+        - strong: "3.4"
+        - text: MUN 3 max 4.3
+    - row "☆ Guéhi Def CRY £4.5M 100.0% 6.6 29.7 0.0 0.0% 29.7 3.3 2.6 CHE 4 max 4.2 3.5 NFO 3 max 4.7 2.8 AVL 4 max 4.1 4.6 SUN 2 max 5.3 3.2 WHU 2 max 4.6 3.0 LIV 4 max 4.7 3.6 EVE 3 max 4.3 3.7 BOU 3 max 4.4 2.7 ARS 4 max 4.5":
+      - cell "☆":
+        - button "☆"
+      - cell "Guéhi":
+        - link "Guéhi":
+          - /url: /player/49
+      - cell "Def"
+      - cell "CRY":
+        - link "CRY":
+          - /url: /team/8
+      - cell "£4.5M"
+      - cell "100.0%"
+      - cell "6.6"
+      - cell "29.7"
+      - cell "0.0"
+      - cell "0.0%"
+      - cell "29.7"
+      - cell "3.3":
+        - strong: "3.3"
+      - cell "2.6 CHE 4 max 4.2":
+        - strong: "2.6"
+        - text: CHE 4 max 4.2
+      - cell "3.5 NFO 3 max 4.7":
+        - strong: "3.5"
+        - text: NFO 3 max 4.7
+      - cell "2.8 AVL 4 max 4.1":
+        - strong: "2.8"
+        - text: AVL 4 max 4.1
+      - cell "4.6 SUN 2 max 5.3":
+        - strong: "4.6"
+        - text: SUN 2 max 5.3
+      - cell "3.2 WHU 2 max 4.6":
+        - strong: "3.2"
+        - text: WHU 2 max 4.6
+      - cell "3.0 LIV 4 max 4.7":
+        - strong: "3.0"
+        - text: LIV 4 max 4.7
+      - cell "3.6 EVE 3 max 4.3":
+        - strong: "3.6"
+        - text: EVE 3 max 4.3
+      - cell "3.7 BOU 3 max 4.4":
+        - strong: "3.7"
+        - text: BOU 3 max 4.4
+      - cell "2.7 ARS 4 max 4.5":
+        - strong: "2.7"
+        - text: ARS 4 max 4.5
+    - row "☆ Leno Goa FUL £5.0M 100.0% 6.6 32.8 0.0 0.0% 32.8 3.6 3.8 BHA 3 max 4.0 4.1 MUN 3 max 4.3 3.5 CHE 4 max 4.0 4.2 LEE 2 max 4.2 3.8 BRE 3 max 4.0 3.2 AVL 4 max 3.9 3.9 BOU 3 max 4.4 3.3 ARS 4 max 4.1 3.0 NEW 4 max 4.3":
+      - cell "☆":
+        - button "☆"
+      - cell "Leno":
+        - link "Leno":
+          - /url: /player/25
+      - cell "Goa"
+      - cell "FUL":
+        - link "FUL":
+          - /url: /team/10
+      - cell "£5.0M"
+      - cell "100.0%"
+      - cell "6.6"
+      - cell "32.8"
+      - cell "0.0"
+      - cell "0.0%"
+      - cell "32.8"
+      - cell "3.6":
+        - strong: "3.6"
+      - cell "3.8 BHA 3 max 4.0":
+        - strong: "3.8"
+        - text: BHA 3 max 4.0
+      - cell "4.1 MUN 3 max 4.3":
+        - strong: "4.1"
+        - text: MUN 3 max 4.3
+      - cell "3.5 CHE 4 max 4.0":
+        - strong: "3.5"
+        - text: CHE 4 max 4.0
+      - cell "4.2 LEE 2 max 4.2":
+        - strong: "4.2"
+        - text: LEE 2 max 4.2
+      - cell "3.8 BRE 3 max 4.0":
+        - strong: "3.8"
+        - text: BRE 3 max 4.0
+      - cell "3.2 AVL 4 max 3.9":
+        - strong: "3.2"
+        - text: AVL 4 max 3.9
+      - cell "3.9 BOU 3 max 4.4":
+        - strong: "3.9"
+        - text: BOU 3 max 4.4
+      - cell "3.3 ARS 4 max 4.1":
+        - strong: "3.3"
+        - text: ARS 4 max 4.1
+      - cell "3.0 NEW 4 max 4.3":
+        - strong: "3.0"
+        - text: NEW 4 max 4.3
+    - row "☆ Tosin Def CHE £4.5M 100.0% 6.6 29.7 0.0 0.0% 29.7 3.3 3.5 CRY 3 max 4.2 3.3 WHU 2 max 4.7 3.6 FUL 3 max 4.1 3.1 BRE 3 max 5.3 2.9 MUN 3 max 4.6 3.5 BHA 3 max 4.7 2.7 LIV 4 max 4.3 2.7 NFO 3 max 4.4 4.4 SUN 2 max 4.5":
+      - cell "☆":
+        - button "☆"
+      - cell "Tosin":
+        - link "Tosin":
+          - /url: /player/51
+      - cell "Def"
+      - cell "CHE":
+        - link "CHE":
+          - /url: /team/7
+      - cell "£4.5M"
+      - cell "100.0%"
+      - cell "6.6"
+      - cell "29.7"
+      - cell "0.0"
+      - cell "0.0%"
+      - cell "29.7"
+      - cell "3.3":
+        - strong: "3.3"
+      - cell "3.5 CRY 3 max 4.2":
+        - strong: "3.5"
+        - text: CRY 3 max 4.2
+      - cell "3.3 WHU 2 max 4.7":
+        - strong: "3.3"
+        - text: WHU 2 max 4.7
+      - cell "3.6 FUL 3 max 4.1":
+        - strong: "3.6"
+        - text: FUL 3 max 4.1
+      - cell "3.1 BRE 3 max 5.3":
+        - strong: "3.1"
+        - text: BRE 3 max 5.3
+      - cell "2.9 MUN 3 max 4.6":
+        - strong: "2.9"
+        - text: MUN 3 max 4.6
+      - cell "3.5 BHA 3 max 4.7":
+        - strong: "3.5"
+        - text: BHA 3 max 4.7
+      - cell "2.7 LIV 4 max 4.3":
+        - strong: "2.7"
+        - text: LIV 4 max 4.3
+      - cell "2.7 NFO 3 max 4.4":
+        - strong: "2.7"
+        - text: NFO 3 max 4.4
+      - cell "4.4 SUN 2 max 4.5":
+        - strong: "4.4"
+        - text: SUN 2 max 4.5
+    - row "☆ Hladký Goa BUR £4.0M 100.0% 6.5 25.8 0.0 0.0% 25.8 2.9 3.0 TOT 3 max 4.0 3.1 SUN 2 max 4.3 3.3 MUN 3 max 4.0 3.0 LIV 4 max 4.2 2.9 NFO 3 max 4.0 3.2 MCI 4 max 3.9 1.1 AVL 4 max 4.4 3.3 LEE 2 max 4.1 2.9 WOL 3 max 4.3":
+      - cell "☆":
+        - button "☆"
+      - cell "Hladký":
+        - link "Hladký":
+          - /url: /player/104
+      - cell "Goa"
+      - cell "BUR":
+        - link "BUR":
+          - /url: /team/3
+      - cell "£4.0M"
+      - cell "100.0%"
+      - cell "6.5"
+      - cell "25.8"
+      - cell "0.0"
+      - cell "0.0%"
+      - cell "25.8"
+      - cell "2.9":
+        - strong: "2.9"
+      - cell "3.0 TOT 3 max 4.0":
+        - strong: "3.0"
+        - text: TOT 3 max 4.0
+      - cell "3.1 SUN 2 max 4.3":
+        - strong: "3.1"
+        - text: SUN 2 max 4.3
+      - cell "3.3 MUN 3 max 4.0":
+        - strong: "3.3"
+        - text: MUN 3 max 4.0
+      - cell "3.0 LIV 4 max 4.2":
+        - strong: "3.0"
+        - text: LIV 4 max 4.2
+      - cell "2.9 NFO 3 max 4.0":
+        - strong: "2.9"
+        - text: NFO 3 max 4.0
+      - cell "3.2 MCI 4 max 3.9":
+        - strong: "3.2"
+        - text: MCI 4 max 3.9
+      - cell "1.1 AVL 4 max 4.4":
+        - strong: "1.1"
+        - text: AVL 4 max 4.4
+      - cell "3.3 LEE 2 max 4.1":
+        - strong: "3.3"
+        - text: LEE 2 max 4.1
+      - cell "2.9 WOL 3 max 4.3":
+        - strong: "2.9"
+        - text: WOL 3 max 4.3
+    - row "☆ Hoever Def WOL £4.0M 100.0% 6.5 25.8 0.0 0.0% 25.8 2.9 2.5 MCI 4 max 4.2 2.5 BOU 3 max 4.7 3.6 EVE 2 max 4.1 1.9 NEW 4 max 5.3 3.7 LEE 2 max 4.6 2.1 TOT 3 max 4.7 2.9 BHA 3 max 4.3 2.7 SUN 2 max 4.4 3.9 BUR 2 max 4.5":
+      - cell "☆":
+        - button "☆"
+      - cell "Hoever":
+        - link "Hoever":
+          - /url: /player/102
+      - cell "Def"
+      - cell "WOL":
+        - link "WOL":
+          - /url: /team/20
+      - cell "£4.0M"
+      - cell "100.0%"
+      - cell "6.5"
+      - cell "25.8"
+      - cell "0.0"
+      - cell "0.0%"
+      - cell "25.8"
+      - cell "2.9":
+        - strong: "2.9"
+      - cell "2.5 MCI 4 max 4.2":
+        - strong: "2.5"
+        - text: MCI 4 max 4.2
+      - cell "2.5 BOU 3 max 4.7":
+        - strong: "2.5"
+        - text: BOU 3 max 4.7
+      - cell "3.6 EVE 2 max 4.1":
+        - strong: "3.6"
+        - text: EVE 2 max 4.1
+      - cell "1.9 NEW 4 max 5.3":
+        - strong: "1.9"
+        - text: NEW 4 max 5.3
+      - cell "3.7 LEE 2 max 4.6":
+        - strong: "3.7"
+        - text: LEE 2 max 4.6
+      - cell "2.1 TOT 3 max 4.7":
+        - strong: "2.1"
+        - text: TOT 3 max 4.7
+      - cell "2.9 BHA 3 max 4.3":
+        - strong: "2.9"
+        - text: BHA 3 max 4.3
+      - cell "2.7 SUN 2 max 4.4":
+        - strong: "2.7"
+        - text: SUN 2 max 4.4
+      - cell "3.9 BUR 2 max 4.5":
+        - strong: "3.9"
+        - text: BUR 2 max 4.5
+    - row "☆ Andersen Def FUL £4.5M 100.0% 6.4 28.8 0.0 0.0% 28.8 3.2 3.3 BHA 3 max 4.2 3.6 MUN 3 max 4.7 2.7 CHE 4 max 4.1 4.0 LEE 2 max 5.3 3.7 BRE 3 max 4.6 2.7 AVL 4 max 4.7 3.4 BOU 3 max 4.3 3.0 ARS 4 max 4.4 2.4 NEW 4 max 4.5":
+      - cell "☆":
+        - button "☆"
+      - cell "Andersen":
+        - link "Andersen":
+          - /url: /player/64
+      - cell "Def"
+      - cell "FUL":
+        - link "FUL":
+          - /url: /team/10
+      - cell "£4.5M"
+      - cell "100.0%"
+      - cell "6.4"
+      - cell "28.8"
+      - cell "0.0"
+      - cell "0.0%"
+      - cell "28.8"
+      - cell "3.2":
+        - strong: "3.2"
+      - cell "3.3 BHA 3 max 4.2":
+        - strong: "3.3"
+        - text: BHA 3 max 4.2
+      - cell "3.6 MUN 3 max 4.7":
+        - strong: "3.6"
+        - text: MUN 3 max 4.7
+      - cell "2.7 CHE 4 max 4.1":
+        - strong: "2.7"
+        - text: CHE 4 max 4.1
+      - cell "4.0 LEE 2 max 5.3":
+        - strong: "4.0"
+        - text: LEE 2 max 5.3
+      - cell "3.7 BRE 3 max 4.6":
+        - strong: "3.7"
+        - text: BRE 3 max 4.6
+      - cell "2.7 AVL 4 max 4.7":
+        - strong: "2.7"
+        - text: AVL 4 max 4.7
+      - cell "3.4 BOU 3 max 4.3":
+        - strong: "3.4"
+        - text: BOU 3 max 4.3
+      - cell "3.0 ARS 4 max 4.4":
+        - strong: "3.0"
+        - text: ARS 4 max 4.4
+      - cell "2.4 NEW 4 max 4.5":
+        - strong: "2.4"
+        - text: NEW 4 max 4.5
+    - row "☆ Lacroix Def CRY £5.0M 100.0% 6.3 31.5 0.0 0.0% 31.5 3.5 2.8 CHE 4 max 4.2 3.6 NFO 3 max 4.7 3.0 AVL 4 max 4.1 4.8 SUN 2 max 5.3 3.4 WHU 2 max 4.6 3.3 LIV 4 max 4.7 3.9 EVE 3 max 4.3 3.7 BOU 3 max 4.4 3.0 ARS 4 max 4.5":
+      - cell "☆":
+        - button "☆"
+      - cell "Lacroix":
+        - link "Lacroix":
+          - /url: /player/32
+      - cell "Def"
+      - cell "CRY":
+        - link "CRY":
+          - /url: /team/8
+      - cell "£5.0M"
+      - cell "100.0%"
+      - cell "6.3"
+      - cell "31.5"
+      - cell "0.0"
+      - cell "0.0%"
+      - cell "31.5"
+      - cell "3.5":
+        - strong: "3.5"
+      - cell "2.8 CHE 4 max 4.2":
+        - strong: "2.8"
+        - text: CHE 4 max 4.2
+      - cell "3.6 NFO 3 max 4.7":
+        - strong: "3.6"
+        - text: NFO 3 max 4.7
+      - cell "3.0 AVL 4 max 4.1":
+        - strong: "3.0"
+        - text: AVL 4 max 4.1
+      - cell "4.8 SUN 2 max 5.3":
+        - strong: "4.8"
+        - text: SUN 2 max 5.3
+      - cell "3.4 WHU 2 max 4.6":
+        - strong: "3.4"
+        - text: WHU 2 max 4.6
+      - cell "3.3 LIV 4 max 4.7":
+        - strong: "3.3"
+        - text: LIV 4 max 4.7
+      - cell "3.9 EVE 3 max 4.3":
+        - strong: "3.9"
+        - text: EVE 3 max 4.3
+      - cell "3.7 BOU 3 max 4.4":
+        - strong: "3.7"
+        - text: BOU 3 max 4.4
+      - cell "3.0 ARS 4 max 4.5":
+        - strong: "3.0"
+        - text: ARS 4 max 4.5
+    - row "☆ Konsa Def AVL £4.5M 100.0% 6.2 28.0 0.0 0.0% 28.0 3.1 2.9 NEW 3 max 4.2 2.6 BRE 3 max 4.7 3.5 CRY 3 max 4.1 3.1 EVE 3 max 5.3 3.3 SUN 2 max 4.6 3.4 FUL 3 max 4.7 4.0 BUR 2 max 4.3 2.3 TOT 3 max 4.4 2.9 MCI 4 max 4.5":
+      - cell "☆":
+        - button "☆"
+      - cell "Konsa":
+        - link "Konsa":
+          - /url: /player/70
+      - cell "Def"
+      - cell "AVL":
+        - link "AVL":
+          - /url: /team/2
+      - cell "£4.5M"
+      - cell "100.0%"
+      - cell "6.2"
+      - cell "28.0"
+      - cell "0.0"
+      - cell "0.0%"
+      - cell "28.0"
+      - cell "3.1":
+        - strong: "3.1"
+      - cell "2.9 NEW 3 max 4.2":
+        - strong: "2.9"
+        - text: NEW 3 max 4.2
+      - cell "2.6 BRE 3 max 4.7":
+        - strong: "2.6"
+        - text: BRE 3 max 4.7
+      - cell "3.5 CRY 3 max 4.1":
+        - strong: "3.5"
+        - text: CRY 3 max 4.1
+      - cell "3.1 EVE 3 max 5.3":
+        - strong: "3.1"
+        - text: EVE 3 max 5.3
+      - cell "3.3 SUN 2 max 4.6":
+        - strong: "3.3"
+        - text: SUN 2 max 4.6
+      - cell "3.4 FUL 3 max 4.7":
+        - strong: "3.4"
+        - text: FUL 3 max 4.7
+      - cell "4.0 BUR 2 max 4.3":
+        - strong: "4.0"
+        - text: BUR 2 max 4.3
+      - cell "2.3 TOT 3 max 4.4":
+        - strong: "2.3"
+        - text: TOT 3 max 4.4
+      - cell "2.9 MCI 4 max 4.5":
+        - strong: "2.9"
+        - text: MCI 4 max 4.5
+    - row "☆ Mykolenko Def EVE £5.0M 100.0% 6.2 31.0 0.0 0.0% 31.0 3.4 4.0 LEE 2 max 4.2 3.6 BHA 3 max 4.7 3.4 WOL 3 max 4.1 3.5 AVL 3 max 5.3 2.6 LIV 5 max 4.6 3.9 WHU 2 max 4.7 3.8 CRY 3 max 4.3 2.7 MCI 4 max 4.4 3.5 TOT 3 max 4.5":
+      - cell "☆":
+        - button "☆"
+      - cell "Mykolenko":
+        - link "Mykolenko":
+          - /url: /player/34
+      - cell "Def"
+      - cell "EVE":
+        - link "EVE":
+          - /url: /team/9
+      - cell "£5.0M"
+      - cell "100.0%"
+      - cell "6.2"
+      - cell "31.0"
+      - cell "0.0"
+      - cell "0.0%"
+      - cell "31.0"
+      - cell "3.4":
+        - strong: "3.4"
+      - cell "4.0 LEE 2 max 4.2":
+        - strong: "4.0"
+        - text: LEE 2 max 4.2
+      - cell "3.6 BHA 3 max 4.7":
+        - strong: "3.6"
+        - text: BHA 3 max 4.7
+      - cell "3.4 WOL 3 max 4.1":
+        - strong: "3.4"
+        - text: WOL 3 max 4.1
+      - cell "3.5 AVL 3 max 5.3":
+        - strong: "3.5"
+        - text: AVL 3 max 5.3
+      - cell "2.6 LIV 5 max 4.6":
+        - strong: "2.6"
+        - text: LIV 5 max 4.6
+      - cell "3.9 WHU 2 max 4.7":
+        - strong: "3.9"
+        - text: WHU 2 max 4.7
+      - cell "3.8 CRY 3 max 4.3":
+        - strong: "3.8"
+        - text: CRY 3 max 4.3
+      - cell "2.7 MCI 4 max 4.4":
+        - strong: "2.7"
+        - text: MCI 4 max 4.4
+      - cell "3.5 TOT 3 max 4.5":
+        - strong: "3.5"
+        - text: TOT 3 max 4.5
+    - row "☆ Kilman Def WHU £4.5M 100.0% 6.1 27.6 0.0 0.0% 27.6 3.1 3.7 SUN 2 max 4.2 2.6 CHE 3 max 4.7 2.6 NFO 3 max 4.1 3.0 TOT 3 max 5.3 3.0 CRY 3 max 4.6 3.5 EVE 3 max 4.7 2.6 ARS 4 max 4.3 3.3 BRE 3 max 4.4 3.3 LEE 2 max 4.5":
+      - cell "☆":
+        - button "☆"
+      - cell "Kilman":
+        - link "Kilman":
+          - /url: /player/74
+      - cell "Def"
+      - cell "WHU":
+        - link "WHU":
+          - /url: /team/19
+      - cell "£4.5M"
+      - cell "100.0%"
+      - cell "6.1"
+      - cell "27.6"
+      - cell "0.0"
+      - cell "0.0%"
+      - cell "27.6"
+      - cell "3.1":
+        - strong: "3.1"
+      - cell "3.7 SUN 2 max 4.2":
+        - strong: "3.7"
+        - text: SUN 2 max 4.2
+      - cell "2.6 CHE 3 max 4.7":
+        - strong: "2.6"
+        - text: CHE 3 max 4.7
+      - cell "2.6 NFO 3 max 4.1":
+        - strong: "2.6"
+        - text: NFO 3 max 4.1
+      - cell "3.0 TOT 3 max 5.3":
+        - strong: "3.0"
+        - text: TOT 3 max 5.3
+      - cell "3.0 CRY 3 max 4.6":
+        - strong: "3.0"
+        - text: CRY 3 max 4.6
+      - cell "3.5 EVE 3 max 4.7":
+        - strong: "3.5"
+        - text: EVE 3 max 4.7
+      - cell "2.6 ARS 4 max 4.3":
+        - strong: "2.6"
+        - text: ARS 4 max 4.3
+      - cell "3.3 BRE 3 max 4.4":
+        - strong: "3.3"
+        - text: BRE 3 max 4.4
+      - cell "3.3 LEE 2 max 4.5":
+        - strong: "3.3"
+        - text: LEE 2 max 4.5
+    - row "☆ Muñoz Def CRY £5.5M 100.0% 6.1 33.5 0.0 0.0% 33.5 3.7 2.9 CHE 4 max 4.2 4.2 NFO 3 max 4.7 3.2 AVL 4 max 4.1 5.3 SUN 2 max 5.3 3.7 WHU 2 max 4.6 3.3 LIV 4 max 4.7 3.9 EVE 3 max 4.3 4.3 BOU 3 max 4.4 2.7 ARS 4 max 4.5":
+      - cell "☆":
+        - button "☆"
+      - cell "Muñoz":
+        - link "Muñoz":
+          - /url: /player/21
+      - cell "Def"
+      - cell "CRY":
+        - link "CRY":
+          - /url: /team/8
+      - cell "£5.5M"
+      - cell "100.0%"
+      - cell "6.1"
+      - cell "33.5"
+      - cell "0.0"
+      - cell "0.0%"
+      - cell "33.5"
+      - cell "3.7":
+        - strong: "3.7"
+      - cell "2.9 CHE 4 max 4.2":
+        - strong: "2.9"
+        - text: CHE 4 max 4.2
+      - cell "4.2 NFO 3 max 4.7":
+        - strong: "4.2"
+        - text: NFO 3 max 4.7
+      - cell "3.2 AVL 4 max 4.1":
+        - strong: "3.2"
+        - text: AVL 4 max 4.1
+      - cell "5.3 SUN 2 max 5.3":
+        - strong: "5.3"
+        - text: SUN 2 max 5.3
+      - cell "3.7 WHU 2 max 4.6":
+        - strong: "3.7"
+        - text: WHU 2 max 4.6
+      - cell "3.3 LIV 4 max 4.7":
+        - strong: "3.3"
+        - text: LIV 4 max 4.7
+      - cell "3.9 EVE 3 max 4.3":
+        - strong: "3.9"
+        - text: EVE 3 max 4.3
+      - cell "4.3 BOU 3 max 4.4":
+        - strong: "4.3"
+        - text: BOU 3 max 4.4
+      - cell "2.7 ARS 4 max 4.5":
+        - strong: "2.7"
+        - text: ARS 4 max 4.5
+    - row "☆ Patterson Goa EVE £4.5M 100.0% 6.1 27.3 0.0 0.0% 27.3 3.0 3.3 LEE 2 max 4.0 3.4 BHA 3 max 4.3 3.0 WOL 3 max 4.0 3.1 AVL 3 max 4.2 3.0 LIV 5 max 4.0 2.5 WHU 2 max 3.9 3.1 CRY 3 max 4.4 3.0 MCI 4 max 4.1 2.9 TOT 3 max 4.3":
+      - cell "☆":
+        - button "☆"
+      - cell "Patterson":
+        - link "Patterson":
+          - /url: /player/78
+      - cell "Goa"
+      - cell "EVE":
+        - link "EVE":
+          - /url: /team/9
+      - cell "£4.5M"
+      - cell "100.0%"
+      - cell "6.1"
+      - cell "27.3"
+      - cell "0.0"
+      - cell "0.0%"
+      - cell "27.3"
+      - cell "3.0":
+        - strong: "3.0"
+      - cell "3.3 LEE 2 max 4.0":
+        - strong: "3.3"
+        - text: LEE 2 max 4.0
+      - cell "3.4 BHA 3 max 4.3":
+        - strong: "3.4"
+        - text: BHA 3 max 4.3
+      - cell "3.0 WOL 3 max 4.0":
+        - strong: "3.0"
+        - text: WOL 3 max 4.0
+      - cell "3.1 AVL 3 max 4.2":
+        - strong: "3.1"
+        - text: AVL 3 max 4.2
+      - cell "3.0 LIV 5 max 4.0":
+        - strong: "3.0"
+        - text: LIV 5 max 4.0
+      - cell "2.5 WHU 2 max 3.9":
+        - strong: "2.5"
+        - text: WHU 2 max 3.9
+      - cell "3.1 CRY 3 max 4.4":
+        - strong: "3.1"
+        - text: CRY 3 max 4.4
+      - cell "3.0 MCI 4 max 4.1":
+        - strong: "3.0"
+        - text: MCI 4 max 4.1
+      - cell "2.9 TOT 3 max 4.3":
+        - strong: "2.9"
+        - text: TOT 3 max 4.3
+    - row "☆ Cash Def AVL £4.5M 100.0% 6.0 27.2 0.0 0.0% 27.2 3.0 2.8 NEW 3 max 4.2 2.6 BRE 3 max 4.7 3.4 CRY 3 max 4.1 3.0 EVE 3 max 5.3 2.9 SUN 2 max 4.6 3.3 FUL 3 max 4.7 4.3 BUR 2 max 4.3 2.2 TOT 3 max 4.4 2.7 MCI 4 max 4.5":
+      - cell "☆":
+        - button "☆"
+      - cell "Cash":
+        - link "Cash":
+          - /url: /player/81
+      - cell "Def"
+      - cell "AVL":
+        - link "AVL":
+          - /url: /team/2
+      - cell "£4.5M"
+      - cell "100.0%"
+      - cell "6.0"
+      - cell "27.2"
+      - cell "0.0"
+      - cell "0.0%"
+      - cell "27.2"
+      - cell "3.0":
+        - strong: "3.0"
+      - cell "2.8 NEW 3 max 4.2":
+        - strong: "2.8"
+        - text: NEW 3 max 4.2
+      - cell "2.6 BRE 3 max 4.7":
+        - strong: "2.6"
+        - text: BRE 3 max 4.7
+      - cell "3.4 CRY 3 max 4.1":
+        - strong: "3.4"
+        - text: CRY 3 max 4.1
+      - cell "3.0 EVE 3 max 5.3":
+        - strong: "3.0"
+        - text: EVE 3 max 5.3
+      - cell "2.9 SUN 2 max 4.6":
+        - strong: "2.9"
+        - text: SUN 2 max 4.6
+      - cell "3.3 FUL 3 max 4.7":
+        - strong: "3.3"
+        - text: FUL 3 max 4.7
+      - cell "4.3 BUR 2 max 4.3":
+        - strong: "4.3"
+        - text: BUR 2 max 4.3
+      - cell "2.2 TOT 3 max 4.4":
+        - strong: "2.2"
+        - text: TOT 3 max 4.4
+      - cell "2.7 MCI 4 max 4.5":
+        - strong: "2.7"
+        - text: MCI 4 max 4.5
+    - row "☆ Henderson Goa BRE £5.0M 100.0% 6.0 30.1 0.0 0.0% 30.1 3.3 3.2 NFO 3 max 4.0 3.4 AVL 3 max 4.3 3.0 SUN 2 max 4.0 4.2 CHE 3 max 4.2 3.1 FUL 3 max 4.0 3.3 MUN 3 max 3.9 3.1 MCI 4 max 4.4 3.8 WHU 2 max 4.1 3.0 LIV 4 max 4.3":
+      - cell "☆":
+        - button "☆"
+      - cell "Henderson":
+        - link "Henderson":
+          - /url: /player/41
+      - cell "Goa"
+      - cell "BRE":
+        - link "BRE":
+          - /url: /team/5
+      - cell "£5.0M"
+      - cell "100.0%"
+      - cell "6.0"
+      - cell "30.1"
+      - cell "0.0"
+      - cell "0.0%"
+      - cell "30.1"
+      - cell "3.3":
+        - strong: "3.3"
+      - cell "3.2 NFO 3 max 4.0":
+        - strong: "3.2"
+        - text: NFO 3 max 4.0
+      - cell "3.4 AVL 3 max 4.3":
+        - strong: "3.4"
+        - text: AVL 3 max 4.3
+      - cell "3.0 SUN 2 max 4.0":
+        - strong: "3.0"
+        - text: SUN 2 max 4.0
+      - cell "4.2 CHE 3 max 4.2":
+        - strong: "4.2"
+        - text: CHE 3 max 4.2
+      - cell "3.1 FUL 3 max 4.0":
+        - strong: "3.1"
+        - text: FUL 3 max 4.0
+      - cell "3.3 MUN 3 max 3.9":
+        - strong: "3.3"
+        - text: MUN 3 max 3.9
+      - cell "3.1 MCI 4 max 4.4":
+        - strong: "3.1"
+        - text: MCI 4 max 4.4
+      - cell "3.8 WHU 2 max 4.1":
+        - strong: "3.8"
+        - text: WHU 2 max 4.1
+      - cell "3.0 LIV 4 max 4.3":
+        - strong: "3.0"
+        - text: LIV 4 max 4.3
+    - row "☆ Vicario Goa TOT £5.0M 100.0% 6.0 29.8 0.0 0.0% 29.8 3.3 3.9 BUR 2 max 4.0 2.9 MCI 4 max 4.3 3.4 BOU 3 max 4.0 3.0 WHU 2 max 4.2 3.2 BHA 3 max 4.0 3.3 WOL 2 max 3.9 3.5 LEE 2 max 4.4 3.2 AVL 3 max 4.1 3.4 EVE 3 max 4.3":
+      - cell "☆":
+        - button "☆"
+      - cell "Vicario":
+        - link "Vicario":
+          - /url: /player/46
+      - cell "Goa"
+      - cell "TOT":
+        - link "TOT":
+          - /url: /team/18
+      - cell "£5.0M"
+      - cell "100.0%"
+      - cell "6.0"
+      - cell "29.8"
+      - cell "0.0"
+      - cell "0.0%"
+      - cell "29.8"
+      - cell "3.3":
+        - strong: "3.3"
+      - cell "3.9 BUR 2 max 4.0":
+        - strong: "3.9"
+        - text: BUR 2 max 4.0
+      - cell "2.9 MCI 4 max 4.3":
+        - strong: "2.9"
+        - text: MCI 4 max 4.3
+      - cell "3.4 BOU 3 max 4.0":
+        - strong: "3.4"
+        - text: BOU 3 max 4.0
+      - cell "3.0 WHU 2 max 4.2":
+        - strong: "3.0"
+        - text: WHU 2 max 4.2
+      - cell "3.2 BHA 3 max 4.0":
+        - strong: "3.2"
+        - text: BHA 3 max 4.0
+      - cell "3.3 WOL 2 max 3.9":
+        - strong: "3.3"
+        - text: WOL 2 max 3.9
+      - cell "3.5 LEE 2 max 4.4":
+        - strong: "3.5"
+        - text: LEE 2 max 4.4
+      - cell "3.2 AVL 3 max 4.1":
+        - strong: "3.2"
+        - text: AVL 3 max 4.1
+      - cell "3.4 EVE 3 max 4.3":
+        - strong: "3.4"
+        - text: EVE 3 max 4.3
+    - row "☆ Chalobah Def CHE £5.0M 100.0% 5.9 29.3 0.0 0.0% 29.3 3.3 3.5 CRY 3 max 4.2 3.2 WHU 2 max 4.7 3.5 FUL 3 max 4.1 3.1 BRE 3 max 5.3 2.9 MUN 3 max 4.6 3.4 BHA 3 max 4.7 2.7 LIV 4 max 4.3 2.7 NFO 3 max 4.4 4.3 SUN 2 max 4.5":
+      - cell "☆":
+        - button "☆"
+      - cell "Chalobah":
+        - link "Chalobah":
+          - /url: /player/58
+      - cell "Def"
+      - cell "CHE":
+        - link "CHE":
+          - /url: /team/7
+      - cell "£5.0M"
+      - cell "100.0%"
+      - cell "5.9"
+      - cell "29.3"
+      - cell "0.0"
+      - cell "0.0%"
+      - cell "29.3"
+      - cell "3.3":
+        - strong: "3.3"
+      - cell "3.5 CRY 3 max 4.2":
+        - strong: "3.5"
+        - text: CRY 3 max 4.2
+      - cell "3.2 WHU 2 max 4.7":
+        - strong: "3.2"
+        - text: WHU 2 max 4.7
+      - cell "3.5 FUL 3 max 4.1":
+        - strong: "3.5"
+        - text: FUL 3 max 4.1
+      - cell "3.1 BRE 3 max 5.3":
+        - strong: "3.1"
+        - text: BRE 3 max 5.3
+      - cell "2.9 MUN 3 max 4.6":
+        - strong: "2.9"
+        - text: MUN 3 max 4.6
+      - cell "3.4 BHA 3 max 4.7":
+        - strong: "3.4"
+        - text: BHA 3 max 4.7
+      - cell "2.7 LIV 4 max 4.3":
+        - strong: "2.7"
+        - text: LIV 4 max 4.3
+      - cell "2.7 NFO 3 max 4.4":
+        - strong: "2.7"
+        - text: NFO 3 max 4.4
+      - cell "4.3 SUN 2 max 4.5":
+        - strong: "4.3"
+        - text: SUN 2 max 4.5
+    - row "☆ Collins Def BRE £5.0M 100.0% 5.9 29.5 0.0 0.0% 29.5 3.3 3.0 NFO 3 max 4.2 3.2 AVL 3 max 4.7 4.0 SUN 2 max 4.1 3.1 CHE 3 max 5.3 3.2 FUL 3 max 4.6 3.6 MUN 3 max 4.7 3.1 MCI 4 max 4.3 3.3 WHU 2 max 4.4 3.0 LIV 4 max 4.5":
+      - cell "☆":
+        - button "☆"
+      - cell "Collins":
+        - link "Collins":
+          - /url: /player/52
+      - cell "Def"
+      - cell "BRE":
+        - link "BRE":
+          - /url: /team/5
+      - cell "£5.0M"
+      - cell "100.0%"
+      - cell "5.9"
+      - cell "29.5"
+      - cell "0.0"
+      - cell "0.0%"
+      - cell "29.5"
+      - cell "3.3":
+        - strong: "3.3"
+      - cell "3.0 NFO 3 max 4.2":
+        - strong: "3.0"
+        - text: NFO 3 max 4.2
+      - cell "3.2 AVL 3 max 4.7":
+        - strong: "3.2"
+        - text: AVL 3 max 4.7
+      - cell "4.0 SUN 2 max 4.1":
+        - strong: "4.0"
+        - text: SUN 2 max 4.1
+      - cell "3.1 CHE 3 max 5.3":
+        - strong: "3.1"
+        - text: CHE 3 max 5.3
+      - cell "3.2 FUL 3 max 4.6":
+        - strong: "3.2"
+        - text: FUL 3 max 4.6
+      - cell "3.6 MUN 3 max 4.7":
+        - strong: "3.6"
+        - text: MUN 3 max 4.7
+      - cell "3.1 MCI 4 max 4.3":
+        - strong: "3.1"
+        - text: MCI 4 max 4.3
+      - cell "3.3 WHU 2 max 4.4":
+        - strong: "3.3"
+        - text: WHU 2 max 4.4
+      - cell "3.0 LIV 4 max 4.5":
+        - strong: "3.0"
+        - text: LIV 4 max 4.5
+    - row "☆ Kelleher Goa BRE £4.5M 100.0% 5.9 26.7 0.0 0.0% 26.7 3.0 2.3 NFO 3 max 4.0 3.2 AVL 3 max 4.3 2.3 SUN 2 max 4.0 3.4 CHE 3 max 4.2 3.0 FUL 3 max 4.0 3.8 MUN 3 max 3.9 2.4 MCI 4 max 4.4 3.2 WHU 2 max 4.1 3.1 LIV 4 max 4.3":
+      - cell "☆":
+        - button "☆"
+      - cell "Kelleher":
+        - link "Kelleher":
+          - /url: /player/87
+      - cell "Goa"
+      - cell "BRE":
+        - link "BRE":
+          - /url: /team/5
+      - cell "£4.5M"
+      - cell "100.0%"
+      - cell "5.9"
+      - cell "26.7"
+      - cell "0.0"
+      - cell "0.0%"
+      - cell "26.7"
+      - cell "3.0":
+        - strong: "3.0"
+      - cell "2.3 NFO 3 max 4.0":
+        - strong: "2.3"
+        - text: NFO 3 max 4.0
+      - cell "3.2 AVL 3 max 4.3":
+        - strong: "3.2"
+        - text: AVL 3 max 4.3
+      - cell "2.3 SUN 2 max 4.0":
+        - strong: "2.3"
+        - text: SUN 2 max 4.0
+      - cell "3.4 CHE 3 max 4.2":
+        - strong: "3.4"
+        - text: CHE 3 max 4.2
+      - cell "3.0 FUL 3 max 4.0":
+        - strong: "3.0"
+        - text: FUL 3 max 4.0
+      - cell "3.8 MUN 3 max 3.9":
+        - strong: "3.8"
+        - text: MUN 3 max 3.9
+      - cell "2.4 MCI 4 max 4.4":
+        - strong: "2.4"
+        - text: MCI 4 max 4.4
+      - cell "3.2 WHU 2 max 4.1":
+        - strong: "3.2"
+        - text: WHU 2 max 4.1
+      - cell "3.1 LIV 4 max 4.3":
+        - strong: "3.1"
+        - text: LIV 4 max 4.3
+    - row "☆ Martinez Goa AVL £5.0M 100.0% 5.9 29.3 0.0 0.0% 29.3 3.3 0.0 NEW 3 max 4.0 3.2 BRE 3 max 4.3 3.9 CRY 3 max 4.0 3.8 EVE 3 max 4.2 3.5 SUN 2 max 4.0 3.9 FUL 3 max 3.9 4.4 BUR 2 max 4.4 3.0 TOT 3 max 4.1 3.6 MCI 4 max 4.3":
+      - cell "☆":
+        - button "☆"
+      - cell "Martinez":
+        - link "Martinez":
+          - /url: /player/56
+      - cell "Goa"
+      - cell "AVL":
+        - link "AVL":
+          - /url: /team/2
+      - cell "£5.0M"
+      - cell "100.0%"
+      - cell "5.9"
+      - cell "29.3"
+      - cell "0.0"
+      - cell "0.0%"
+      - cell "29.3"
+      - cell "3.3":
+        - strong: "3.3"
+      - cell "0.0 NEW 3 max 4.0":
+        - strong: "0.0"
+        - text: NEW 3 max 4.0
+      - cell "3.2 BRE 3 max 4.3":
+        - strong: "3.2"
+        - text: BRE 3 max 4.3
+      - cell "3.9 CRY 3 max 4.0":
+        - strong: "3.9"
+        - text: CRY 3 max 4.0
+      - cell "3.8 EVE 3 max 4.2":
+        - strong: "3.8"
+        - text: EVE 3 max 4.2
+      - cell "3.5 SUN 2 max 4.0":
+        - strong: "3.5"
+        - text: SUN 2 max 4.0
+      - cell "3.9 FUL 3 max 3.9":
+        - strong: "3.9"
+        - text: FUL 3 max 3.9
+      - cell "4.4 BUR 2 max 4.4":
+        - strong: "4.4"
+        - text: BUR 2 max 4.4
+      - cell "3.0 TOT 3 max 4.1":
+        - strong: "3.0"
+        - text: TOT 3 max 4.1
+      - cell "3.6 MCI 4 max 4.3":
+        - strong: "3.6"
+        - text: MCI 4 max 4.3
+    - row "☆ Milenković Def NFO £5.5M 100.0% 5.9 32.4 0.0 0.0% 32.4 3.6 4.0 BRE 3 max 4.2 3.2 CRY 3 max 4.7 4.1 WHU 2 max 4.1 2.7 ARS 4 max 5.3 4.1 BUR 2 max 4.6 4.7 SUN 2 max 4.7 2.7 NEW 4 max 4.3 3.5 CHE 3 max 4.4 3.4 BOU 3 max 4.5":
+      - cell "☆":
+        - button "☆"
+      - cell "Milenković":
+        - link "Milenković":
+          - /url: /player/28
+      - cell "Def"
+      - cell "NFO":
+        - link "NFO":
+          - /url: /team/16
+      - cell "£5.5M"
+      - cell "100.0%"
+      - cell "5.9"
+      - cell "32.4"
+      - cell "0.0"
+      - cell "0.0%"
+      - cell "32.4"
+      - cell "3.6":
+        - strong: "3.6"
+      - cell "4.0 BRE 3 max 4.2":
+        - strong: "4.0"
+        - text: BRE 3 max 4.2
+      - cell "3.2 CRY 3 max 4.7":
+        - strong: "3.2"
+        - text: CRY 3 max 4.7
+      - cell "4.1 WHU 2 max 4.1":
+        - strong: "4.1"
+        - text: WHU 2 max 4.1
+      - cell "2.7 ARS 4 max 5.3":
+        - strong: "2.7"
+        - text: ARS 4 max 5.3
+      - cell "4.1 BUR 2 max 4.6":
+        - strong: "4.1"
+        - text: BUR 2 max 4.6
+      - cell "4.7 SUN 2 max 4.7":
+        - strong: "4.7"
+        - text: SUN 2 max 4.7
+      - cell "2.7 NEW 4 max 4.3":
+        - strong: "2.7"
+        - text: NEW 4 max 4.3
+      - cell "3.5 CHE 3 max 4.4":
+        - strong: "3.5"
+        - text: CHE 3 max 4.4
+      - cell "3.4 BOU 3 max 4.5":
+        - strong: "3.4"
+        - text: BOU 3 max 4.5
+    - row "☆ Mitchell Def CRY £5.0M 100.0% 5.9 29.6 0.0 0.0% 29.6 3.3 2.7 CHE 4 max 4.2 3.6 NFO 3 max 4.7 2.9 AVL 4 max 4.1 4.6 SUN 2 max 5.3 3.2 WHU 2 max 4.6 2.9 LIV 4 max 4.7 3.5 EVE 3 max 4.3 3.8 BOU 3 max 4.4 2.4 ARS 4 max 4.5":
+      - cell "☆":
+        - button "☆"
+      - cell "Mitchell":
+        - link "Mitchell":
+          - /url: /player/48
+      - cell "Def"
+      - cell "CRY":
+        - link "CRY":
+          - /url: /team/8
+      - cell "£5.0M"
+      - cell "100.0%"
+      - cell "5.9"
+      - cell "29.6"
+      - cell "0.0"
+      - cell "0.0%"
+      - cell "29.6"
+      - cell "3.3":
+        - strong: "3.3"
+      - cell "2.7 CHE 4 max 4.2":
+        - strong: "2.7"
+        - text: CHE 4 max 4.2
+      - cell "3.6 NFO 3 max 4.7":
+        - strong: "3.6"
+        - text: NFO 3 max 4.7
+      - cell "2.9 AVL 4 max 4.1":
+        - strong: "2.9"
+        - text: AVL 4 max 4.1
+      - cell "4.6 SUN 2 max 5.3":
+        - strong: "4.6"
+        - text: SUN 2 max 5.3
+      - cell "3.2 WHU 2 max 4.6":
+        - strong: "3.2"
+        - text: WHU 2 max 4.6
+      - cell "2.9 LIV 4 max 4.7":
+        - strong: "2.9"
+        - text: LIV 4 max 4.7
+      - cell "3.5 EVE 3 max 4.3":
+        - strong: "3.5"
+        - text: EVE 3 max 4.3
+      - cell "3.8 BOU 3 max 4.4":
+        - strong: "3.8"
+        - text: BOU 3 max 4.4
+      - cell "2.4 ARS 4 max 4.5":
+        - strong: "2.4"
+        - text: ARS 4 max 4.5
+    - row "☆ Murillo Def NFO £5.5M 100.0% 5.9 32.5 0.0 0.0% 32.5 3.6 3.9 BRE 3 max 4.2 3.4 CRY 3 max 4.7 3.9 WHU 2 max 4.1 3.0 ARS 4 max 5.3 4.0 BUR 2 max 4.6 4.6 SUN 2 max 4.7 2.8 NEW 4 max 4.3 3.4 CHE 3 max 4.4 3.5 BOU 3 max 4.5":
+      - cell "☆":
+        - button "☆"
+      - cell "Murillo":
+        - link "Murillo":
+          - /url: /player/26
+      - cell "Def"
+      - cell "NFO":
+        - link "NFO":
+          - /url: /team/16
+      - cell "£5.5M"
+      - cell "100.0%"
+      - cell "5.9"
+      - cell "32.5"
+      - cell "0.0"
+      - cell "0.0%"
+      - cell "32.5"
+      - cell "3.6":
+        - strong: "3.6"
+      - cell "3.9 BRE 3 max 4.2":
+        - strong: "3.9"
+        - text: BRE 3 max 4.2
+      - cell "3.4 CRY 3 max 4.7":
+        - strong: "3.4"
+        - text: CRY 3 max 4.7
+      - cell "3.9 WHU 2 max 4.1":
+        - strong: "3.9"
+        - text: WHU 2 max 4.1
+      - cell "3.0 ARS 4 max 5.3":
+        - strong: "3.0"
+        - text: ARS 4 max 5.3
+      - cell "4.0 BUR 2 max 4.6":
+        - strong: "4.0"
+        - text: BUR 2 max 4.6
+      - cell "4.6 SUN 2 max 4.7":
+        - strong: "4.6"
+        - text: SUN 2 max 4.7
+      - cell "2.8 NEW 4 max 4.3":
+        - strong: "2.8"
+        - text: NEW 4 max 4.3
+      - cell "3.4 CHE 3 max 4.4":
+        - strong: "3.4"
+        - text: CHE 3 max 4.4
+      - cell "3.5 BOU 3 max 4.5":
+        - strong: "3.5"
+        - text: BOU 3 max 4.5
+    - row "☆ Raya Goa ARS £5.5M 100.0% 5.9 32.6 0.0 0.0% 32.6 3.6 3.3 MUN 3 max 4.0 4.3 LEE 2 max 4.3 3.3 LIV 5 max 4.0 3.7 NFO 3 max 4.2 3.5 MCI 4 max 4.0 3.1 NEW 4 max 3.9 4.3 WHU 2 max 4.4 3.3 FUL 3 max 4.1 3.8 CRY 3 max 4.3":
+      - cell "☆":
+        - button "☆"
+      - cell "Raya":
+        - link "Raya":
+          - /url: /player/27
+      - cell "Goa"
+      - cell "ARS":
+        - link "ARS":
+          - /url: /team/1
+      - cell "£5.5M"
+      - cell "100.0%"
+      - cell "5.9"
+      - cell "32.6"
+      - cell "0.0"
+      - cell "0.0%"
+      - cell "32.6"
+      - cell "3.6":
+        - strong: "3.6"
+      - cell "3.3 MUN 3 max 4.0":
+        - strong: "3.3"
+        - text: MUN 3 max 4.0
+      - cell "4.3 LEE 2 max 4.3":
+        - strong: "4.3"
+        - text: LEE 2 max 4.3
+      - cell "3.3 LIV 5 max 4.0":
+        - strong: "3.3"
+        - text: LIV 5 max 4.0
+      - cell "3.7 NFO 3 max 4.2":
+        - strong: "3.7"
+        - text: NFO 3 max 4.2
+      - cell "3.5 MCI 4 max 4.0":
+        - strong: "3.5"
+        - text: MCI 4 max 4.0
+      - cell "3.1 NEW 4 max 3.9":
+        - strong: "3.1"
+        - text: NEW 4 max 3.9
+      - cell "4.3 WHU 2 max 4.4":
+        - strong: "4.3"
+        - text: WHU 2 max 4.4
+      - cell "3.3 FUL 3 max 4.1":
+        - strong: "3.3"
+        - text: FUL 3 max 4.1
+      - cell "3.8 CRY 3 max 4.3":
+        - strong: "3.8"
+        - text: CRY 3 max 4.3
+    - row "☆ Toti Def WOL £4.5M 100.0% 5.9 26.6 0.0 0.0% 26.6 3.0 2.6 MCI 4 max 4.2 2.8 BOU 3 max 4.7 3.6 EVE 2 max 4.1 2.1 NEW 4 max 5.3 3.8 LEE 2 max 4.6 2.3 TOT 3 max 4.7 2.7 BHA 3 max 4.3 3.2 SUN 2 max 4.4 3.5 BUR 2 max 4.5":
+      - cell "☆":
+        - button "☆"
+      - cell "Toti":
+        - link "Toti":
+          - /url: /player/90
+      - cell "Def"
+      - cell "WOL":
+        - link "WOL":
+          - /url: /team/20
+      - cell "£4.5M"
+      - cell "100.0%"
+      - cell "5.9"
+      - cell "26.6"
+      - cell "0.0"
+      - cell "0.0%"
+      - cell "26.6"
+      - cell "3.0":
+        - strong: "3.0"
+      - cell "2.6 MCI 4 max 4.2":
+        - strong: "2.6"
+        - text: MCI 4 max 4.2
+      - cell "2.8 BOU 3 max 4.7":
+        - strong: "2.8"
+        - text: BOU 3 max 4.7
+      - cell "3.6 EVE 2 max 4.1":
+        - strong: "3.6"
+        - text: EVE 2 max 4.1
+      - cell "2.1 NEW 4 max 5.3":
+        - strong: "2.1"
+        - text: NEW 4 max 5.3
+      - cell "3.8 LEE 2 max 4.6":
+        - strong: "3.8"
+        - text: LEE 2 max 4.6
+      - cell "2.3 TOT 3 max 4.7":
+        - strong: "2.3"
+        - text: TOT 3 max 4.7
+      - cell "2.7 BHA 3 max 4.3":
+        - strong: "2.7"
+        - text: BHA 3 max 4.3
+      - cell "3.2 SUN 2 max 4.4":
+        - strong: "3.2"
+        - text: SUN 2 max 4.4
+      - cell "3.5 BUR 2 max 4.5":
+        - strong: "3.5"
+        - text: BUR 2 max 4.5
+    - row "☆ Virgil Def LIV £6.0M 100.0% 5.9 35.1 0.0 0.0% 35.1 3.9 4.2 BOU 3 max 4.2 3.2 NEW 4 max 4.7 3.5 ARS 4 max 4.1 4.4 BUR 2 max 5.3 4.6 EVE 2 max 4.6 3.7 CRY 3 max 4.7 3.3 CHE 4 max 4.3 4.4 MUN 3 max 4.4 3.8 BRE 3 max 4.5":
+      - cell "☆":
+        - button "☆"
+      - cell "Virgil":
+        - link "Virgil":
+          - /url: /player/12
+      - cell "Def"
+      - cell "LIV":
+        - link "LIV":
+          - /url: /team/12
+      - cell "£6.0M"
+      - cell "100.0%"
+      - cell "5.9"
+      - cell "35.1"
+      - cell "0.0"
+      - cell "0.0%"
+      - cell "35.1"
+      - cell "3.9":
+        - strong: "3.9"
+      - cell "4.2 BOU 3 max 4.2":
+        - strong: "4.2"
+        - text: BOU 3 max 4.2
+      - cell "3.2 NEW 4 max 4.7":
+        - strong: "3.2"
+        - text: NEW 4 max 4.7
+      - cell "3.5 ARS 4 max 4.1":
+        - strong: "3.5"
+        - text: ARS 4 max 4.1
+      - cell "4.4 BUR 2 max 5.3":
+        - strong: "4.4"
+        - text: BUR 2 max 5.3
+      - cell "4.6 EVE 2 max 4.6":
+        - strong: "4.6"
+        - text: EVE 2 max 4.6
+      - cell "3.7 CRY 3 max 4.7":
+        - strong: "3.7"
+        - text: CRY 3 max 4.7
+      - cell "3.3 CHE 4 max 4.3":
+        - strong: "3.3"
+        - text: CHE 4 max 4.3
+      - cell "4.4 MUN 3 max 4.4":
+        - strong: "4.4"
+        - text: MUN 3 max 4.4
+      - cell "3.8 BRE 3 max 4.5":
+        - strong: "3.8"
+        - text: BRE 3 max 4.5
+    - row "☆ Branthwaite Def EVE £5.5M 100.0% 5.8 31.9 0.0 0.0% 31.9 3.5 4.0 LEE 2 max 4.2 3.8 BHA 3 max 4.7 3.5 WOL 3 max 4.1 3.5 AVL 3 max 5.3 3.0 LIV 5 max 4.6 3.9 WHU 2 max 4.7 3.7 CRY 3 max 4.3 3.0 MCI 4 max 4.4 3.5 TOT 3 max 4.5":
+      - cell "☆":
+        - button "☆"
+      - cell "Branthwaite":
+        - link "Branthwaite":
+          - /url: /player/29
+      - cell "Def"
+      - cell "EVE":
+        - link "EVE":
+          - /url: /team/9
+      - cell "£5.5M"
+      - cell "100.0%"
+      - cell "5.8"
+      - cell "31.9"
+      - cell "0.0"
+      - cell "0.0%"
+      - cell "31.9"
+      - cell "3.5":
+        - strong: "3.5"
+      - cell "4.0 LEE 2 max 4.2":
+        - strong: "4.0"
+        - text: LEE 2 max 4.2
+      - cell "3.8 BHA 3 max 4.7":
+        - strong: "3.8"
+        - text: BHA 3 max 4.7
+      - cell "3.5 WOL 3 max 4.1":
+        - strong: "3.5"
+        - text: WOL 3 max 4.1
+      - cell "3.5 AVL 3 max 5.3":
+        - strong: "3.5"
+        - text: AVL 3 max 5.3
+      - cell "3.0 LIV 5 max 4.6":
+        - strong: "3.0"
+        - text: LIV 5 max 4.6
+      - cell "3.9 WHU 2 max 4.7":
+        - strong: "3.9"
+        - text: WHU 2 max 4.7
+      - cell "3.7 CRY 3 max 4.3":
+        - strong: "3.7"
+        - text: CRY 3 max 4.3
+      - cell "3.0 MCI 4 max 4.4":
+        - strong: "3.0"
+        - text: MCI 4 max 4.4
+      - cell "3.5 TOT 3 max 4.5":
+        - strong: "3.5"
+        - text: TOT 3 max 4.5
+    - row "☆ Potts Mid WHU £4.5M 100.0% 5.8 26.3 0.0 0.0% 26.3 2.9 3.1 SUN 2 max 6.7 2.9 CHE 3 max 6.1 2.7 NFO 3 max 5.6 3.2 TOT 3 max 7.0 3.0 CRY 3 max 6.6 2.8 EVE 3 max 5.9 2.4 ARS 4 max 5.7 3.1 BRE 3 max 7.4 3.1 LEE 2 max 6.7":
+      - cell "☆":
+        - button "☆"
+      - cell "Potts":
+        - link "Potts":
+          - /url: /player/92
+      - cell "Mid"
+      - cell "WHU":
+        - link "WHU":
+          - /url: /team/19
+      - cell "£4.5M"
+      - cell "100.0%"
+      - cell "5.8"
+      - cell "26.3"
+      - cell "0.0"
+      - cell "0.0%"
+      - cell "26.3"
+      - cell "2.9":
+        - strong: "2.9"
+      - cell "3.1 SUN 2 max 6.7":
+        - strong: "3.1"
+        - text: SUN 2 max 6.7
+      - cell "2.9 CHE 3 max 6.1":
+        - strong: "2.9"
+        - text: CHE 3 max 6.1
+      - cell "2.7 NFO 3 max 5.6":
+        - strong: "2.7"
+        - text: NFO 3 max 5.6
+      - cell "3.2 TOT 3 max 7.0":
+        - strong: "3.2"
+        - text: TOT 3 max 7.0
+      - cell "3.0 CRY 3 max 6.6":
+        - strong: "3.0"
+        - text: CRY 3 max 6.6
+      - cell "2.8 EVE 3 max 5.9":
+        - strong: "2.8"
+        - text: EVE 3 max 5.9
+      - cell "2.4 ARS 4 max 5.7":
+        - strong: "2.4"
+        - text: ARS 4 max 5.7
+      - cell "3.1 BRE 3 max 7.4":
+        - strong: "3.1"
+        - text: BRE 3 max 7.4
+      - cell "3.1 LEE 2 max 6.7":
+        - strong: "3.1"
+        - text: LEE 2 max 6.7
+    - row "☆ Senesi Def BOU £4.5M 100.0% 5.8 25.9 0.0 0.0% 25.9 2.9 2.3 LIV 5 max 4.2 3.3 WOL 2 max 4.7 2.5 TOT 3 max 4.1 3.2 BHA 3 max 5.3 2.6 NEW 3 max 4.6 3.2 LEE 2 max 4.7 3.1 FUL 3 max 4.3 2.7 CRY 3 max 4.4 3.0 NFO 3 max 4.5":
+      - cell "☆":
+        - button "☆"
+      - cell "Senesi":
+        - link "Senesi":
+          - /url: /player/99
+      - cell "Def"
+      - cell "BOU":
+        - link "BOU":
+          - /url: /team/4
+      - cell "£4.5M"
+      - cell "100.0%"
+      - cell "5.8"
+      - cell "25.9"
+      - cell "0.0"
+      - cell "0.0%"
+      - cell "25.9"
+      - cell "2.9":
+        - strong: "2.9"
+      - cell "2.3 LIV 5 max 4.2":
+        - strong: "2.3"
+        - text: LIV 5 max 4.2
+      - cell "3.3 WOL 2 max 4.7":
+        - strong: "3.3"
+        - text: WOL 2 max 4.7
+      - cell "2.5 TOT 3 max 4.1":
+        - strong: "2.5"
+        - text: TOT 3 max 4.1
+      - cell "3.2 BHA 3 max 5.3":
+        - strong: "3.2"
+        - text: BHA 3 max 5.3
+      - cell "2.6 NEW 3 max 4.6":
+        - strong: "2.6"
+        - text: NEW 3 max 4.6
+      - cell "3.2 LEE 2 max 4.7":
+        - strong: "3.2"
+        - text: LEE 2 max 4.7
+      - cell "3.1 FUL 3 max 4.3":
+        - strong: "3.1"
+        - text: FUL 3 max 4.3
+      - cell "2.7 CRY 3 max 4.4":
+        - strong: "2.7"
+        - text: CRY 3 max 4.4
+      - cell "3.0 NFO 3 max 4.5":
+        - strong: "3.0"
+        - text: NFO 3 max 4.5
+    - row "☆ Agbadou Def WOL £4.5M 100.0% 5.7 25.8 0.0 0.0% 25.8 2.9 2.4 MCI 4 max 4.2 2.6 BOU 3 max 4.7 3.7 EVE 2 max 4.1 2.1 NEW 4 max 5.3 3.6 LEE 2 max 4.6 2.0 TOT 3 max 4.7 2.9 BHA 3 max 4.3 3.0 SUN 2 max 4.4 3.5 BUR 2 max 4.5":
+      - cell "☆":
+        - button "☆"
+      - cell "Agbadou":
+        - link "Agbadou":
+          - /url: /player/100
+      - cell "Def"
+      - cell "WOL":
+        - link "WOL":
+          - /url: /team/20
+      - cell "£4.5M"
+      - cell "100.0%"
+      - cell "5.7"
+      - cell "25.8"
+      - cell "0.0"
+      - cell "0.0%"
+      - cell "25.8"
+      - cell "2.9":
+        - strong: "2.9"
+      - cell "2.4 MCI 4 max 4.2":
+        - strong: "2.4"
+        - text: MCI 4 max 4.2
+      - cell "2.6 BOU 3 max 4.7":
+        - strong: "2.6"
+        - text: BOU 3 max 4.7
+      - cell "3.7 EVE 2 max 4.1":
+        - strong: "3.7"
+        - text: EVE 2 max 4.1
+      - cell "2.1 NEW 4 max 5.3":
+        - strong: "2.1"
+        - text: NEW 4 max 5.3
+      - cell "3.6 LEE 2 max 4.6":
+        - strong: "3.6"
+        - text: LEE 2 max 4.6
+      - cell "2.0 TOT 3 max 4.7":
+        - strong: "2.0"
+        - text: TOT 3 max 4.7
+      - cell "2.9 BHA 3 max 4.3":
+        - strong: "2.9"
+        - text: BHA 3 max 4.3
+      - cell "3.0 SUN 2 max 4.4":
+        - strong: "3.0"
+        - text: SUN 2 max 4.4
+      - cell "3.5 BUR 2 max 4.5":
+        - strong: "3.5"
+        - text: BUR 2 max 4.5
+    - row "☆ Tarkowski Def EVE £5.5M 100.0% 5.7 31.1 0.0 0.0% 31.1 3.5 3.9 LEE 2 max 4.2 3.6 BHA 3 max 4.7 3.5 WOL 3 max 4.1 3.6 AVL 3 max 5.3 3.0 LIV 5 max 4.6 3.6 WHU 2 max 4.7 3.8 CRY 3 max 4.3 2.7 MCI 4 max 4.4 3.4 TOT 3 max 4.5":
+      - cell "☆":
+        - button "☆"
+      - cell "Tarkowski":
+        - link "Tarkowski":
+          - /url: /player/33
+      - cell "Def"
+      - cell "EVE":
+        - link "EVE":
+          - /url: /team/9
+      - cell "£5.5M"
+      - cell "100.0%"
+      - cell "5.7"
+      - cell "31.1"
+      - cell "0.0"
+      - cell "0.0%"
+      - cell "31.1"
+      - cell "3.5":
+        - strong: "3.5"
+      - cell "3.9 LEE 2 max 4.2":
+        - strong: "3.9"
+        - text: LEE 2 max 4.2
+      - cell "3.6 BHA 3 max 4.7":
+        - strong: "3.6"
+        - text: BHA 3 max 4.7
+      - cell "3.5 WOL 3 max 4.1":
+        - strong: "3.5"
+        - text: WOL 3 max 4.1
+      - cell "3.6 AVL 3 max 5.3":
+        - strong: "3.6"
+        - text: AVL 3 max 5.3
+      - cell "3.0 LIV 5 max 4.6":
+        - strong: "3.0"
+        - text: LIV 5 max 4.6
+      - cell "3.6 WHU 2 max 4.7":
+        - strong: "3.6"
+        - text: WHU 2 max 4.7
+      - cell "3.8 CRY 3 max 4.3":
+        - strong: "3.8"
+        - text: CRY 3 max 4.3
+      - cell "2.7 MCI 4 max 4.4":
+        - strong: "2.7"
+        - text: MCI 4 max 4.4
+      - cell "3.4 TOT 3 max 4.5":
+        - strong: "3.4"
+        - text: TOT 3 max 4.5
+    - row "☆ Wan-Bissaka Def WHU £4.5M 100.0% 5.7 25.5 0.0 0.0% 25.5 2.8 3.4 SUN 2 max 4.2 2.7 CHE 3 max 4.7 2.4 NFO 3 max 4.1 2.9 TOT 3 max 5.3 2.9 CRY 3 max 4.6 3.2 EVE 3 max 4.7 2.0 ARS 4 max 4.3 2.9 BRE 3 max 4.4 3.1 LEE 2 max 4.5":
+      - cell "☆":
+        - button "☆"
+      - cell "Wan-Bissaka":
+        - link "Wan-Bissaka":
+          - /url: /player/105
+      - cell "Def"
+      - cell "WHU":
+        - link "WHU":
+          - /url: /team/19
+      - cell "£4.5M"
+      - cell "100.0%"
+      - cell "5.7"
+      - cell "25.5"
+      - cell "0.0"
+      - cell "0.0%"
+      - cell "25.5"
+      - cell "2.8":
+        - strong: "2.8"
+      - cell "3.4 SUN 2 max 4.2":
+        - strong: "3.4"
+        - text: SUN 2 max 4.2
+      - cell "2.7 CHE 3 max 4.7":
+        - strong: "2.7"
+        - text: CHE 3 max 4.7
+      - cell "2.4 NFO 3 max 4.1":
+        - strong: "2.4"
+        - text: NFO 3 max 4.1
+      - cell "2.9 TOT 3 max 5.3":
+        - strong: "2.9"
+        - text: TOT 3 max 5.3
+      - cell "2.9 CRY 3 max 4.6":
+        - strong: "2.9"
+        - text: CRY 3 max 4.6
+      - cell "3.2 EVE 3 max 4.7":
+        - strong: "3.2"
+        - text: EVE 3 max 4.7
+      - cell "2.0 ARS 4 max 4.3":
+        - strong: "2.0"
+        - text: ARS 4 max 4.3
+      - cell "2.9 BRE 3 max 4.4":
+        - strong: "2.9"
+        - text: BRE 3 max 4.4
+      - cell "3.1 LEE 2 max 4.5":
+        - strong: "3.1"
+        - text: LEE 2 max 4.5
+    - row "☆ Tonali Mid NEW £5.5M 100.0% 5.6 30.6 0.0 0.0% 30.6 3.4 3.2 AVL 4 max 6.7 3.3 LIV 4 max 6.1 3.7 LEE 2 max 5.6 3.8 WOL 2 max 7.0 3.3 BOU 3 max 6.6 3.0 ARS 4 max 5.9 3.6 NFO 3 max 5.7 3.2 BHA 3 max 7.4 3.5 FUL 3 max 6.7":
+      - cell "☆":
+        - button "☆"
+      - cell "Tonali":
+        - link "Tonali":
+          - /url: /player/36
+      - cell "Mid"
+      - cell "NEW":
+        - link "NEW":
+          - /url: /team/15
+      - cell "£5.5M"
+      - cell "100.0%"
+      - cell "5.6"
+      - cell "30.6"
+      - cell "0.0"
+      - cell "0.0%"
+      - cell "30.6"
+      - cell "3.4":
+        - strong: "3.4"
+      - cell "3.2 AVL 4 max 6.7":
+        - strong: "3.2"
+        - text: AVL 4 max 6.7
+      - cell "3.3 LIV 4 max 6.1":
+        - strong: "3.3"
+        - text: LIV 4 max 6.1
+      - cell "3.7 LEE 2 max 5.6":
+        - strong: "3.7"
+        - text: LEE 2 max 5.6
+      - cell "3.8 WOL 2 max 7.0":
+        - strong: "3.8"
+        - text: WOL 2 max 7.0
+      - cell "3.3 BOU 3 max 6.6":
+        - strong: "3.3"
+        - text: BOU 3 max 6.6
+      - cell "3.0 ARS 4 max 5.9":
+        - strong: "3.0"
+        - text: ARS 4 max 5.9
+      - cell "3.6 NFO 3 max 5.7":
+        - strong: "3.6"
+        - text: NFO 3 max 5.7
+      - cell "3.2 BHA 3 max 7.4":
+        - strong: "3.2"
+        - text: BHA 3 max 7.4
+      - cell "3.5 FUL 3 max 6.7":
+        - strong: "3.5"
+        - text: FUL 3 max 6.7
+    - row "☆ Trippier Def NEW £5.0M 100.0% 5.6 28.0 0.0 0.0% 28.0 3.1 2.7 AVL 4 max 4.2 2.6 LIV 4 max 4.7 3.8 LEE 2 max 4.1 3.6 WOL 2 max 5.3 2.7 BOU 3 max 4.6 2.7 ARS 4 max 4.7 3.6 NFO 3 max 4.3 2.7 BHA 3 max 4.4 3.6 FUL 3 max 4.5":
+      - cell "☆":
+        - button "☆"
+      - cell "Trippier":
+        - link "Trippier":
+          - /url: /player/69
+      - cell "Def"
+      - cell "NEW":
+        - link "NEW":
+          - /url: /team/15
+      - cell "£5.0M"
+      - cell "100.0%"
+      - cell "5.6"
+      - cell "28.0"
+      - cell "0.0"
+      - cell "0.0%"
+      - cell "28.0"
+      - cell "3.1":
+        - strong: "3.1"
+      - cell "2.7 AVL 4 max 4.2":
+        - strong: "2.7"
+        - text: AVL 4 max 4.2
+      - cell "2.6 LIV 4 max 4.7":
+        - strong: "2.6"
+        - text: LIV 4 max 4.7
+      - cell "3.8 LEE 2 max 4.1":
+        - strong: "3.8"
+        - text: LEE 2 max 4.1
+      - cell "3.6 WOL 2 max 5.3":
+        - strong: "3.6"
+        - text: WOL 2 max 5.3
+      - cell "2.7 BOU 3 max 4.6":
+        - strong: "2.7"
+        - text: BOU 3 max 4.6
+      - cell "2.7 ARS 4 max 4.7":
+        - strong: "2.7"
+        - text: ARS 4 max 4.7
+      - cell "3.6 NFO 3 max 4.3":
+        - strong: "3.6"
+        - text: NFO 3 max 4.3
+      - cell "2.7 BHA 3 max 4.4":
+        - strong: "2.7"
+        - text: BHA 3 max 4.4
+      - cell "3.6 FUL 3 max 4.5":
+        - strong: "3.6"
+        - text: FUL 3 max 4.5
+    - row "☆ Van Hecke Def BHA £4.5M 100.0% 5.6 25.1 0.0 0.0% 25.1 2.8 3.2 FUL 3 max 4.2 3.3 EVE 3 max 4.7 2.5 MCI 4 max 4.1 2.7 BOU 3 max 5.3 2.9 TOT 3 max 4.6 2.1 CHE 4 max 4.7 3.0 WOL 3 max 4.3 2.6 NEW 3 max 4.4 2.8 MUN 3 max 4.5":
+      - cell "☆":
+        - button "☆"
+      - cell "Van Hecke":
+        - link "Van Hecke":
+          - /url: /player/111
+      - cell "Def"
+      - cell "BHA":
+        - link "BHA":
+          - /url: /team/6
+      - cell "£4.5M"
+      - cell "100.0%"
+      - cell "5.6"
+      - cell "25.1"
+      - cell "0.0"
+      - cell "0.0%"
+      - cell "25.1"
+      - cell "2.8":
+        - strong: "2.8"
+      - cell "3.2 FUL 3 max 4.2":
+        - strong: "3.2"
+        - text: FUL 3 max 4.2
+      - cell "3.3 EVE 3 max 4.7":
+        - strong: "3.3"
+        - text: EVE 3 max 4.7
+      - cell "2.5 MCI 4 max 4.1":
+        - strong: "2.5"
+        - text: MCI 4 max 4.1
+      - cell "2.7 BOU 3 max 5.3":
+        - strong: "2.7"
+        - text: BOU 3 max 5.3
+      - cell "2.9 TOT 3 max 4.6":
+        - strong: "2.9"
+        - text: TOT 3 max 4.6
+      - cell "2.1 CHE 4 max 4.7":
+        - strong: "2.1"
+        - text: CHE 4 max 4.7
+      - cell "3.0 WOL 3 max 4.3":
+        - strong: "3.0"
+        - text: WOL 3 max 4.3
+      - cell "2.6 NEW 3 max 4.4":
+        - strong: "2.6"
+        - text: NEW 3 max 4.4
+      - cell "2.8 MUN 3 max 4.5":
+        - strong: "2.8"
+        - text: MUN 3 max 4.5
+    - row "☆ Van den Berg Def BRE £4.5M 100.0% 5.6 25.3 0.0 0.0% 25.3 2.8 2.6 NFO 3 max 4.2 2.8 AVL 3 max 4.7 3.3 SUN 2 max 4.1 2.8 CHE 3 max 5.3 2.5 FUL 3 max 4.6 3.3 MUN 3 max 4.7 2.6 MCI 4 max 4.3 2.9 WHU 2 max 4.4 2.5 LIV 4 max 4.5":
+      - cell "☆":
+        - button "☆"
+      - cell "Van den Berg":
+        - link "Van den Berg":
+          - /url: /player/108
+      - cell "Def"
+      - cell "BRE":
+        - link "BRE":
+          - /url: /team/5
+      - cell "£4.5M"
+      - cell "100.0%"
+      - cell "5.6"
+      - cell "25.3"
+      - cell "0.0"
+      - cell "0.0%"
+      - cell "25.3"
+      - cell "2.8":
+        - strong: "2.8"
+      - cell "2.6 NFO 3 max 4.2":
+        - strong: "2.6"
+        - text: NFO 3 max 4.2
+      - cell "2.8 AVL 3 max 4.7":
+        - strong: "2.8"
+        - text: AVL 3 max 4.7
+      - cell "3.3 SUN 2 max 4.1":
+        - strong: "3.3"
+        - text: SUN 2 max 4.1
+      - cell "2.8 CHE 3 max 5.3":
+        - strong: "2.8"
+        - text: CHE 3 max 5.3
+      - cell "2.5 FUL 3 max 4.6":
+        - strong: "2.5"
+        - text: FUL 3 max 4.6
+      - cell "3.3 MUN 3 max 4.7":
+        - strong: "3.3"
+        - text: MUN 3 max 4.7
+      - cell "2.6 MCI 4 max 4.3":
+        - strong: "2.6"
+        - text: MCI 4 max 4.3
+      - cell "2.9 WHU 2 max 4.4":
+        - strong: "2.9"
+        - text: WHU 2 max 4.4
+      - cell "2.5 LIV 4 max 4.5":
+        - strong: "2.5"
+        - text: LIV 4 max 4.5
+    - row "☆ A.Becker Goa LIV £5.5M 100.0% 5.5 30.1 0.0 0.0% 30.1 3.3 3.9 BOU 3 max 4.0 2.7 NEW 4 max 4.3 2.8 ARS 4 max 4.0 3.6 BUR 2 max 4.2 4.0 EVE 2 max 4.0 3.4 CRY 3 max 3.9 2.2 CHE 4 max 4.4 4.1 MUN 3 max 4.1 3.4 BRE 3 max 4.3":
+      - cell "☆":
+        - button "☆"
+      - cell "A.Becker":
+        - link "A.Becker":
+          - /url: /player/44
+      - cell "Goa"
+      - cell "LIV":
+        - link "LIV":
+          - /url: /team/12
+      - cell "£5.5M"
+      - cell "100.0%"
+      - cell "5.5"
+      - cell "30.1"
+      - cell "0.0"
+      - cell "0.0%"
+      - cell "30.1"
+      - cell "3.3":
+        - strong: "3.3"
+      - cell "3.9 BOU 3 max 4.0":
+        - strong: "3.9"
+        - text: BOU 3 max 4.0
+      - cell "2.7 NEW 4 max 4.3":
+        - strong: "2.7"
+        - text: NEW 4 max 4.3
+      - cell "2.8 ARS 4 max 4.0":
+        - strong: "2.8"
+        - text: ARS 4 max 4.0
+      - cell "3.6 BUR 2 max 4.2":
+        - strong: "3.6"
+        - text: BUR 2 max 4.2
+      - cell "4.0 EVE 2 max 4.0":
+        - strong: "4.0"
+        - text: EVE 2 max 4.0
+      - cell "3.4 CRY 3 max 3.9":
+        - strong: "3.4"
+        - text: CRY 3 max 3.9
+      - cell "2.2 CHE 4 max 4.4":
+        - strong: "2.2"
+        - text: CHE 4 max 4.4
+      - cell "4.1 MUN 3 max 4.1":
+        - strong: "4.1"
+        - text: MUN 3 max 4.1
+      - cell "3.4 BRE 3 max 4.3":
+        - strong: "3.4"
+        - text: BRE 3 max 4.3
+    - row "☆ Beto For EVE £5.5M 100.0% 5.5 30.0 0.0 0.0% 30.0 3.3 3.8 LEE 2 max 5.2 3.4 BHA 3 max 6.3 3.2 WOL 3 max 5.8 3.5 AVL 3 max 5.8 2.8 LIV 5 max 5.7 3.6 WHU 2 max 6.6 3.4 CRY 3 max 6.6 2.7 MCI 4 max 5.1 3.6 TOT 3 max 5.4":
+      - cell "☆":
+        - button "☆"
+      - cell "Beto":
+        - link "Beto":
+          - /url: /player/45
+      - cell "For"
+      - cell "EVE":
+        - link "EVE":
+          - /url: /team/9
+      - cell "£5.5M"
+      - cell "100.0%"
+      - cell "5.5"
+      - cell "30.0"
+      - cell "0.0"
+      - cell "0.0%"
+      - cell "30.0"
+      - cell "3.3":
+        - strong: "3.3"
+      - cell "3.8 LEE 2 max 5.2":
+        - strong: "3.8"
+        - text: LEE 2 max 5.2
+      - cell "3.4 BHA 3 max 6.3":
+        - strong: "3.4"
+        - text: BHA 3 max 6.3
+      - cell "3.2 WOL 3 max 5.8":
+        - strong: "3.2"
+        - text: WOL 3 max 5.8
+      - cell "3.5 AVL 3 max 5.8":
+        - strong: "3.5"
+        - text: AVL 3 max 5.8
+      - cell "2.8 LIV 5 max 5.7":
+        - strong: "2.8"
+        - text: LIV 5 max 5.7
+      - cell "3.6 WHU 2 max 6.6":
+        - strong: "3.6"
+        - text: WHU 2 max 6.6
+      - cell "3.4 CRY 3 max 6.6":
+        - strong: "3.4"
+        - text: CRY 3 max 6.6
+      - cell "2.7 MCI 4 max 5.1":
+        - strong: "2.7"
+        - text: MCI 4 max 5.1
+      - cell "3.6 TOT 3 max 5.4":
+        - strong: "3.6"
+        - text: TOT 3 max 5.4
+    - row "☆ Darlow Goa LEE £4.0M 100.0% 5.5 21.9 0.0 0.0% 21.9 2.4 2.2 EVE 2 max 4.0 2.2 ARS 4 max 4.3 2.3 NEW 3 max 4.0 2.7 FUL 3 max 4.2 1.6 WOL 3 max 4.0 2.9 BOU 3 max 3.9 2.6 TOT 3 max 4.4 2.8 BUR 2 max 4.1 2.6 WHU 2 max 4.3":
+      - cell "☆":
+        - button "☆"
+      - cell "Darlow":
+        - link "Darlow":
+          - /url: /player/145
+      - cell "Goa"
+      - cell "LEE":
+        - link "LEE":
+          - /url: /team/11
+      - cell "£4.0M"
+      - cell "100.0%"
+      - cell "5.5"
+      - cell "21.9"
+      - cell "0.0"
+      - cell "0.0%"
+      - cell "21.9"
+      - cell "2.4":
+        - strong: "2.4"
+      - cell "2.2 EVE 2 max 4.0":
+        - strong: "2.2"
+        - text: EVE 2 max 4.0
+      - cell "2.2 ARS 4 max 4.3":
+        - strong: "2.2"
+        - text: ARS 4 max 4.3
+      - cell "2.3 NEW 3 max 4.0":
+        - strong: "2.3"
+        - text: NEW 3 max 4.0
+      - cell "2.7 FUL 3 max 4.2":
+        - strong: "2.7"
+        - text: FUL 3 max 4.2
+      - cell "1.6 WOL 3 max 4.0":
+        - strong: "1.6"
+        - text: WOL 3 max 4.0
+      - cell "2.9 BOU 3 max 3.9":
+        - strong: "2.9"
+        - text: BOU 3 max 3.9
+      - cell "2.6 TOT 3 max 4.4":
+        - strong: "2.6"
+        - text: TOT 3 max 4.4
+      - cell "2.8 BUR 2 max 4.1":
+        - strong: "2.8"
+        - text: BUR 2 max 4.1
+      - cell "2.6 WHU 2 max 4.3":
+        - strong: "2.6"
+        - text: WHU 2 max 4.3
+    - row "☆ Estève Def BUR £4.0M 100.0% 5.5 22.2 0.0 0.0% 22.2 2.5 2.2 TOT 3 max 4.2 3.5 SUN 2 max 4.7 2.4 MUN 3 max 4.1 2.3 LIV 4 max 5.3 2.7 NFO 3 max 4.6 2.0 MCI 4 max 4.7 1.8 AVL 4 max 4.3 3.0 LEE 2 max 4.4 2.3 WOL 3 max 4.5":
+      - cell "☆":
+        - button "☆"
+      - cell "Estève":
+        - link "Estève":
+          - /url: /player/138
+      - cell "Def"
+      - cell "BUR":
+        - link "BUR":
+          - /url: /team/3
+      - cell "£4.0M"
+      - cell "100.0%"
+      - cell "5.5"
+      - cell "22.2"
+      - cell "0.0"
+      - cell "0.0%"
+      - cell "22.2"
+      - cell "2.5":
+        - strong: "2.5"
+      - cell "2.2 TOT 3 max 4.2":
+        - strong: "2.2"
+        - text: TOT 3 max 4.2
+      - cell "3.5 SUN 2 max 4.7":
+        - strong: "3.5"
+        - text: SUN 2 max 4.7
+      - cell "2.4 MUN 3 max 4.1":
+        - strong: "2.4"
+        - text: MUN 3 max 4.1
+      - cell "2.3 LIV 4 max 5.3":
+        - strong: "2.3"
+        - text: LIV 4 max 5.3
+      - cell "2.7 NFO 3 max 4.6":
+        - strong: "2.7"
+        - text: NFO 3 max 4.6
+      - cell "2.0 MCI 4 max 4.7":
+        - strong: "2.0"
+        - text: MCI 4 max 4.7
+      - cell "1.8 AVL 4 max 4.3":
+        - strong: "1.8"
+        - text: AVL 4 max 4.3
+      - cell "3.0 LEE 2 max 4.4":
+        - strong: "3.0"
+        - text: LEE 2 max 4.4
+      - cell "2.3 WOL 3 max 4.5":
+        - strong: "2.3"
+        - text: WOL 3 max 4.5
+    - row "☆ Konaté Def LIV £5.5M 100.0% 5.5 30.5 0.0 0.0% 30.5 3.4 3.8 BOU 3 max 4.2 2.8 NEW 4 max 4.7 3.1 ARS 4 max 4.1 3.8 BUR 2 max 5.3 4.2 EVE 2 max 4.6 3.1 CRY 3 max 4.7 2.6 CHE 4 max 4.3 3.9 MUN 3 max 4.4 3.2 BRE 3 max 4.5":
+      - cell "☆":
+        - button "☆"
+      - cell "Konaté":
+        - link "Konaté":
+          - /url: /player/38
+      - cell "Def"
+      - cell "LIV":
+        - link "LIV":
+          - /url: /team/12
+      - cell "£5.5M"
+      - cell "100.0%"
+      - cell "5.5"
+      - cell "30.5"
+      - cell "0.0"
+      - cell "0.0%"
+      - cell "30.5"
+      - cell "3.4":
+        - strong: "3.4"
+      - cell "3.8 BOU 3 max 4.2":
+        - strong: "3.8"
+        - text: BOU 3 max 4.2
+      - cell "2.8 NEW 4 max 4.7":
+        - strong: "2.8"
+        - text: NEW 4 max 4.7
+      - cell "3.1 ARS 4 max 4.1":
+        - strong: "3.1"
+        - text: ARS 4 max 4.1
+      - cell "3.8 BUR 2 max 5.3":
+        - strong: "3.8"
+        - text: BUR 2 max 5.3
+      - cell "4.2 EVE 2 max 4.6":
+        - strong: "4.2"
+        - text: EVE 2 max 4.6
+      - cell "3.1 CRY 3 max 4.7":
+        - strong: "3.1"
+        - text: CRY 3 max 4.7
+      - cell "2.6 CHE 4 max 4.3":
+        - strong: "2.6"
+        - text: CHE 4 max 4.3
+      - cell "3.9 MUN 3 max 4.4":
+        - strong: "3.9"
+        - text: MUN 3 max 4.4
+      - cell "3.2 BRE 3 max 4.5":
+        - strong: "3.2"
+        - text: BRE 3 max 4.5
+    - row "☆ Neil Mid SUN £5.0M 100.0% 5.5 27.4 0.0 0.0% 27.4 3.0 3.2 WHU 2 max 6.7 3.2 BUR 2 max 6.1 3.2 BRE 3 max 5.6 2.9 CRY 3 max 7.0 3.1 AVL 3 max 6.6 2.9 NFO 3 max 5.9 3.0 MUN 3 max 5.7 3.2 WOL 2 max 7.4 2.7 CHE 4 max 6.7":
+      - cell "☆":
+        - button "☆"
+      - cell "Neil":
+        - link "Neil":
+          - /url: /player/75
+      - cell "Mid"
+      - cell "SUN":
+        - link "SUN":
+          - /url: /team/17
+      - cell "£5.0M"
+      - cell "100.0%"
+      - cell "5.5"
+      - cell "27.4"
+      - cell "0.0"
+      - cell "0.0%"
+      - cell "27.4"
+      - cell "3.0":
+        - strong: "3.0"
+      - cell "3.2 WHU 2 max 6.7":
+        - strong: "3.2"
+        - text: WHU 2 max 6.7
+      - cell "3.2 BUR 2 max 6.1":
+        - strong: "3.2"
+        - text: BUR 2 max 6.1
+      - cell "3.2 BRE 3 max 5.6":
+        - strong: "3.2"
+        - text: BRE 3 max 5.6
+      - cell "2.9 CRY 3 max 7.0":
+        - strong: "2.9"
+        - text: CRY 3 max 7.0
+      - cell "3.1 AVL 3 max 6.6":
+        - strong: "3.1"
+        - text: AVL 3 max 6.6
+      - cell "2.9 NFO 3 max 5.9":
+        - strong: "2.9"
+        - text: NFO 3 max 5.9
+      - cell "3.0 MUN 3 max 5.7":
+        - strong: "3.0"
+        - text: MUN 3 max 5.7
+      - cell "3.2 WOL 2 max 7.4":
+        - strong: "3.2"
+        - text: WOL 2 max 7.4
+      - cell "2.7 CHE 4 max 6.7":
+        - strong: "2.7"
+        - text: CHE 4 max 6.7
+    - row "☆ Onana Goa AVL £5.0M 100.0% 5.5 27.4 0.0 0.0% 27.4 3.0 0.9 NEW 3 max 4.0 3.1 BRE 3 max 4.3 3.9 CRY 3 max 4.0 3.1 EVE 3 max 4.2 3.6 SUN 2 max 4.0 3.0 FUL 3 max 3.9 3.1 BUR 2 max 4.4 2.9 TOT 3 max 4.1 3.8 MCI 4 max 4.3":
+      - cell "☆":
+        - button "☆"
+      - cell "Onana":
+        - link "Onana":
+          - /url: /player/73
+      - cell "Goa"
+      - cell "AVL":
+        - link "AVL":
+          - /url: /team/2
+      - cell "£5.0M"
+      - cell "100.0%"
+      - cell "5.5"
+      - cell "27.4"
+      - cell "0.0"
+      - cell "0.0%"
+      - cell "27.4"
+      - cell "3.0":
+        - strong: "3.0"
+      - cell "0.9 NEW 3 max 4.0":
+        - strong: "0.9"
+        - text: NEW 3 max 4.0
+      - cell "3.1 BRE 3 max 4.3":
+        - strong: "3.1"
+        - text: BRE 3 max 4.3
+      - cell "3.9 CRY 3 max 4.0":
+        - strong: "3.9"
+        - text: CRY 3 max 4.0
+      - cell "3.1 EVE 3 max 4.2":
+        - strong: "3.1"
+        - text: EVE 3 max 4.2
+      - cell "3.6 SUN 2 max 4.0":
+        - strong: "3.6"
+        - text: SUN 2 max 4.0
+      - cell "3.0 FUL 3 max 3.9":
+        - strong: "3.0"
+        - text: FUL 3 max 3.9
+      - cell "3.1 BUR 2 max 4.4":
+        - strong: "3.1"
+        - text: BUR 2 max 4.4
+      - cell "2.9 TOT 3 max 4.1":
+        - strong: "2.9"
+        - text: TOT 3 max 4.1
+      - cell "3.8 MCI 4 max 4.3":
+        - strong: "3.8"
+        - text: MCI 4 max 4.3
+    - row "☆ Saliba Def ARS £6.0M 100.0% 5.5 33.0 0.0 0.0% 33.0 3.7 3.4 MUN 3 max 4.2 4.7 LEE 2 max 4.7 2.8 LIV 5 max 4.1 3.9 NFO 3 max 5.3 3.5 MCI 4 max 4.6 3.1 NEW 4 max 4.7 4.2 WHU 2 max 4.3 3.5 FUL 3 max 4.4 3.9 CRY 3 max 4.5":
+      - cell "☆":
+        - button "☆"
+      - cell "Saliba":
+        - link "Saliba":
+          - /url: /player/24
+      - cell "Def"
+      - cell "ARS":
+        - link "ARS":
+          - /url: /team/1
+      - cell "£6.0M"
+      - cell "100.0%"
+      - cell "5.5"
+      - cell "33.0"
+      - cell "0.0"
+      - cell "0.0%"
+      - cell "33.0"
+      - cell "3.7":
+        - strong: "3.7"
+      - cell "3.4 MUN 3 max 4.2":
+        - strong: "3.4"
+        - text: MUN 3 max 4.2
+      - cell "4.7 LEE 2 max 4.7":
+        - strong: "4.7"
+        - text: LEE 2 max 4.7
+      - cell "2.8 LIV 5 max 4.1":
+        - strong: "2.8"
+        - text: LIV 5 max 4.1
+      - cell "3.9 NFO 3 max 5.3":
+        - strong: "3.9"
+        - text: NFO 3 max 5.3
+      - cell "3.5 MCI 4 max 4.6":
+        - strong: "3.5"
+        - text: MCI 4 max 4.6
+      - cell "3.1 NEW 4 max 4.7":
+        - strong: "3.1"
+        - text: NEW 4 max 4.7
+      - cell "4.2 WHU 2 max 4.3":
+        - strong: "4.2"
+        - text: WHU 2 max 4.3
+      - cell "3.5 FUL 3 max 4.4":
+        - strong: "3.5"
+        - text: FUL 3 max 4.4
+      - cell "3.9 CRY 3 max 4.5":
+        - strong: "3.9"
+        - text: CRY 3 max 4.5
+    - row "☆ Adams Mid BOU £5.0M 100.0% 5.4 27.0 0.0 0.0% 27.0 3.0 2.9 LIV 5 max 6.7 3.3 WOL 2 max 6.1 3.0 TOT 3 max 5.6 3.1 BHA 3 max 7.0 2.9 NEW 3 max 6.6 3.0 LEE 2 max 5.9 3.0 FUL 3 max 5.7 2.8 CRY 3 max 7.4 3.0 NFO 3 max 6.7":
+      - cell "☆":
+        - button "☆"
+      - cell "Adams":
+        - link "Adams":
+          - /url: /player/83
+      - cell "Mid"
+      - cell "BOU":
+        - link "BOU":
+          - /url: /team/4
+      - cell "£5.0M"
+      - cell "100.0%"
+      - cell "5.4"
+      - cell "27.0"
+      - cell "0.0"
+      - cell "0.0%"
+      - cell "27.0"
+      - cell "3.0":
+        - strong: "3.0"
+      - cell "2.9 LIV 5 max 6.7":
+        - strong: "2.9"
+        - text: LIV 5 max 6.7
+      - cell "3.3 WOL 2 max 6.1":
+        - strong: "3.3"
+        - text: WOL 2 max 6.1
+      - cell "3.0 TOT 3 max 5.6":
+        - strong: "3.0"
+        - text: TOT 3 max 5.6
+      - cell "3.1 BHA 3 max 7.0":
+        - strong: "3.1"
+        - text: BHA 3 max 7.0
+      - cell "2.9 NEW 3 max 6.6":
+        - strong: "2.9"
+        - text: NEW 3 max 6.6
+      - cell "3.0 LEE 2 max 5.9":
+        - strong: "3.0"
+        - text: LEE 2 max 5.9
+      - cell "3.0 FUL 3 max 5.7":
+        - strong: "3.0"
+        - text: FUL 3 max 5.7
+      - cell "2.8 CRY 3 max 7.4":
+        - strong: "2.8"
+        - text: CRY 3 max 7.4
+      - cell "3.0 NFO 3 max 6.7":
+        - strong: "3.0"
+        - text: NFO 3 max 6.7
+    - row "☆ Aina Def NFO £5.0M 100.0% 5.4 26.8 0.0 0.0% 26.8 3.0 3.4 BRE 3 max 4.2 2.7 CRY 3 max 4.7 3.5 WHU 2 max 4.1 2.0 ARS 4 max 5.3 3.6 BUR 2 max 4.6 3.8 SUN 2 max 4.7 2.1 NEW 4 max 4.3 3.0 CHE 3 max 4.4 2.7 BOU 3 max 4.5":
+      - cell "☆":
+        - button "☆"
+      - cell "Aina":
+        - link "Aina":
+          - /url: /player/85
+      - cell "Def"
+      - cell "NFO":
+        - link "NFO":
+          - /url: /team/16
+      - cell "£5.0M"
+      - cell "100.0%"
+      - cell "5.4"
+      - cell "26.8"
+      - cell "0.0"
+      - cell "0.0%"
+      - cell "26.8"
+      - cell "3.0":
+        - strong: "3.0"
+      - cell "3.4 BRE 3 max 4.2":
+        - strong: "3.4"
+        - text: BRE 3 max 4.2
+      - cell "2.7 CRY 3 max 4.7":
+        - strong: "2.7"
+        - text: CRY 3 max 4.7
+      - cell "3.5 WHU 2 max 4.1":
+        - strong: "3.5"
+        - text: WHU 2 max 4.1
+      - cell "2.0 ARS 4 max 5.3":
+        - strong: "2.0"
+        - text: ARS 4 max 5.3
+      - cell "3.6 BUR 2 max 4.6":
+        - strong: "3.6"
+        - text: BUR 2 max 4.6
+      - cell "3.8 SUN 2 max 4.7":
+        - strong: "3.8"
+        - text: SUN 2 max 4.7
+      - cell "2.1 NEW 4 max 4.3":
+        - strong: "2.1"
+        - text: NEW 4 max 4.3
+      - cell "3.0 CHE 3 max 4.4":
+        - strong: "3.0"
+        - text: CHE 3 max 4.4
+      - cell "2.7 BOU 3 max 4.5":
+        - strong: "2.7"
+        - text: BOU 3 max 4.5
+    - row "☆ Rúben Def MCI £5.5M 100.0% 5.4 29.7 0.0 0.0% 29.7 3.3 3.4 WOL 3 max 4.2 3.5 TOT 3 max 4.7 3.1 BHA 3 max 4.1 3.7 MUN 3 max 5.3 2.5 ARS 4 max 4.6 4.0 BUR 2 max 4.7 3.0 BRE 3 max 4.3 3.7 EVE 2 max 4.4 2.8 AVL 4 max 4.5":
+      - cell "☆":
+        - button "☆"
+      - cell "Rúben":
+        - link "Rúben":
+          - /url: /player/47
+      - cell "Def"
+      - cell "MCI":
+        - link "MCI":
+          - /url: /team/13
+      - cell "£5.5M"
+      - cell "100.0%"
+      - cell "5.4"
+      - cell "29.7"
+      - cell "0.0"
+      - cell "0.0%"
+      - cell "29.7"
+      - cell "3.3":
+        - strong: "3.3"
+      - cell "3.4 WOL 3 max 4.2":
+        - strong: "3.4"
+        - text: WOL 3 max 4.2
+      - cell "3.5 TOT 3 max 4.7":
+        - strong: "3.5"
+        - text: TOT 3 max 4.7
+      - cell "3.1 BHA 3 max 4.1":
+        - strong: "3.1"
+        - text: BHA 3 max 4.1
+      - cell "3.7 MUN 3 max 5.3":
+        - strong: "3.7"
+        - text: MUN 3 max 5.3
+      - cell "2.5 ARS 4 max 4.6":
+        - strong: "2.5"
+        - text: ARS 4 max 4.6
+      - cell "4.0 BUR 2 max 4.7":
+        - strong: "4.0"
+        - text: BUR 2 max 4.7
+      - cell "3.0 BRE 3 max 4.3":
+        - strong: "3.0"
+        - text: BRE 3 max 4.3
+      - cell "3.7 EVE 2 max 4.4":
+        - strong: "3.7"
+        - text: EVE 2 max 4.4
+      - cell "2.8 AVL 4 max 4.5":
+        - strong: "2.8"
+        - text: AVL 4 max 4.5
+    - row "☆ Strand Larsen For WOL £6.5M 100.0% 5.4 34.9 0.0 0.0% 34.9 3.9 3.2 MCI 4 max 5.2 3.5 BOU 3 max 6.3 3.7 EVE 2 max 5.8 3.4 NEW 4 max 5.8 5.1 LEE 2 max 5.7 3.5 TOT 3 max 6.6 3.8 BHA 3 max 6.6 4.3 SUN 2 max 5.1 4.4 BUR 2 max 5.4":
+      - cell "☆":
+        - button "☆"
+      - cell "Strand Larsen":
+        - link "Strand Larsen":
+          - /url: /player/14
+      - cell "For"
+      - cell "WOL":
+        - link "WOL":
+          - /url: /team/20
+      - cell "£6.5M"
+      - cell "100.0%"
+      - cell "5.4"
+      - cell "34.9"
+      - cell "0.0"
+      - cell "0.0%"
+      - cell "34.9"
+      - cell "3.9":
+        - strong: "3.9"
+      - cell "3.2 MCI 4 max 5.2":
+        - strong: "3.2"
+        - text: MCI 4 max 5.2
+      - cell "3.5 BOU 3 max 6.3":
+        - strong: "3.5"
+        - text: BOU 3 max 6.3
+      - cell "3.7 EVE 2 max 5.8":
+        - strong: "3.7"
+        - text: EVE 2 max 5.8
+      - cell "3.4 NEW 4 max 5.8":
+        - strong: "3.4"
+        - text: NEW 4 max 5.8
+      - cell "5.1 LEE 2 max 5.7":
+        - strong: "5.1"
+        - text: LEE 2 max 5.7
+      - cell "3.5 TOT 3 max 6.6":
+        - strong: "3.5"
+        - text: TOT 3 max 6.6
+      - cell "3.8 BHA 3 max 6.6":
+        - strong: "3.8"
+        - text: BHA 3 max 6.6
+      - cell "4.3 SUN 2 max 5.1":
+        - strong: "4.3"
+        - text: SUN 2 max 5.1
+      - cell "4.4 BUR 2 max 5.4":
+        - strong: "4.4"
+        - text: BUR 2 max 5.4
+    - row "☆ Wood For NFO £7.5M 100.0% 5.4 40.2 0.0 0.0% 40.2 4.5 4.8 BRE 3 max 5.2 3.9 CRY 3 max 6.3 5.2 WHU 2 max 5.8 3.2 ARS 4 max 5.8 4.8 BUR 2 max 5.7 5.8 SUN 2 max 6.6 3.9 NEW 4 max 6.6 4.6 CHE 3 max 5.1 4.0 BOU 3 max 5.4":
+      - cell "☆":
+        - button "☆"
+      - cell "Wood":
+        - link "Wood":
+          - /url: /player/6
+      - cell "For"
+      - cell "NFO":
+        - link "NFO":
+          - /url: /team/16
+      - cell "£7.5M"
+      - cell "100.0%"
+      - cell "5.4"
+      - cell "40.2"
+      - cell "0.0"
+      - cell "0.0%"
+      - cell "40.2"
+      - cell "4.5":
+        - strong: "4.5"
+      - cell "4.8 BRE 3 max 5.2":
+        - strong: "4.8"
+        - text: BRE 3 max 5.2
+      - cell "3.9 CRY 3 max 6.3":
+        - strong: "3.9"
+        - text: CRY 3 max 6.3
+      - cell "5.2 WHU 2 max 5.8":
+        - strong: "5.2"
+        - text: WHU 2 max 5.8
+      - cell "3.2 ARS 4 max 5.8":
+        - strong: "3.2"
+        - text: ARS 4 max 5.8
+      - cell "4.8 BUR 2 max 5.7":
+        - strong: "4.8"
+        - text: BUR 2 max 5.7
+      - cell "5.8 SUN 2 max 6.6":
+        - strong: "5.8"
+        - text: SUN 2 max 6.6
+      - cell "3.9 NEW 4 max 6.6":
+        - strong: "3.9"
+        - text: NEW 4 max 6.6
+      - cell "4.6 CHE 3 max 5.1":
+        - strong: "4.6"
+        - text: CHE 3 max 5.1
+      - cell "4.0 BOU 3 max 5.4":
+        - strong: "4.0"
+        - text: BOU 3 max 5.4
+    - row "☆ Anderson Mid NFO £5.5M 100.0% 5.3 28.9 0.0 0.0% 28.9 3.2 3.6 BRE 3 max 6.7 3.1 CRY 3 max 6.1 3.6 WHU 2 max 5.6 2.6 ARS 4 max 7.0 3.4 BUR 2 max 6.6 3.5 SUN 2 max 5.9 2.8 NEW 4 max 5.7 3.2 CHE 3 max 7.4 3.1 BOU 3 max 6.7":
+      - cell "☆":
+        - button "☆"
+      - cell "Anderson":
+        - link "Anderson":
+          - /url: /player/62
+      - cell "Mid"
+      - cell "NFO":
+        - link "NFO":
+          - /url: /team/16
+      - cell "£5.5M"
+      - cell "100.0%"
+      - cell "5.3"
+      - cell "28.9"
+      - cell "0.0"
+      - cell "0.0%"
+      - cell "28.9"
+      - cell "3.2":
+        - strong: "3.2"
+      - cell "3.6 BRE 3 max 6.7":
+        - strong: "3.6"
+        - text: BRE 3 max 6.7
+      - cell "3.1 CRY 3 max 6.1":
+        - strong: "3.1"
+        - text: CRY 3 max 6.1
+      - cell "3.6 WHU 2 max 5.6":
+        - strong: "3.6"
+        - text: WHU 2 max 5.6
+      - cell "2.6 ARS 4 max 7.0":
+        - strong: "2.6"
+        - text: ARS 4 max 7.0
+      - cell "3.4 BUR 2 max 6.6":
+        - strong: "3.4"
+        - text: BUR 2 max 6.6
+      - cell "3.5 SUN 2 max 5.9":
+        - strong: "3.5"
+        - text: SUN 2 max 5.9
+      - cell "2.8 NEW 4 max 5.7":
+        - strong: "2.8"
+        - text: NEW 4 max 5.7
+      - cell "3.2 CHE 3 max 7.4":
+        - strong: "3.2"
+        - text: CHE 3 max 7.4
+      - cell "3.1 BOU 3 max 6.7":
+        - strong: "3.1"
+        - text: BOU 3 max 6.7
+    - row "☆ Danso Def TOT £4.5M 100.0% 5.3 24.0 0.0 0.0% 24.0 2.7 3.4 BUR 2 max 4.2 1.9 MCI 4 max 4.7 2.7 BOU 3 max 4.1 2.4 WHU 2 max 5.3 2.6 BHA 3 max 4.6 2.8 WOL 2 max 4.7 2.9 LEE 2 max 4.3 2.5 AVL 3 max 4.4 2.8 EVE 3 max 4.5":
+      - cell "☆":
+        - button "☆"
+      - cell "Danso":
+        - link "Danso":
+          - /url: /player/121
+      - cell "Def"
+      - cell "TOT":
+        - link "TOT":
+          - /url: /team/18
+      - cell "£4.5M"
+      - cell "100.0%"
+      - cell "5.3"
+      - cell "24.0"
+      - cell "0.0"
+      - cell "0.0%"
+      - cell "24.0"
+      - cell "2.7":
+        - strong: "2.7"
+      - cell "3.4 BUR 2 max 4.2":
+        - strong: "3.4"
+        - text: BUR 2 max 4.2
+      - cell "1.9 MCI 4 max 4.7":
+        - strong: "1.9"
+        - text: MCI 4 max 4.7
+      - cell "2.7 BOU 3 max 4.1":
+        - strong: "2.7"
+        - text: BOU 3 max 4.1
+      - cell "2.4 WHU 2 max 5.3":
+        - strong: "2.4"
+        - text: WHU 2 max 5.3
+      - cell "2.6 BHA 3 max 4.6":
+        - strong: "2.6"
+        - text: BHA 3 max 4.6
+      - cell "2.8 WOL 2 max 4.7":
+        - strong: "2.8"
+        - text: WOL 2 max 4.7
+      - cell "2.9 LEE 2 max 4.3":
+        - strong: "2.9"
+        - text: LEE 2 max 4.3
+      - cell "2.5 AVL 3 max 4.4":
+        - strong: "2.5"
+        - text: AVL 3 max 4.4
+      - cell "2.8 EVE 3 max 4.5":
+        - strong: "2.8"
+        - text: EVE 3 max 4.5
+    - row "☆ Dunk Def BHA £4.5M 100.0% 5.3 24.0 0.0 0.0% 24.0 2.7 3.0 FUL 3 max 4.2 3.0 EVE 3 max 4.7 2.5 MCI 4 max 4.1 2.5 BOU 3 max 5.3 2.9 TOT 3 max 4.6 2.0 CHE 4 max 4.7 2.8 WOL 3 max 4.3 2.6 NEW 3 max 4.4 2.7 MUN 3 max 4.5":
+      - cell "☆":
+        - button "☆"
+      - cell "Dunk":
+        - link "Dunk":
+          - /url: /player/123
+      - cell "Def"
+      - cell "BHA":
+        - link "BHA":
+          - /url: /team/6
+      - cell "£4.5M"
+      - cell "100.0%"
+      - cell "5.3"
+      - cell "24.0"
+      - cell "0.0"
+      - cell "0.0%"
+      - cell "24.0"
+      - cell "2.7":
+        - strong: "2.7"
+      - cell "3.0 FUL 3 max 4.2":
+        - strong: "3.0"
+        - text: FUL 3 max 4.2
+      - cell "3.0 EVE 3 max 4.7":
+        - strong: "3.0"
+        - text: EVE 3 max 4.7
+      - cell "2.5 MCI 4 max 4.1":
+        - strong: "2.5"
+        - text: MCI 4 max 4.1
+      - cell "2.5 BOU 3 max 5.3":
+        - strong: "2.5"
+        - text: BOU 3 max 5.3
+      - cell "2.9 TOT 3 max 4.6":
+        - strong: "2.9"
+        - text: TOT 3 max 4.6
+      - cell "2.0 CHE 4 max 4.7":
+        - strong: "2.0"
+        - text: CHE 4 max 4.7
+      - cell "2.8 WOL 3 max 4.3":
+        - strong: "2.8"
+        - text: WOL 3 max 4.3
+      - cell "2.6 NEW 3 max 4.4":
+        - strong: "2.6"
+        - text: NEW 3 max 4.4
+      - cell "2.7 MUN 3 max 4.5":
+        - strong: "2.7"
+        - text: MUN 3 max 4.5
+    - row "☆ Evanilson For BOU £7.0M 100.0% 5.3 36.9 0.0 0.0% 36.9 4.1 3.4 LIV 5 max 5.2 4.6 WOL 2 max 6.3 3.9 TOT 3 max 5.8 4.2 BHA 3 max 5.8 4.3 NEW 3 max 5.7 4.7 LEE 2 max 6.6 4.0 FUL 3 max 6.6 3.6 CRY 3 max 5.1 4.2 NFO 3 max 5.4":
+      - cell "☆":
+        - button "☆"
+      - cell "Evanilson":
+        - link "Evanilson":
+          - /url: /player/9
+      - cell "For"
+      - cell "BOU":
+        - link "BOU":
+          - /url: /team/4
+      - cell "£7.0M"
+      - cell "100.0%"
+      - cell "5.3"
+      - cell "36.9"
+      - cell "0.0"
+      - cell "0.0%"
+      - cell "36.9"
+      - cell "4.1":
+        - strong: "4.1"
+      - cell "3.4 LIV 5 max 5.2":
+        - strong: "3.4"
+        - text: LIV 5 max 5.2
+      - cell "4.6 WOL 2 max 6.3":
+        - strong: "4.6"
+        - text: WOL 2 max 6.3
+      - cell "3.9 TOT 3 max 5.8":
+        - strong: "3.9"
+        - text: TOT 3 max 5.8
+      - cell "4.2 BHA 3 max 5.8":
+        - strong: "4.2"
+        - text: BHA 3 max 5.8
+      - cell "4.3 NEW 3 max 5.7":
+        - strong: "4.3"
+        - text: NEW 3 max 5.7
+      - cell "4.7 LEE 2 max 6.6":
+        - strong: "4.7"
+        - text: LEE 2 max 6.6
+      - cell "4.0 FUL 3 max 6.6":
+        - strong: "4.0"
+        - text: FUL 3 max 6.6
+      - cell "3.6 CRY 3 max 5.1":
+        - strong: "3.6"
+        - text: CRY 3 max 5.1
+      - cell "4.2 NFO 3 max 5.4":
+        - strong: "4.2"
+        - text: NFO 3 max 5.4
+    - row "☆ Eze Mid CRY £7.5M 100.0% 5.3 39.6 0.0 0.0% 39.6 4.4 4.1 CHE 4 max 6.7 4.8 NFO 3 max 6.1 4.0 AVL 4 max 5.6 5.8 SUN 2 max 7.0 4.4 WHU 2 max 6.6 4.2 LIV 4 max 5.9 4.0 EVE 3 max 5.7 4.9 BOU 3 max 7.4 3.4 ARS 4 max 6.7":
+      - cell "☆":
+        - button "☆"
+      - cell "Eze":
+        - link "Eze":
+          - /url: /player/7
+      - cell "Mid"
+      - cell "CRY":
+        - link "CRY":
+          - /url: /team/8
+      - cell "£7.5M"
+      - cell "100.0%"
+      - cell "5.3"
+      - cell "39.6"
+      - cell "0.0"
+      - cell "0.0%"
+      - cell "39.6"
+      - cell "4.4":
+        - strong: "4.4"
+      - cell "4.1 CHE 4 max 6.7":
+        - strong: "4.1"
+        - text: CHE 4 max 6.7
+      - cell "4.8 NFO 3 max 6.1":
+        - strong: "4.8"
+        - text: NFO 3 max 6.1
+      - cell "4.0 AVL 4 max 5.6":
+        - strong: "4.0"
+        - text: AVL 4 max 5.6
+      - cell "5.8 SUN 2 max 7.0":
+        - strong: "5.8"
+        - text: SUN 2 max 7.0
+      - cell "4.4 WHU 2 max 6.6":
+        - strong: "4.4"
+        - text: WHU 2 max 6.6
+      - cell "4.2 LIV 4 max 5.9":
+        - strong: "4.2"
+        - text: LIV 4 max 5.9
+      - cell "4.0 EVE 3 max 5.7":
+        - strong: "4.0"
+        - text: EVE 3 max 5.7
+      - cell "4.9 BOU 3 max 7.4":
+        - strong: "4.9"
+        - text: BOU 3 max 7.4
+      - cell "3.4 ARS 4 max 6.7":
+        - strong: "3.4"
+        - text: ARS 4 max 6.7
+    - row "☆ Matheus N. Def MCI £5.5M 100.0% 5.3 29.4 0.0 0.0% 29.4 3.3 3.3 WOL 3 max 4.2 3.7 TOT 3 max 4.7 2.9 BHA 3 max 4.1 3.8 MUN 3 max 5.3 2.4 ARS 4 max 4.6 4.2 BUR 2 max 4.7 2.9 BRE 3 max 4.3 3.7 EVE 2 max 4.4 2.5 AVL 4 max 4.5":
+      - cell "☆":
+        - button "☆"
+      - cell "Matheus N.":
+        - link "Matheus N.":
+          - /url: /player/55
+      - cell "Def"
+      - cell "MCI":
+        - link "MCI":
+          - /url: /team/13
+      - cell "£5.5M"
+      - cell "100.0%"
+      - cell "5.3"
+      - cell "29.4"
+      - cell "0.0"
+      - cell "0.0%"
+      - cell "29.4"
+      - cell "3.3":
+        - strong: "3.3"
+      - cell "3.3 WOL 3 max 4.2":
+        - strong: "3.3"
+        - text: WOL 3 max 4.2
+      - cell "3.7 TOT 3 max 4.7":
+        - strong: "3.7"
+        - text: TOT 3 max 4.7
+      - cell "2.9 BHA 3 max 4.1":
+        - strong: "2.9"
+        - text: BHA 3 max 4.1
+      - cell "3.8 MUN 3 max 5.3":
+        - strong: "3.8"
+        - text: MUN 3 max 5.3
+      - cell "2.4 ARS 4 max 4.6":
+        - strong: "2.4"
+        - text: ARS 4 max 4.6
+      - cell "4.2 BUR 2 max 4.7":
+        - strong: "4.2"
+        - text: BUR 2 max 4.7
+      - cell "2.9 BRE 3 max 4.3":
+        - strong: "2.9"
+        - text: BRE 3 max 4.3
+      - cell "3.7 EVE 2 max 4.4":
+        - strong: "3.7"
+        - text: EVE 2 max 4.4
+      - cell "2.5 AVL 4 max 4.5":
+        - strong: "2.5"
+        - text: AVL 4 max 4.5
+    - row "☆ Nørgaard Mid ARS £5.5M 100.0% 5.3 29.0 0.0 0.0% 29.0 3.2 2.8 MUN 3 max 6.7 3.7 LEE 2 max 6.1 2.9 LIV 5 max 5.6 3.5 NFO 3 max 7.0 2.9 MCI 4 max 6.6 3.1 NEW 4 max 5.9 3.7 WHU 2 max 5.7 3.0 FUL 3 max 7.4 3.4 CRY 3 max 6.7":
+      - cell "☆":
+        - button "☆"
+      - cell "Nørgaard":
+        - link "Nørgaard":
+          - /url: /player/61
+      - cell "Mid"
+      - cell "ARS":
+        - link "ARS":
+          - /url: /team/1
+      - cell "£5.5M"
+      - cell "100.0%"
+      - cell "5.3"
+      - cell "29.0"
+      - cell "0.0"
+      - cell "0.0%"
+      - cell "29.0"
+      - cell "3.2":
+        - strong: "3.2"
+      - cell "2.8 MUN 3 max 6.7":
+        - strong: "2.8"
+        - text: MUN 3 max 6.7
+      - cell "3.7 LEE 2 max 6.1":
+        - strong: "3.7"
+        - text: LEE 2 max 6.1
+      - cell "2.9 LIV 5 max 5.6":
+        - strong: "2.9"
+        - text: LIV 5 max 5.6
+      - cell "3.5 NFO 3 max 7.0":
+        - strong: "3.5"
+        - text: NFO 3 max 7.0
+      - cell "2.9 MCI 4 max 6.6":
+        - strong: "2.9"
+        - text: MCI 4 max 6.6
+      - cell "3.1 NEW 4 max 5.9":
+        - strong: "3.1"
+        - text: NEW 4 max 5.9
+      - cell "3.7 WHU 2 max 5.7":
+        - strong: "3.7"
+        - text: WHU 2 max 5.7
+      - cell "3.0 FUL 3 max 7.4":
+        - strong: "3.0"
+        - text: FUL 3 max 7.4
+      - cell "3.4 CRY 3 max 6.7":
+        - strong: "3.4"
+        - text: CRY 3 max 6.7
+    - row "☆ Rice Mid ARS £6.5M 100.0% 5.3 34.5 0.0 0.0% 34.5 3.8 3.7 MUN 3 max 6.7 5.0 LEE 2 max 6.1 3.1 LIV 5 max 5.6 4.1 NFO 3 max 7.0 3.4 MCI 4 max 6.6 3.5 NEW 4 max 5.9 4.1 WHU 2 max 5.7 3.6 FUL 3 max 7.4 4.0 CRY 3 max 6.7":
+      - cell "☆":
+        - button "☆"
+      - cell "Rice":
+        - link "Rice":
+          - /url: /player/15
+      - cell "Mid"
+      - cell "ARS":
+        - link "ARS":
+          - /url: /team/1
+      - cell "£6.5M"
+      - cell "100.0%"
+      - cell "5.3"
+      - cell "34.5"
+      - cell "0.0"
+      - cell "0.0%"
+      - cell "34.5"
+      - cell "3.8":
+        - strong: "3.8"
+      - cell "3.7 MUN 3 max 6.7":
+        - strong: "3.7"
+        - text: MUN 3 max 6.7
+      - cell "5.0 LEE 2 max 6.1":
+        - strong: "5.0"
+        - text: LEE 2 max 6.1
+      - cell "3.1 LIV 5 max 5.6":
+        - strong: "3.1"
+        - text: LIV 5 max 5.6
+      - cell "4.1 NFO 3 max 7.0":
+        - strong: "4.1"
+        - text: NFO 3 max 7.0
+      - cell "3.4 MCI 4 max 6.6":
+        - strong: "3.4"
+        - text: MCI 4 max 6.6
+      - cell "3.5 NEW 4 max 5.9":
+        - strong: "3.5"
+        - text: NEW 4 max 5.9
+      - cell "4.1 WHU 2 max 5.7":
+        - strong: "4.1"
+        - text: WHU 2 max 5.7
+      - cell "3.6 FUL 3 max 7.4":
+        - strong: "3.6"
+        - text: FUL 3 max 7.4
+      - cell "4.0 CRY 3 max 6.7":
+        - strong: "4.0"
+        - text: CRY 3 max 6.7
+    - row "☆ Gana Mid EVE £5.5M 100.0% 5.2 28.5 0.0 0.0% 28.5 3.2 3.3 LEE 2 max 6.7 3.4 BHA 3 max 6.1 3.1 WOL 3 max 5.6 3.3 AVL 3 max 7.0 2.8 LIV 5 max 6.6 3.5 WHU 2 max 5.9 3.1 CRY 3 max 5.7 2.6 MCI 4 max 7.4 3.4 TOT 3 max 6.7":
+      - cell "☆":
+        - button "☆"
+      - cell "Gana":
+        - link "Gana":
+          - /url: /player/65
+      - cell "Mid"
+      - cell "EVE":
+        - link "EVE":
+          - /url: /team/9
+      - cell "£5.5M"
+      - cell "100.0%"
+      - cell "5.2"
+      - cell "28.5"
+      - cell "0.0"
+      - cell "0.0%"
+      - cell "28.5"
+      - cell "3.2":
+        - strong: "3.2"
+      - cell "3.3 LEE 2 max 6.7":
+        - strong: "3.3"
+        - text: LEE 2 max 6.7
+      - cell "3.4 BHA 3 max 6.1":
+        - strong: "3.4"
+        - text: BHA 3 max 6.1
+      - cell "3.1 WOL 3 max 5.6":
+        - strong: "3.1"
+        - text: WOL 3 max 5.6
+      - cell "3.3 AVL 3 max 7.0":
+        - strong: "3.3"
+        - text: AVL 3 max 7.0
+      - cell "2.8 LIV 5 max 6.6":
+        - strong: "2.8"
+        - text: LIV 5 max 6.6
+      - cell "3.5 WHU 2 max 5.9":
+        - strong: "3.5"
+        - text: WHU 2 max 5.9
+      - cell "3.1 CRY 3 max 5.7":
+        - strong: "3.1"
+        - text: CRY 3 max 5.7
+      - cell "2.6 MCI 4 max 7.4":
+        - strong: "2.6"
+        - text: MCI 4 max 7.4
+      - cell "3.4 TOT 3 max 6.7":
+        - strong: "3.4"
+        - text: TOT 3 max 6.7
+    - row "☆ N.Williams Def NFO £5.0M 100.0% 5.2 26.1 0.0 0.0% 26.1 2.9 3.3 BRE 3 max 4.2 2.6 CRY 3 max 4.7 3.4 WHU 2 max 4.1 2.1 ARS 4 max 5.3 3.4 BUR 2 max 4.6 3.7 SUN 2 max 4.7 2.0 NEW 4 max 4.3 2.9 CHE 3 max 4.4 2.7 BOU 3 max 4.5":
+      - cell "☆":
+        - button "☆"
+      - cell "N.Williams":
+        - link "N.Williams":
+          - /url: /player/94
+      - cell "Def"
+      - cell "NFO":
+        - link "NFO":
+          - /url: /team/16
+      - cell "£5.0M"
+      - cell "100.0%"
+      - cell "5.2"
+      - cell "26.1"
+      - cell "0.0"
+      - cell "0.0%"
+      - cell "26.1"
+      - cell "2.9":
+        - strong: "2.9"
+      - cell "3.3 BRE 3 max 4.2":
+        - strong: "3.3"
+        - text: BRE 3 max 4.2
+      - cell "2.6 CRY 3 max 4.7":
+        - strong: "2.6"
+        - text: CRY 3 max 4.7
+      - cell "3.4 WHU 2 max 4.1":
+        - strong: "3.4"
+        - text: WHU 2 max 4.1
+      - cell "2.1 ARS 4 max 5.3":
+        - strong: "2.1"
+        - text: ARS 4 max 5.3
+      - cell "3.4 BUR 2 max 4.6":
+        - strong: "3.4"
+        - text: BUR 2 max 4.6
+      - cell "3.7 SUN 2 max 4.7":
+        - strong: "3.7"
+        - text: SUN 2 max 4.7
+      - cell "2.0 NEW 4 max 4.3":
+        - strong: "2.0"
+        - text: NEW 4 max 4.3
+      - cell "2.9 CHE 3 max 4.4":
+        - strong: "2.9"
+        - text: CHE 3 max 4.4
+      - cell "2.7 BOU 3 max 4.5":
+        - strong: "2.7"
+        - text: BOU 3 max 4.5
+    - row "☆ Welbeck For BHA £6.5M 100.0% 5.2 33.5 0.0 0.0% 33.5 3.7 4.1 FUL 3 max 5.2 3.3 EVE 3 max 6.3 3.6 MCI 4 max 5.8 3.4 BOU 3 max 5.8 4.1 TOT 3 max 5.7 3.3 CHE 4 max 6.6 4.0 WOL 3 max 6.6 4.2 NEW 3 max 5.1 3.5 MUN 3 max 5.4":
+      - cell "☆":
+        - button "☆"
+      - cell "Welbeck":
+        - link "Welbeck":
+          - /url: /player/18
+      - cell "For"
+      - cell "BHA":
+        - link "BHA":
+          - /url: /team/6
+      - cell "£6.5M"
+      - cell "100.0%"
+      - cell "5.2"
+      - cell "33.5"
+      - cell "0.0"
+      - cell "0.0%"
+      - cell "33.5"
+      - cell "3.7":
+        - strong: "3.7"
+      - cell "4.1 FUL 3 max 5.2":
+        - strong: "4.1"
+        - text: FUL 3 max 5.2
+      - cell "3.3 EVE 3 max 6.3":
+        - strong: "3.3"
+        - text: EVE 3 max 6.3
+      - cell "3.6 MCI 4 max 5.8":
+        - strong: "3.6"
+        - text: MCI 4 max 5.8
+      - cell "3.4 BOU 3 max 5.8":
+        - strong: "3.4"
+        - text: BOU 3 max 5.8
+      - cell "4.1 TOT 3 max 5.7":
+        - strong: "4.1"
+        - text: TOT 3 max 5.7
+      - cell "3.3 CHE 4 max 6.6":
+        - strong: "3.3"
+        - text: CHE 4 max 6.6
+      - cell "4.0 WOL 3 max 6.6":
+        - strong: "4.0"
+        - text: WOL 3 max 6.6
+      - cell "4.2 NEW 3 max 5.1":
+        - strong: "4.2"
+        - text: NEW 3 max 5.1
+      - cell "3.5 MUN 3 max 5.4":
+        - strong: "3.5"
+        - text: MUN 3 max 5.4
+    - row "☆ Bruno G. Mid NEW £6.5M 100.0% 5.1 32.9 0.0 0.0% 32.9 3.7 3.4 AVL 4 max 6.7 3.5 LIV 4 max 6.1 4.1 LEE 2 max 5.6 4.1 WOL 2 max 7.0 3.4 BOU 3 max 6.6 3.1 ARS 4 max 5.9 3.9 NFO 3 max 5.7 3.5 BHA 3 max 7.4 3.9 FUL 3 max 6.7":
+      - cell "☆":
+        - button "☆"
+      - cell "Bruno G.":
+        - link "Bruno G.":
+          - /url: /player/22
+      - cell "Mid"
+      - cell "NEW":
+        - link "NEW":
+          - /url: /team/15
+      - cell "£6.5M"
+      - cell "100.0%"
+      - cell "5.1"
+      - cell "32.9"
+      - cell "0.0"
+      - cell "0.0%"
+      - cell "32.9"
+      - cell "3.7":
+        - strong: "3.7"
+      - cell "3.4 AVL 4 max 6.7":
+        - strong: "3.4"
+        - text: AVL 4 max 6.7
+      - cell "3.5 LIV 4 max 6.1":
+        - strong: "3.5"
+        - text: LIV 4 max 6.1
+      - cell "4.1 LEE 2 max 5.6":
+        - strong: "4.1"
+        - text: LEE 2 max 5.6
+      - cell "4.1 WOL 2 max 7.0":
+        - strong: "4.1"
+        - text: WOL 2 max 7.0
+      - cell "3.4 BOU 3 max 6.6":
+        - strong: "3.4"
+        - text: BOU 3 max 6.6
+      - cell "3.1 ARS 4 max 5.9":
+        - strong: "3.1"
+        - text: ARS 4 max 5.9
+      - cell "3.9 NFO 3 max 5.7":
+        - strong: "3.9"
+        - text: NFO 3 max 5.7
+      - cell "3.5 BHA 3 max 7.4":
+        - strong: "3.5"
+        - text: BHA 3 max 7.4
+      - cell "3.9 FUL 3 max 6.7":
+        - strong: "3.9"
+        - text: FUL 3 max 6.7
+    - row "☆ Lewis-Skelly Def ARS £5.5M 100.0% 5.1 28.3 0.0 0.0% 28.3 3.1 2.9 MUN 3 max 4.2 4.0 LEE 2 max 4.7 2.2 LIV 5 max 4.1 3.5 NFO 3 max 5.3 2.9 MCI 4 max 4.6 2.7 NEW 4 max 4.7 3.7 WHU 2 max 4.3 2.9 FUL 3 max 4.4 3.5 CRY 3 max 4.5":
+      - cell "☆":
+        - button "☆"
+      - cell "Lewis-Skelly":
+        - link "Lewis-Skelly":
+          - /url: /player/67
+      - cell "Def"
+      - cell "ARS":
+        - link "ARS":
+          - /url: /team/1
+      - cell "£5.5M"
+      - cell "100.0%"
+      - cell "5.1"
+      - cell "28.3"
+      - cell "0.0"
+      - cell "0.0%"
+      - cell "28.3"
+      - cell "3.1":
+        - strong: "3.1"
+      - cell "2.9 MUN 3 max 4.2":
+        - strong: "2.9"
+        - text: MUN 3 max 4.2
+      - cell "4.0 LEE 2 max 4.7":
+        - strong: "4.0"
+        - text: LEE 2 max 4.7
+      - cell "2.2 LIV 5 max 4.1":
+        - strong: "2.2"
+        - text: LIV 5 max 4.1
+      - cell "3.5 NFO 3 max 5.3":
+        - strong: "3.5"
+        - text: NFO 3 max 5.3
+      - cell "2.9 MCI 4 max 4.6":
+        - strong: "2.9"
+        - text: MCI 4 max 4.6
+      - cell "2.7 NEW 4 max 4.7":
+        - strong: "2.7"
+        - text: NEW 4 max 4.7
+      - cell "3.7 WHU 2 max 4.3":
+        - strong: "3.7"
+        - text: WHU 2 max 4.3
+      - cell "2.9 FUL 3 max 4.4":
+        - strong: "2.9"
+        - text: FUL 3 max 4.4
+      - cell "3.5 CRY 3 max 4.5":
+        - strong: "3.5"
+        - text: CRY 3 max 4.5
+    - row "☆ Mac Allister Mid LIV £6.5M 100.0% 5.1 33.2 0.0 0.0% 33.2 3.7 4.0 BOU 3 max 6.7 3.5 NEW 4 max 6.1 3.2 ARS 4 max 5.6 4.0 BUR 2 max 7.0 3.9 EVE 2 max 6.6 3.6 CRY 3 max 5.9 3.2 CHE 4 max 5.7 4.1 MUN 3 max 7.4 3.7 BRE 3 max 6.7":
+      - cell "☆":
+        - button "☆"
+      - cell "Mac Allister":
+        - link "Mac Allister":
+          - /url: /player/19
+      - cell "Mid"
+      - cell "LIV":
+        - link "LIV":
+          - /url: /team/12
+      - cell "£6.5M"
+      - cell "100.0%"
+      - cell "5.1"
+      - cell "33.2"
+      - cell "0.0"
+      - cell "0.0%"
+      - cell "33.2"
+      - cell "3.7":
+        - strong: "3.7"
+      - cell "4.0 BOU 3 max 6.7":
+        - strong: "4.0"
+        - text: BOU 3 max 6.7
+      - cell "3.5 NEW 4 max 6.1":
+        - strong: "3.5"
+        - text: NEW 4 max 6.1
+      - cell "3.2 ARS 4 max 5.6":
+        - strong: "3.2"
+        - text: ARS 4 max 5.6
+      - cell "4.0 BUR 2 max 7.0":
+        - strong: "4.0"
+        - text: BUR 2 max 7.0
+      - cell "3.9 EVE 2 max 6.6":
+        - strong: "3.9"
+        - text: EVE 2 max 6.6
+      - cell "3.6 CRY 3 max 5.9":
+        - strong: "3.6"
+        - text: CRY 3 max 5.9
+      - cell "3.2 CHE 4 max 5.7":
+        - strong: "3.2"
+        - text: CHE 4 max 5.7
+      - cell "4.1 MUN 3 max 7.4":
+        - strong: "4.1"
+        - text: MUN 3 max 7.4
+      - cell "3.7 BRE 3 max 6.7":
+        - strong: "3.7"
+        - text: BRE 3 max 6.7
+    - row "☆ McNeil Mid EVE £6.0M 100.0% 5.1 30.7 0.0 0.0% 30.7 3.4 4.0 LEE 2 max 6.7 3.6 BHA 3 max 6.1 3.3 WOL 3 max 5.6 3.7 AVL 3 max 7.0 2.7 LIV 5 max 6.6 3.6 WHU 2 max 5.9 3.5 CRY 3 max 5.7 2.7 MCI 4 max 7.4 3.6 TOT 3 max 6.7":
+      - cell "☆":
+        - button "☆"
+      - cell "McNeil":
+        - link "McNeil":
+          - /url: /player/35
+      - cell "Mid"
+      - cell "EVE":
+        - link "EVE":
+          - /url: /team/9
+      - cell "£6.0M"
+      - cell "100.0%"
+      - cell "5.1"
+      - cell "30.7"
+      - cell "0.0"
+      - cell "0.0%"
+      - cell "30.7"
+      - cell "3.4":
+        - strong: "3.4"
+      - cell "4.0 LEE 2 max 6.7":
+        - strong: "4.0"
+        - text: LEE 2 max 6.7
+      - cell "3.6 BHA 3 max 6.1":
+        - strong: "3.6"
+        - text: BHA 3 max 6.1
+      - cell "3.3 WOL 3 max 5.6":
+        - strong: "3.3"
+        - text: WOL 3 max 5.6
+      - cell "3.7 AVL 3 max 7.0":
+        - strong: "3.7"
+        - text: AVL 3 max 7.0
+      - cell "2.7 LIV 5 max 6.6":
+        - strong: "2.7"
+        - text: LIV 5 max 6.6
+      - cell "3.6 WHU 2 max 5.9":
+        - strong: "3.6"
+        - text: WHU 2 max 5.9
+      - cell "3.5 CRY 3 max 5.7":
+        - strong: "3.5"
+        - text: CRY 3 max 5.7
+      - cell "2.7 MCI 4 max 7.4":
+        - strong: "2.7"
+        - text: MCI 4 max 7.4
+      - cell "3.6 TOT 3 max 6.7":
+        - strong: "3.6"
+        - text: TOT 3 max 6.7
+    - row "☆ Caicedo Mid CHE £5.5M 100.0% 5.0 27.4 0.0 0.0% 27.4 3.0 3.4 CRY 3 max 6.7 3.1 WHU 2 max 6.1 3.2 FUL 3 max 5.6 2.9 BRE 3 max 7.0 2.9 MUN 3 max 6.6 3.1 BHA 3 max 5.9 2.9 LIV 4 max 5.7 2.7 NFO 3 max 7.4 3.2 SUN 2 max 6.7":
+      - cell "☆":
+        - button "☆"
+      - cell "Caicedo":
+        - link "Caicedo":
+          - /url: /player/77
+      - cell "Mid"
+      - cell "CHE":
+        - link "CHE":
+          - /url: /team/7
+      - cell "£5.5M"
+      - cell "100.0%"
+      - cell "5.0"
+      - cell "27.4"
+      - cell "0.0"
+      - cell "0.0%"
+      - cell "27.4"
+      - cell "3.0":
+        - strong: "3.0"
+      - cell "3.4 CRY 3 max 6.7":
+        - strong: "3.4"
+        - text: CRY 3 max 6.7
+      - cell "3.1 WHU 2 max 6.1":
+        - strong: "3.1"
+        - text: WHU 2 max 6.1
+      - cell "3.2 FUL 3 max 5.6":
+        - strong: "3.2"
+        - text: FUL 3 max 5.6
+      - cell "2.9 BRE 3 max 7.0":
+        - strong: "2.9"
+        - text: BRE 3 max 7.0
+      - cell "2.9 MUN 3 max 6.6":
+        - strong: "2.9"
+        - text: MUN 3 max 6.6
+      - cell "3.1 BHA 3 max 5.9":
+        - strong: "3.1"
+        - text: BHA 3 max 5.9
+      - cell "2.9 LIV 4 max 5.7":
+        - strong: "2.9"
+        - text: LIV 4 max 5.7
+      - cell "2.7 NFO 3 max 7.4":
+        - strong: "2.7"
+        - text: NFO 3 max 7.4
+      - cell "3.2 SUN 2 max 6.7":
+        - strong: "3.2"
+        - text: SUN 2 max 6.7
+    - row "☆ Cucurella Def CHE £6.0M 100.0% 5.0 30.3 0.0 0.0% 30.3 3.4 3.7 CRY 3 max 4.2 3.3 WHU 2 max 4.7 3.6 FUL 3 max 4.1 3.1 BRE 3 max 5.3 3.0 MUN 3 max 4.6 3.6 BHA 3 max 4.7 2.7 LIV 4 max 4.3 2.8 NFO 3 max 4.4 4.5 SUN 2 max 4.5":
+      - cell "☆":
+        - button "☆"
+      - cell "Cucurella":
+        - link "Cucurella":
+          - /url: /player/40
+      - cell "Def"
+      - cell "CHE":
+        - link "CHE":
+          - /url: /team/7
+      - cell "£6.0M"
+      - cell "100.0%"
+      - cell "5.0"
+      - cell "30.3"
+      - cell "0.0"
+      - cell "0.0%"
+      - cell "30.3"
+      - cell "3.4":
+        - strong: "3.4"
+      - cell "3.7 CRY 3 max 4.2":
+        - strong: "3.7"
+        - text: CRY 3 max 4.2
+      - cell "3.3 WHU 2 max 4.7":
+        - strong: "3.3"
+        - text: WHU 2 max 4.7
+      - cell "3.6 FUL 3 max 4.1":
+        - strong: "3.6"
+        - text: FUL 3 max 4.1
+      - cell "3.1 BRE 3 max 5.3":
+        - strong: "3.1"
+        - text: BRE 3 max 5.3
+      - cell "3.0 MUN 3 max 4.6":
+        - strong: "3.0"
+        - text: MUN 3 max 4.6
+      - cell "3.6 BHA 3 max 4.7":
+        - strong: "3.6"
+        - text: BHA 3 max 4.7
+      - cell "2.7 LIV 4 max 4.3":
+        - strong: "2.7"
+        - text: LIV 4 max 4.3
+      - cell "2.8 NFO 3 max 4.4":
+        - strong: "2.8"
+        - text: NFO 3 max 4.4
+      - cell "4.5 SUN 2 max 4.5":
+        - strong: "4.5"
+        - text: SUN 2 max 4.5
+    - row "☆ Gomes Mid WOL £5.5M 100.0% 5.0 27.5 0.0 0.0% 27.5 3.1 2.7 MCI 4 max 6.7 3.0 BOU 3 max 6.1 3.2 EVE 2 max 5.6 2.8 NEW 4 max 7.0 3.4 LEE 2 max 6.6 3.0 TOT 3 max 5.9 3.0 BHA 3 max 5.7 2.9 SUN 2 max 7.4 3.5 BUR 2 max 6.7":
+      - cell "☆":
+        - button "☆"
+      - cell "Gomes":
+        - link "Gomes":
+          - /url: /player/72
+      - cell "Mid"
+      - cell "WOL":
+        - link "WOL":
+          - /url: /team/20
+      - cell "£5.5M"
+      - cell "100.0%"
+      - cell "5.0"
+      - cell "27.5"
+      - cell "0.0"
+      - cell "0.0%"
+      - cell "27.5"
+      - cell "3.1":
+        - strong: "3.1"
+      - cell "2.7 MCI 4 max 6.7":
+        - strong: "2.7"
+        - text: MCI 4 max 6.7
+      - cell "3.0 BOU 3 max 6.1":
+        - strong: "3.0"
+        - text: BOU 3 max 6.1
+      - cell "3.2 EVE 2 max 5.6":
+        - strong: "3.2"
+        - text: EVE 2 max 5.6
+      - cell "2.8 NEW 4 max 7.0":
+        - strong: "2.8"
+        - text: NEW 4 max 7.0
+      - cell "3.4 LEE 2 max 6.6":
+        - strong: "3.4"
+        - text: LEE 2 max 6.6
+      - cell "3.0 TOT 3 max 5.9":
+        - strong: "3.0"
+        - text: TOT 3 max 5.9
+      - cell "3.0 BHA 3 max 5.7":
+        - strong: "3.0"
+        - text: BHA 3 max 5.7
+      - cell "2.9 SUN 2 max 7.4":
+        - strong: "2.9"
+        - text: SUN 2 max 7.4
+      - cell "3.5 BUR 2 max 6.7":
+        - strong: "3.5"
+        - text: BUR 2 max 6.7
+    - row "☆ Watkins For AVL £9.0M 100.0% 5.0 44.8 0.0 0.0% 44.8 5.0 5.2 NEW 3 max 5.2 4.6 BRE 3 max 6.3 4.8 CRY 3 max 5.8 4.1 EVE 3 max 5.8 5.7 SUN 2 max 5.7 5.2 FUL 3 max 6.6 6.6 BUR 2 max 6.6 4.5 TOT 3 max 5.1 4.1 MCI 4 max 5.4":
+      - cell "☆":
+        - button "☆"
+      - cell "Watkins":
+        - link "Watkins":
+          - /url: /player/4
+      - cell "For"
+      - cell "AVL":
+        - link "AVL":
+          - /url: /team/2
+      - cell "£9.0M"
+      - cell "100.0%"
+      - cell "5.0"
+      - cell "44.8"
+      - cell "0.0"
+      - cell "0.0%"
+      - cell "44.8"
+      - cell "5.0":
+        - strong: "5.0"
+      - cell "5.2 NEW 3 max 5.2":
+        - strong: "5.2"
+        - text: NEW 3 max 5.2
+      - cell "4.6 BRE 3 max 6.3":
+        - strong: "4.6"
+        - text: BRE 3 max 6.3
+      - cell "4.8 CRY 3 max 5.8":
+        - strong: "4.8"
+        - text: CRY 3 max 5.8
+      - cell "4.1 EVE 3 max 5.8":
+        - strong: "4.1"
+        - text: EVE 3 max 5.8
+      - cell "5.7 SUN 2 max 5.7":
+        - strong: "5.7"
+        - text: SUN 2 max 5.7
+      - cell "5.2 FUL 3 max 6.6":
+        - strong: "5.2"
+        - text: FUL 3 max 6.6
+      - cell "6.6 BUR 2 max 6.6":
+        - strong: "6.6"
+        - text: BUR 2 max 6.6
+      - cell "4.5 TOT 3 max 5.1":
+        - strong: "4.5"
+        - text: TOT 3 max 5.1
+      - cell "4.1 MCI 4 max 5.4":
+        - strong: "4.1"
+        - text: MCI 4 max 5.4
+    - row "☆ Bassey Def FUL £4.5M 100.0% 4.9 21.9 0.0 0.0% 21.9 2.4 2.5 BHA 3 max 4.2 3.0 MUN 3 max 4.7 2.0 CHE 4 max 4.1 3.5 LEE 2 max 5.3 2.8 BRE 3 max 4.6 1.9 AVL 4 max 4.7 2.3 BOU 3 max 4.3 2.1 ARS 4 max 4.4 1.8 NEW 4 max 4.5":
+      - cell "☆":
+        - button "☆"
+      - cell "Bassey":
+        - link "Bassey":
+          - /url: /player/146
+      - cell "Def"
+      - cell "FUL":
+        - link "FUL":
+          - /url: /team/10
+      - cell "£4.5M"
+      - cell "100.0%"
+      - cell "4.9"
+      - cell "21.9"
+      - cell "0.0"
+      - cell "0.0%"
+      - cell "21.9"
+      - cell "2.4":
+        - strong: "2.4"
+      - cell "2.5 BHA 3 max 4.2":
+        - strong: "2.5"
+        - text: BHA 3 max 4.2
+      - cell "3.0 MUN 3 max 4.7":
+        - strong: "3.0"
+        - text: MUN 3 max 4.7
+      - cell "2.0 CHE 4 max 4.1":
+        - strong: "2.0"
+        - text: CHE 4 max 4.1
+      - cell "3.5 LEE 2 max 5.3":
+        - strong: "3.5"
+        - text: LEE 2 max 5.3
+      - cell "2.8 BRE 3 max 4.6":
+        - strong: "2.8"
+        - text: BRE 3 max 4.6
+      - cell "1.9 AVL 4 max 4.7":
+        - strong: "1.9"
+        - text: AVL 4 max 4.7
+      - cell "2.3 BOU 3 max 4.3":
+        - strong: "2.3"
+        - text: BOU 3 max 4.3
+      - cell "2.1 ARS 4 max 4.4":
+        - strong: "2.1"
+        - text: ARS 4 max 4.4
+      - cell "1.8 NEW 4 max 4.5":
+        - strong: "1.8"
+        - text: NEW 4 max 4.5
+    - row "☆ Burn Def NEW £5.0M 100.0% 4.9 24.6 0.0 0.0% 24.6 2.7 2.3 AVL 4 max 4.2 2.4 LIV 4 max 4.7 3.4 LEE 2 max 4.1 3.0 WOL 2 max 5.3 2.5 BOU 3 max 4.6 2.5 ARS 4 max 4.7 3.1 NFO 3 max 4.3 2.4 BHA 3 max 4.4 3.0 FUL 3 max 4.5":
+      - cell "☆":
+        - button "☆"
+      - cell "Burn":
+        - link "Burn":
+          - /url: /player/116
+      - cell "Def"
+      - cell "NEW":
+        - link "NEW":
+          - /url: /team/15
+      - cell "£5.0M"
+      - cell "100.0%"
+      - cell "4.9"
+      - cell "24.6"
+      - cell "0.0"
+      - cell "0.0%"
+      - cell "24.6"
+      - cell "2.7":
+        - strong: "2.7"
+      - cell "2.3 AVL 4 max 4.2":
+        - strong: "2.3"
+        - text: AVL 4 max 4.2
+      - cell "2.4 LIV 4 max 4.7":
+        - strong: "2.4"
+        - text: LIV 4 max 4.7
+      - cell "3.4 LEE 2 max 4.1":
+        - strong: "3.4"
+        - text: LEE 2 max 4.1
+      - cell "3.0 WOL 2 max 5.3":
+        - strong: "3.0"
+        - text: WOL 2 max 5.3
+      - cell "2.5 BOU 3 max 4.6":
+        - strong: "2.5"
+        - text: BOU 3 max 4.6
+      - cell "2.5 ARS 4 max 4.7":
+        - strong: "2.5"
+        - text: ARS 4 max 4.7
+      - cell "3.1 NFO 3 max 4.3":
+        - strong: "3.1"
+        - text: NFO 3 max 4.3
+      - cell "2.4 BHA 3 max 4.4":
+        - strong: "2.4"
+        - text: BHA 3 max 4.4
+      - cell "3.0 FUL 3 max 4.5":
+        - strong: "3.0"
+        - text: FUL 3 max 4.5
+    - row "☆ Sarr Mid CRY £6.5M 100.0% 4.9 31.6 0.0 0.0% 31.6 3.5 3.1 CHE 4 max 6.7 3.9 NFO 3 max 6.1 3.1 AVL 4 max 5.6 4.7 SUN 2 max 7.0 3.7 WHU 2 max 6.6 3.3 LIV 4 max 5.9 3.3 EVE 3 max 5.7 3.7 BOU 3 max 7.4 2.8 ARS 4 max 6.7":
+      - cell "☆":
+        - button "☆"
+      - cell "Sarr":
+        - link "Sarr":
+          - /url: /player/31
+      - cell "Mid"
+      - cell "CRY":
+        - link "CRY":
+          - /url: /team/8
+      - cell "£6.5M"
+      - cell "100.0%"
+      - cell "4.9"
+      - cell "31.6"
+      - cell "0.0"
+      - cell "0.0%"
+      - cell "31.6"
+      - cell "3.5":
+        - strong: "3.5"
+      - cell "3.1 CHE 4 max 6.7":
+        - strong: "3.1"
+        - text: CHE 4 max 6.7
+      - cell "3.9 NFO 3 max 6.1":
+        - strong: "3.9"
+        - text: NFO 3 max 6.1
+      - cell "3.1 AVL 4 max 5.6":
+        - strong: "3.1"
+        - text: AVL 4 max 5.6
+      - cell "4.7 SUN 2 max 7.0":
+        - strong: "4.7"
+        - text: SUN 2 max 7.0
+      - cell "3.7 WHU 2 max 6.6":
+        - strong: "3.7"
+        - text: WHU 2 max 6.6
+      - cell "3.3 LIV 4 max 5.9":
+        - strong: "3.3"
+        - text: LIV 4 max 5.9
+      - cell "3.3 EVE 3 max 5.7":
+        - strong: "3.3"
+        - text: EVE 3 max 5.7
+      - cell "3.7 BOU 3 max 7.4":
+        - strong: "3.7"
+        - text: BOU 3 max 7.4
+      - cell "2.8 ARS 4 max 6.7":
+        - strong: "2.8"
+        - text: ARS 4 max 6.7
+    - row "☆ Wissa For BRE £7.5M 100.0% 4.9 36.7 0.0 0.0% 36.7 4.1 3.8 NFO 3 max 5.2 4.4 AVL 3 max 6.3 4.7 SUN 2 max 5.8 4.0 CHE 3 max 5.8 3.7 FUL 3 max 5.7 4.5 MUN 3 max 6.6 3.8 MCI 4 max 6.6 4.1 WHU 2 max 5.1 3.7 LIV 4 max 5.4":
+      - cell "☆":
+        - button "☆"
+      - cell "Wissa":
+        - link "Wissa":
+          - /url: /player/10
+      - cell "For"
+      - cell "BRE":
+        - link "BRE":
+          - /url: /team/5
+      - cell "£7.5M"
+      - cell "100.0%"
+      - cell "4.9"
+      - cell "36.7"
+      - cell "0.0"
+      - cell "0.0%"
+      - cell "36.7"
+      - cell "4.1":
+        - strong: "4.1"
+      - cell "3.8 NFO 3 max 5.2":
+        - strong: "3.8"
+        - text: NFO 3 max 5.2
+      - cell "4.4 AVL 3 max 6.3":
+        - strong: "4.4"
+        - text: AVL 3 max 6.3
+      - cell "4.7 SUN 2 max 5.8":
+        - strong: "4.7"
+        - text: SUN 2 max 5.8
+      - cell "4.0 CHE 3 max 5.8":
+        - strong: "4.0"
+        - text: CHE 3 max 5.8
+      - cell "3.7 FUL 3 max 5.7":
+        - strong: "3.7"
+        - text: FUL 3 max 5.7
+      - cell "4.5 MUN 3 max 6.6":
+        - strong: "4.5"
+        - text: MUN 3 max 6.6
+      - cell "3.8 MCI 4 max 6.6":
+        - strong: "3.8"
+        - text: MCI 4 max 6.6
+      - cell "4.1 WHU 2 max 5.1":
+        - strong: "4.1"
+        - text: WHU 2 max 5.1
+      - cell "3.7 LIV 4 max 5.4":
+        - strong: "3.7"
+        - text: LIV 4 max 5.4
+    - row "☆ Cullen Mid BUR £5.0M 100.0% 4.8 24.0 0.0 0.0% 24.0 2.7 2.7 TOT 3 max 6.7 3.1 SUN 2 max 6.1 2.6 MUN 3 max 5.6 2.6 LIV 4 max 7.0 2.7 NFO 3 max 6.6 2.3 MCI 4 max 5.9 2.4 AVL 4 max 5.7 3.0 LEE 2 max 7.4 2.6 WOL 3 max 6.7":
+      - cell "☆":
+        - button "☆"
+      - cell "Cullen":
+        - link "Cullen":
+          - /url: /player/122
+      - cell "Mid"
+      - cell "BUR":
+        - link "BUR":
+          - /url: /team/3
+      - cell "£5.0M"
+      - cell "100.0%"
+      - cell "4.8"
+      - cell "24.0"
+      - cell "0.0"
+      - cell "0.0%"
+      - cell "24.0"
+      - cell "2.7":
+        - strong: "2.7"
+      - cell "2.7 TOT 3 max 6.7":
+        - strong: "2.7"
+        - text: TOT 3 max 6.7
+      - cell "3.1 SUN 2 max 6.1":
+        - strong: "3.1"
+        - text: SUN 2 max 6.1
+      - cell "2.6 MUN 3 max 5.6":
+        - strong: "2.6"
+        - text: MUN 3 max 5.6
+      - cell "2.6 LIV 4 max 7.0":
+        - strong: "2.6"
+        - text: LIV 4 max 7.0
+      - cell "2.7 NFO 3 max 6.6":
+        - strong: "2.7"
+        - text: NFO 3 max 6.6
+      - cell "2.3 MCI 4 max 5.9":
+        - strong: "2.3"
+        - text: MCI 4 max 5.9
+      - cell "2.4 AVL 4 max 5.7":
+        - strong: "2.4"
+        - text: AVL 4 max 5.7
+      - cell "3.0 LEE 2 max 7.4":
+        - strong: "3.0"
+        - text: LEE 2 max 7.4
+      - cell "2.6 WOL 3 max 6.7":
+        - strong: "2.6"
+        - text: WOL 3 max 6.7
+    - row "☆ Frimpong Def LIV £6.0M 100.0% 4.8 29.0 0.0 0.0% 29.0 3.2 3.9 BOU 3 max 4.2 2.7 NEW 4 max 4.7 2.7 ARS 4 max 4.1 3.8 BUR 2 max 5.3 4.0 EVE 2 max 4.6 2.8 CRY 3 max 4.7 2.3 CHE 4 max 4.3 3.7 MUN 3 max 4.4 3.1 BRE 3 max 4.5":
+      - cell "☆":
+        - button "☆"
+      - cell "Frimpong":
+        - link "Frimpong":
+          - /url: /player/60
+      - cell "Def"
+      - cell "LIV":
+        - link "LIV":
+          - /url: /team/12
+      - cell "£6.0M"
+      - cell "100.0%"
+      - cell "4.8"
+      - cell "29.0"
+      - cell "0.0"
+      - cell "0.0%"
+      - cell "29.0"
+      - cell "3.2":
+        - strong: "3.2"
+      - cell "3.9 BOU 3 max 4.2":
+        - strong: "3.9"
+        - text: BOU 3 max 4.2
+      - cell "2.7 NEW 4 max 4.7":
+        - strong: "2.7"
+        - text: NEW 4 max 4.7
+      - cell "2.7 ARS 4 max 4.1":
+        - strong: "2.7"
+        - text: ARS 4 max 4.1
+      - cell "3.8 BUR 2 max 5.3":
+        - strong: "3.8"
+        - text: BUR 2 max 5.3
+      - cell "4.0 EVE 2 max 4.6":
+        - strong: "4.0"
+        - text: EVE 2 max 4.6
+      - cell "2.8 CRY 3 max 4.7":
+        - strong: "2.8"
+        - text: CRY 3 max 4.7
+      - cell "2.3 CHE 4 max 4.3":
+        - strong: "2.3"
+        - text: CHE 4 max 4.3
+      - cell "3.7 MUN 3 max 4.4":
+        - strong: "3.7"
+        - text: MUN 3 max 4.4
+      - cell "3.1 BRE 3 max 4.5":
+        - strong: "3.1"
+        - text: BRE 3 max 4.5
+    - row "☆ Rogers Mid AVL £7.0M 100.0% 4.8 33.8 0.0 0.0% 33.8 3.8 1.1 NEW 3 max 6.7 4.0 BRE 3 max 6.1 4.2 CRY 3 max 5.6 3.7 EVE 3 max 7.0 4.4 SUN 2 max 6.6 4.2 FUL 3 max 5.9 5.2 BUR 2 max 5.7 3.7 TOT 3 max 7.4 3.3 MCI 4 max 6.7":
+      - cell "☆":
+        - button "☆"
+      - cell "Rogers":
+        - link "Rogers":
+          - /url: /player/16
+      - cell "Mid"
+      - cell "AVL":
+        - link "AVL":
+          - /url: /team/2
+      - cell "£7.0M"
+      - cell "100.0%"
+      - cell "4.8"
+      - cell "33.8"
+      - cell "0.0"
+      - cell "0.0%"
+      - cell "33.8"
+      - cell "3.8":
+        - strong: "3.8"
+      - cell "1.1 NEW 3 max 6.7":
+        - strong: "1.1"
+        - text: NEW 3 max 6.7
+      - cell "4.0 BRE 3 max 6.1":
+        - strong: "4.0"
+        - text: BRE 3 max 6.1
+      - cell "4.2 CRY 3 max 5.6":
+        - strong: "4.2"
+        - text: CRY 3 max 5.6
+      - cell "3.7 EVE 3 max 7.0":
+        - strong: "3.7"
+        - text: EVE 3 max 7.0
+      - cell "4.4 SUN 2 max 6.6":
+        - strong: "4.4"
+        - text: SUN 2 max 6.6
+      - cell "4.2 FUL 3 max 5.9":
+        - strong: "4.2"
+        - text: FUL 3 max 5.9
+      - cell "5.2 BUR 2 max 5.7":
+        - strong: "5.2"
+        - text: BUR 2 max 5.7
+      - cell "3.7 TOT 3 max 7.4":
+        - strong: "3.7"
+        - text: TOT 3 max 7.4
+      - cell "3.3 MCI 4 max 6.7":
+        - strong: "3.3"
+        - text: MCI 4 max 6.7
+    - row "☆ Tanaka Mid LEE £5.0M 100.0% 4.8 23.8 0.0 0.0% 23.8 2.6 2.8 EVE 2 max 6.7 2.2 ARS 4 max 6.1 2.6 NEW 3 max 5.6 2.6 FUL 3 max 7.0 2.5 WOL 3 max 6.6 2.6 BOU 3 max 5.9 2.8 TOT 3 max 5.7 2.8 BUR 2 max 7.4 2.9 WHU 2 max 6.7":
+      - cell "☆":
+        - button "☆"
+      - cell "Tanaka":
+        - link "Tanaka":
+          - /url: /player/127
+      - cell "Mid"
+      - cell "LEE":
+        - link "LEE":
+          - /url: /team/11
+      - cell "£5.0M"
+      - cell "100.0%"
+      - cell "4.8"
+      - cell "23.8"
+      - cell "0.0"
+      - cell "0.0%"
+      - cell "23.8"
+      - cell "2.6":
+        - strong: "2.6"
+      - cell "2.8 EVE 2 max 6.7":
+        - strong: "2.8"
+        - text: EVE 2 max 6.7
+      - cell "2.2 ARS 4 max 6.1":
+        - strong: "2.2"
+        - text: ARS 4 max 6.1
+      - cell "2.6 NEW 3 max 5.6":
+        - strong: "2.6"
+        - text: NEW 3 max 5.6
+      - cell "2.6 FUL 3 max 7.0":
+        - strong: "2.6"
+        - text: FUL 3 max 7.0
+      - cell "2.5 WOL 3 max 6.6":
+        - strong: "2.5"
+        - text: WOL 3 max 6.6
+      - cell "2.6 BOU 3 max 5.9":
+        - strong: "2.6"
+        - text: BOU 3 max 5.9
+      - cell "2.8 TOT 3 max 5.7":
+        - strong: "2.8"
+        - text: TOT 3 max 5.7
+      - cell "2.8 BUR 2 max 7.4":
+        - strong: "2.8"
+        - text: BUR 2 max 7.4
+      - cell "2.9 WHU 2 max 6.7":
+        - strong: "2.9"
+        - text: WHU 2 max 6.7
+    - row "☆ Van de Ven Def TOT £4.5M 100.0% 4.8 21.7 0.0 0.0% 21.7 2.4 3.2 BUR 2 max 4.2 1.5 MCI 4 max 4.7 2.5 BOU 3 max 4.1 2.1 WHU 2 max 5.3 2.2 BHA 3 max 4.6 2.6 WOL 2 max 4.7 2.5 LEE 2 max 4.3 2.4 AVL 3 max 4.4 2.7 EVE 3 max 4.5":
+      - cell "☆":
+        - button "☆"
+      - cell "Van de Ven":
+        - link "Van de Ven":
+          - /url: /player/150
+      - cell "Def"
+      - cell "TOT":
+        - link "TOT":
+          - /url: /team/18
+      - cell "£4.5M"
+      - cell "100.0%"
+      - cell "4.8"
+      - cell "21.7"
+      - cell "0.0"
+      - cell "0.0%"
+      - cell "21.7"
+      - cell "2.4":
+        - strong: "2.4"
+      - cell "3.2 BUR 2 max 4.2":
+        - strong: "3.2"
+        - text: BUR 2 max 4.2
+      - cell "1.5 MCI 4 max 4.7":
+        - strong: "1.5"
+        - text: MCI 4 max 4.7
+      - cell "2.5 BOU 3 max 4.1":
+        - strong: "2.5"
+        - text: BOU 3 max 4.1
+      - cell "2.1 WHU 2 max 5.3":
+        - strong: "2.1"
+        - text: WHU 2 max 5.3
+      - cell "2.2 BHA 3 max 4.6":
+        - strong: "2.2"
+        - text: BHA 3 max 4.6
+      - cell "2.6 WOL 2 max 4.7":
+        - strong: "2.6"
+        - text: WOL 2 max 4.7
+      - cell "2.5 LEE 2 max 4.3":
+        - strong: "2.5"
+        - text: LEE 2 max 4.3
+      - cell "2.4 AVL 3 max 4.4":
+        - strong: "2.4"
+        - text: AVL 3 max 4.4
+      - cell "2.7 EVE 3 max 4.5":
+        - strong: "2.7"
+        - text: EVE 3 max 4.5
+    - row "☆ Ballard Def SUN £4.5M 100.0% 4.7 21.2 0.0 0.0% 21.2 2.4 3.2 WHU 2 max 4.2 3.1 BUR 2 max 4.7 3.1 BRE 3 max 4.1 2.1 CRY 3 max 5.3 2.2 AVL 3 max 4.6 1.6 NFO 3 max 4.7 2.2 MUN 3 max 4.3 2.2 WOL 2 max 4.4 1.5 CHE 4 max 4.5":
+      - cell "☆":
+        - button "☆"
+      - cell "Ballard":
+        - link "Ballard":
+          - /url: /player/157
+      - cell "Def"
+      - cell "SUN":
+        - link "SUN":
+          - /url: /team/17
+      - cell "£4.5M"
+      - cell "100.0%"
+      - cell "4.7"
+      - cell "21.2"
+      - cell "0.0"
+      - cell "0.0%"
+      - cell "21.2"
+      - cell "2.4":
+        - strong: "2.4"
+      - cell "3.2 WHU 2 max 4.2":
+        - strong: "3.2"
+        - text: WHU 2 max 4.2
+      - cell "3.1 BUR 2 max 4.7":
+        - strong: "3.1"
+        - text: BUR 2 max 4.7
+      - cell "3.1 BRE 3 max 4.1":
+        - strong: "3.1"
+        - text: BRE 3 max 4.1
+      - cell "2.1 CRY 3 max 5.3":
+        - strong: "2.1"
+        - text: CRY 3 max 5.3
+      - cell "2.2 AVL 3 max 4.6":
+        - strong: "2.2"
+        - text: AVL 3 max 4.6
+      - cell "1.6 NFO 3 max 4.7":
+        - strong: "1.6"
+        - text: NFO 3 max 4.7
+      - cell "2.2 MUN 3 max 4.3":
+        - strong: "2.2"
+        - text: MUN 3 max 4.3
+      - cell "2.2 WOL 2 max 4.4":
+        - strong: "2.2"
+        - text: WOL 2 max 4.4
+      - cell "1.5 CHE 4 max 4.5":
+        - strong: "1.5"
+        - text: CHE 4 max 4.5
+    - row "☆ Garner Mid EVE £5.0M 100.0% 4.7 23.4 0.0 0.0% 23.4 2.6 2.9 LEE 2 max 6.7 2.7 BHA 3 max 6.1 2.7 WOL 3 max 5.6 2.7 AVL 3 max 7.0 2.3 LIV 5 max 6.6 2.6 WHU 2 max 5.9 2.7 CRY 3 max 5.7 2.1 MCI 4 max 7.4 2.7 TOT 3 max 6.7":
+      - cell "☆":
+        - button "☆"
+      - cell "Garner":
+        - link "Garner":
+          - /url: /player/131
+      - cell "Mid"
+      - cell "EVE":
+        - link "EVE":
+          - /url: /team/9
+      - cell "£5.0M"
+      - cell "100.0%"
+      - cell "4.7"
+      - cell "23.4"
+      - cell "0.0"
+      - cell "0.0%"
+      - cell "23.4"
+      - cell "2.6":
+        - strong: "2.6"
+      - cell "2.9 LEE 2 max 6.7":
+        - strong: "2.9"
+        - text: LEE 2 max 6.7
+      - cell "2.7 BHA 3 max 6.1":
+        - strong: "2.7"
+        - text: BHA 3 max 6.1
+      - cell "2.7 WOL 3 max 5.6":
+        - strong: "2.7"
+        - text: WOL 3 max 5.6
+      - cell "2.7 AVL 3 max 7.0":
+        - strong: "2.7"
+        - text: AVL 3 max 7.0
+      - cell "2.3 LIV 5 max 6.6":
+        - strong: "2.3"
+        - text: LIV 5 max 6.6
+      - cell "2.6 WHU 2 max 5.9":
+        - strong: "2.6"
+        - text: WHU 2 max 5.9
+      - cell "2.7 CRY 3 max 5.7":
+        - strong: "2.7"
+        - text: CRY 3 max 5.7
+      - cell "2.1 MCI 4 max 7.4":
+        - strong: "2.1"
+        - text: MCI 4 max 7.4
+      - cell "2.7 TOT 3 max 6.7":
+        - strong: "2.7"
+        - text: TOT 3 max 6.7
+    - row "☆ Gibbs-White Mid NFO £7.5M 100.0% 4.7 35.2 0.0 0.0% 35.2 3.9 4.3 BRE 3 max 6.7 3.5 CRY 3 max 6.1 4.4 WHU 2 max 5.6 2.9 ARS 4 max 7.0 4.2 BUR 2 max 6.6 5.2 SUN 2 max 5.9 3.4 NEW 4 max 5.7 3.9 CHE 3 max 7.4 3.4 BOU 3 max 6.7":
+      - cell "☆":
+        - button "☆"
+      - cell "Gibbs-White":
+        - link "Gibbs-White":
+          - /url: /player/13
+      - cell "Mid"
+      - cell "NFO":
+        - link "NFO":
+          - /url: /team/16
+      - cell "£7.5M"
+      - cell "100.0%"
+      - cell "4.7"
+      - cell "35.2"
+      - cell "0.0"
+      - cell "0.0%"
+      - cell "35.2"
+      - cell "3.9":
+        - strong: "3.9"
+      - cell "4.3 BRE 3 max 6.7":
+        - strong: "4.3"
+        - text: BRE 3 max 6.7
+      - cell "3.5 CRY 3 max 6.1":
+        - strong: "3.5"
+        - text: CRY 3 max 6.1
+      - cell "4.4 WHU 2 max 5.6":
+        - strong: "4.4"
+        - text: WHU 2 max 5.6
+      - cell "2.9 ARS 4 max 7.0":
+        - strong: "2.9"
+        - text: ARS 4 max 7.0
+      - cell "4.2 BUR 2 max 6.6":
+        - strong: "4.2"
+        - text: BUR 2 max 6.6
+      - cell "5.2 SUN 2 max 5.9":
+        - strong: "5.2"
+        - text: SUN 2 max 5.9
+      - cell "3.4 NEW 4 max 5.7":
+        - strong: "3.4"
+        - text: NEW 4 max 5.7
+      - cell "3.9 CHE 3 max 7.4":
+        - strong: "3.9"
+        - text: CHE 3 max 7.4
+      - cell "3.4 BOU 3 max 6.7":
+        - strong: "3.4"
+        - text: BOU 3 max 6.7
+    - row "☆ Hudson-Odoi Mid NFO £6.0M 100.0% 4.7 28.3 0.0 0.0% 28.3 3.1 3.5 BRE 3 max 6.7 2.9 CRY 3 max 6.1 3.7 WHU 2 max 5.6 2.4 ARS 4 max 7.0 3.4 BUR 2 max 6.6 3.9 SUN 2 max 5.9 2.7 NEW 4 max 5.7 3.1 CHE 3 max 7.4 2.7 BOU 3 max 6.7":
+      - cell "☆":
+        - button "☆"
+      - cell "Hudson-Odoi":
+        - link "Hudson-Odoi":
+          - /url: /player/68
+      - cell "Mid"
+      - cell "NFO":
+        - link "NFO":
+          - /url: /team/16
+      - cell "£6.0M"
+      - cell "100.0%"
+      - cell "4.7"
+      - cell "28.3"
+      - cell "0.0"
+      - cell "0.0%"
+      - cell "28.3"
+      - cell "3.1":
+        - strong: "3.1"
+      - cell "3.5 BRE 3 max 6.7":
+        - strong: "3.5"
+        - text: BRE 3 max 6.7
+      - cell "2.9 CRY 3 max 6.1":
+        - strong: "2.9"
+        - text: CRY 3 max 6.1
+      - cell "3.7 WHU 2 max 5.6":
+        - strong: "3.7"
+        - text: WHU 2 max 5.6
+      - cell "2.4 ARS 4 max 7.0":
+        - strong: "2.4"
+        - text: ARS 4 max 7.0
+      - cell "3.4 BUR 2 max 6.6":
+        - strong: "3.4"
+        - text: BUR 2 max 6.6
+      - cell "3.9 SUN 2 max 5.9":
+        - strong: "3.9"
+        - text: SUN 2 max 5.9
+      - cell "2.7 NEW 4 max 5.7":
+        - strong: "2.7"
+        - text: NEW 4 max 5.7
+      - cell "3.1 CHE 3 max 7.4":
+        - strong: "3.1"
+        - text: CHE 3 max 7.4
+      - cell "2.7 BOU 3 max 6.7":
+        - strong: "2.7"
+        - text: BOU 3 max 6.7
+    - row "☆ Hume Def SUN £4.5M 100.0% 4.7 21.3 0.0 0.0% 21.3 2.4 3.0 WHU 2 max 4.2 2.9 BUR 2 max 4.7 2.8 BRE 3 max 4.1 2.0 CRY 3 max 5.3 2.4 AVL 3 max 4.6 1.7 NFO 3 max 4.7 2.2 MUN 3 max 4.3 2.7 WOL 2 max 4.4 1.6 CHE 4 max 4.5":
+      - cell "☆":
+        - button "☆"
+      - cell "Hume":
+        - link "Hume":
+          - /url: /player/158
+      - cell "Def"
+      - cell "SUN":
+        - link "SUN":
+          - /url: /team/17
+      - cell "£4.5M"
+      - cell "100.0%"
+      - cell "4.7"
+      - cell "21.3"
+      - cell "0.0"
+      - cell "0.0%"
+      - cell "21.3"
+      - cell "2.4":
+        - strong: "2.4"
+      - cell "3.0 WHU 2 max 4.2":
+        - strong: "3.0"
+        - text: WHU 2 max 4.2
+      - cell "2.9 BUR 2 max 4.7":
+        - strong: "2.9"
+        - text: BUR 2 max 4.7
+      - cell "2.8 BRE 3 max 4.1":
+        - strong: "2.8"
+        - text: BRE 3 max 4.1
+      - cell "2.0 CRY 3 max 5.3":
+        - strong: "2.0"
+        - text: CRY 3 max 5.3
+      - cell "2.4 AVL 3 max 4.6":
+        - strong: "2.4"
+        - text: AVL 3 max 4.6
+      - cell "1.7 NFO 3 max 4.7":
+        - strong: "1.7"
+        - text: NFO 3 max 4.7
+      - cell "2.2 MUN 3 max 4.3":
+        - strong: "2.2"
+        - text: MUN 3 max 4.3
+      - cell "2.7 WOL 2 max 4.4":
+        - strong: "2.7"
+        - text: WOL 2 max 4.4
+      - cell "1.6 CHE 4 max 4.5":
+        - strong: "1.6"
+        - text: CHE 4 max 4.5
+    - row "☆ Lewis-Potter Def BRE £5.0M 100.0% 4.7 23.5 0.0 0.0% 23.5 2.6 2.4 NFO 3 max 4.2 2.6 AVL 3 max 4.7 2.9 SUN 2 max 4.1 2.5 CHE 3 max 5.3 2.4 FUL 3 max 4.6 3.2 MUN 3 max 4.7 2.6 MCI 4 max 4.3 2.7 WHU 2 max 4.4 2.2 LIV 4 max 4.5":
+      - cell "☆":
+        - button "☆"
+      - cell "Lewis-Potter":
+        - link "Lewis-Potter":
+          - /url: /player/129
+      - cell "Def"
+      - cell "BRE":
+        - link "BRE":
+          - /url: /team/5
+      - cell "£5.0M"
+      - cell "100.0%"
+      - cell "4.7"
+      - cell "23.5"
+      - cell "0.0"
+      - cell "0.0%"
+      - cell "23.5"
+      - cell "2.6":
+        - strong: "2.6"
+      - cell "2.4 NFO 3 max 4.2":
+        - strong: "2.4"
+        - text: NFO 3 max 4.2
+      - cell "2.6 AVL 3 max 4.7":
+        - strong: "2.6"
+        - text: AVL 3 max 4.7
+      - cell "2.9 SUN 2 max 4.1":
+        - strong: "2.9"
+        - text: SUN 2 max 4.1
+      - cell "2.5 CHE 3 max 5.3":
+        - strong: "2.5"
+        - text: CHE 3 max 5.3
+      - cell "2.4 FUL 3 max 4.6":
+        - strong: "2.4"
+        - text: FUL 3 max 4.6
+      - cell "3.2 MUN 3 max 4.7":
+        - strong: "3.2"
+        - text: MUN 3 max 4.7
+      - cell "2.6 MCI 4 max 4.3":
+        - strong: "2.6"
+        - text: MCI 4 max 4.3
+      - cell "2.7 WHU 2 max 4.4":
+        - strong: "2.7"
+        - text: WHU 2 max 4.4
+      - cell "2.2 LIV 4 max 4.5":
+        - strong: "2.2"
+        - text: LIV 4 max 4.5
+    - row "☆ Maguire Def MUN £4.5M 100.0% 4.7 21.3 0.0 0.0% 21.3 2.4 2.2 ARS 4 max 4.2 2.3 FUL 3 max 4.7 3.2 BUR 2 max 4.1 1.8 MCI 4 max 5.3 2.2 CHE 3 max 4.6 2.2 BRE 3 max 4.7 3.4 SUN 2 max 4.3 1.6 LIV 5 max 4.4 2.4 BHA 3 max 4.5":
+      - cell "☆":
+        - button "☆"
+      - cell "Maguire":
+        - link "Maguire":
+          - /url: /player/153
+      - cell "Def"
+      - cell "MUN":
+        - link "MUN":
+          - /url: /team/14
+      - cell "£4.5M"
+      - cell "100.0%"
+      - cell "4.7"
+      - cell "21.3"
+      - cell "0.0"
+      - cell "0.0%"
+      - cell "21.3"
+      - cell "2.4":
+        - strong: "2.4"
+      - cell "2.2 ARS 4 max 4.2":
+        - strong: "2.2"
+        - text: ARS 4 max 4.2
+      - cell "2.3 FUL 3 max 4.7":
+        - strong: "2.3"
+        - text: FUL 3 max 4.7
+      - cell "3.2 BUR 2 max 4.1":
+        - strong: "3.2"
+        - text: BUR 2 max 4.1
+      - cell "1.8 MCI 4 max 5.3":
+        - strong: "1.8"
+        - text: MCI 4 max 5.3
+      - cell "2.2 CHE 3 max 4.6":
+        - strong: "2.2"
+        - text: CHE 3 max 4.6
+      - cell "2.2 BRE 3 max 4.7":
+        - strong: "2.2"
+        - text: BRE 3 max 4.7
+      - cell "3.4 SUN 2 max 4.3":
+        - strong: "3.4"
+        - text: SUN 2 max 4.3
+      - cell "1.6 LIV 5 max 4.4":
+        - strong: "1.6"
+        - text: LIV 5 max 4.4
+      - cell "2.4 BHA 3 max 4.5":
+        - strong: "2.4"
+        - text: BHA 3 max 4.5
+    - row "☆ Pau Def AVL £4.5M 100.0% 4.7 21.0 0.0 0.0% 21.0 2.3 2.1 NEW 3 max 4.2 2.0 BRE 3 max 4.7 2.4 CRY 3 max 4.1 2.3 EVE 3 max 5.3 2.5 SUN 2 max 4.6 2.5 FUL 3 max 4.7 3.1 BUR 2 max 4.3 1.7 TOT 3 max 4.4 2.4 MCI 4 max 4.5":
+      - cell "☆":
+        - button "☆"
+      - cell "Pau":
+        - link "Pau":
+          - /url: /player/161
+      - cell "Def"
+      - cell "AVL":
+        - link "AVL":
+          - /url: /team/2
+      - cell "£4.5M"
+      - cell "100.0%"
+      - cell "4.7"
+      - cell "21.0"
+      - cell "0.0"
+      - cell "0.0%"
+      - cell "21.0"
+      - cell "2.3":
+        - strong: "2.3"
+      - cell "2.1 NEW 3 max 4.2":
+        - strong: "2.1"
+        - text: NEW 3 max 4.2
+      - cell "2.0 BRE 3 max 4.7":
+        - strong: "2.0"
+        - text: BRE 3 max 4.7
+      - cell "2.4 CRY 3 max 4.1":
+        - strong: "2.4"
+        - text: CRY 3 max 4.1
+      - cell "2.3 EVE 3 max 5.3":
+        - strong: "2.3"
+        - text: EVE 3 max 5.3
+      - cell "2.5 SUN 2 max 4.6":
+        - strong: "2.5"
+        - text: SUN 2 max 4.6
+      - cell "2.5 FUL 3 max 4.7":
+        - strong: "2.5"
+        - text: FUL 3 max 4.7
+      - cell "3.1 BUR 2 max 4.3":
+        - strong: "3.1"
+        - text: BUR 2 max 4.3
+      - cell "1.7 TOT 3 max 4.4":
+        - strong: "1.7"
+        - text: TOT 3 max 4.4
+      - cell "2.4 MCI 4 max 4.5":
+        - strong: "2.4"
+        - text: MCI 4 max 4.5
+    - row "☆ R.Gomes Def WOL £4.5M 100.0% 4.7 21.1 0.0 0.0% 21.1 2.3 2.0 MCI 4 max 4.2 2.1 BOU 3 max 4.7 2.7 EVE 2 max 4.1 1.8 NEW 4 max 5.3 3.5 LEE 2 max 4.6 1.8 TOT 3 max 4.7 2.2 BHA 3 max 4.3 2.2 SUN 2 max 4.4 2.8 BUR 2 max 4.5":
+      - cell "☆":
+        - button "☆"
+      - cell "R.Gomes":
+        - link "R.Gomes":
+          - /url: /player/159
+      - cell "Def"
+      - cell "WOL":
+        - link "WOL":
+          - /url: /team/20
+      - cell "£4.5M"
+      - cell "100.0%"
+      - cell "4.7"
+      - cell "21.1"
+      - cell "0.0"
+      - cell "0.0%"
+      - cell "21.1"
+      - cell "2.3":
+        - strong: "2.3"
+      - cell "2.0 MCI 4 max 4.2":
+        - strong: "2.0"
+        - text: MCI 4 max 4.2
+      - cell "2.1 BOU 3 max 4.7":
+        - strong: "2.1"
+        - text: BOU 3 max 4.7
+      - cell "2.7 EVE 2 max 4.1":
+        - strong: "2.7"
+        - text: EVE 2 max 4.1
+      - cell "1.8 NEW 4 max 5.3":
+        - strong: "1.8"
+        - text: NEW 4 max 5.3
+      - cell "3.5 LEE 2 max 4.6":
+        - strong: "3.5"
+        - text: LEE 2 max 4.6
+      - cell "1.8 TOT 3 max 4.7":
+        - strong: "1.8"
+        - text: TOT 3 max 4.7
+      - cell "2.2 BHA 3 max 4.3":
+        - strong: "2.2"
+        - text: BHA 3 max 4.3
+      - cell "2.2 SUN 2 max 4.4":
+        - strong: "2.2"
+        - text: SUN 2 max 4.4
+      - cell "2.8 BUR 2 max 4.5":
+        - strong: "2.8"
+        - text: BUR 2 max 4.5
+    - row "☆ Roberts Mid BUR £5.5M 100.0% 4.7 25.8 0.0 0.0% 25.8 2.9 3.2 TOT 3 max 6.7 3.2 SUN 2 max 6.1 2.9 MUN 3 max 5.6 2.6 LIV 4 max 7.0 2.7 NFO 3 max 6.6 2.7 MCI 4 max 5.9 2.9 AVL 4 max 5.7 3.1 LEE 2 max 7.4 2.5 WOL 3 max 6.7":
+      - cell "☆":
+        - button "☆"
+      - cell "Roberts":
+        - link "Roberts":
+          - /url: /player/101
+      - cell "Mid"
+      - cell "BUR":
+        - link "BUR":
+          - /url: /team/3
+      - cell "£5.5M"
+      - cell "100.0%"
+      - cell "4.7"
+      - cell "25.8"
+      - cell "0.0"
+      - cell "0.0%"
+      - cell "25.8"
+      - cell "2.9":
+        - strong: "2.9"
+      - cell "3.2 TOT 3 max 6.7":
+        - strong: "3.2"
+        - text: TOT 3 max 6.7
+      - cell "3.2 SUN 2 max 6.1":
+        - strong: "3.2"
+        - text: SUN 2 max 6.1
+      - cell "2.9 MUN 3 max 5.6":
+        - strong: "2.9"
+        - text: MUN 3 max 5.6
+      - cell "2.6 LIV 4 max 7.0":
+        - strong: "2.6"
+        - text: LIV 4 max 7.0
+      - cell "2.7 NFO 3 max 6.6":
+        - strong: "2.7"
+        - text: NFO 3 max 6.6
+      - cell "2.7 MCI 4 max 5.9":
+        - strong: "2.7"
+        - text: MCI 4 max 5.9
+      - cell "2.9 AVL 4 max 5.7":
+        - strong: "2.9"
+        - text: AVL 4 max 5.7
+      - cell "3.1 LEE 2 max 7.4":
+        - strong: "3.1"
+        - text: LEE 2 max 7.4
+      - cell "2.5 WOL 3 max 6.7":
+        - strong: "2.5"
+        - text: WOL 3 max 6.7
+    - row "☆ Rodon Def LEE £4.0M 100.0% 4.7 18.7 0.0 0.0% 18.7 2.1 2.8 EVE 2 max 4.2 1.3 ARS 4 max 4.7 1.8 NEW 3 max 4.1 1.9 FUL 3 max 5.3 1.8 WOL 3 max 4.6 2.3 BOU 3 max 4.7 1.9 TOT 3 max 4.3 2.4 BUR 2 max 4.4 2.5 WHU 2 max 4.5":
+      - cell "☆":
+        - button "☆"
+      - cell "Rodon":
+        - link "Rodon":
+          - /url: /player/194
+      - cell "Def"
+      - cell "LEE":
+        - link "LEE":
+          - /url: /team/11
+      - cell "£4.0M"
+      - cell "100.0%"
+      - cell "4.7"
+      - cell "18.7"
+      - cell "0.0"
+      - cell "0.0%"
+      - cell "18.7"
+      - cell "2.1":
+        - strong: "2.1"
+      - cell "2.8 EVE 2 max 4.2":
+        - strong: "2.8"
+        - text: EVE 2 max 4.2
+      - cell "1.3 ARS 4 max 4.7":
+        - strong: "1.3"
+        - text: ARS 4 max 4.7
+      - cell "1.8 NEW 3 max 4.1":
+        - strong: "1.8"
+        - text: NEW 3 max 4.1
+      - cell "1.9 FUL 3 max 5.3":
+        - strong: "1.9"
+        - text: FUL 3 max 5.3
+      - cell "1.8 WOL 3 max 4.6":
+        - strong: "1.8"
+        - text: WOL 3 max 4.6
+      - cell "2.3 BOU 3 max 4.7":
+        - strong: "2.3"
+        - text: BOU 3 max 4.7
+      - cell "1.9 TOT 3 max 4.3":
+        - strong: "1.9"
+        - text: TOT 3 max 4.3
+      - cell "2.4 BUR 2 max 4.4":
+        - strong: "2.4"
+        - text: BUR 2 max 4.4
+      - cell "2.5 WHU 2 max 4.5":
+        - strong: "2.5"
+        - text: WHU 2 max 4.5
+    - row "☆ Schade Mid BRE £7.0M 100.0% 4.7 33.0 0.0 0.0% 33.0 3.7 1.6 NFO 3 max 6.7 4.2 AVL 3 max 6.1 4.5 SUN 2 max 5.6 4.0 CHE 3 max 7.0 3.5 FUL 3 max 6.6 4.4 MUN 3 max 5.9 3.5 MCI 4 max 5.7 3.8 WHU 2 max 7.4 3.5 LIV 4 max 6.7":
+      - cell "☆":
+        - button "☆"
+      - cell "Schade":
+        - link "Schade":
+          - /url: /player/23
+      - cell "Mid"
+      - cell "BRE":
+        - link "BRE":
+          - /url: /team/5
+      - cell "£7.0M"
+      - cell "100.0%"
+      - cell "4.7"
+      - cell "33.0"
+      - cell "0.0"
+      - cell "0.0%"
+      - cell "33.0"
+      - cell "3.7":
+        - strong: "3.7"
+      - cell "1.6 NFO 3 max 6.7":
+        - strong: "1.6"
+        - text: NFO 3 max 6.7
+      - cell "4.2 AVL 3 max 6.1":
+        - strong: "4.2"
+        - text: AVL 3 max 6.1
+      - cell "4.5 SUN 2 max 5.6":
+        - strong: "4.5"
+        - text: SUN 2 max 5.6
+      - cell "4.0 CHE 3 max 7.0":
+        - strong: "4.0"
+        - text: CHE 3 max 7.0
+      - cell "3.5 FUL 3 max 6.6":
+        - strong: "3.5"
+        - text: FUL 3 max 6.6
+      - cell "4.4 MUN 3 max 5.9":
+        - strong: "4.4"
+        - text: MUN 3 max 5.9
+      - cell "3.5 MCI 4 max 5.7":
+        - strong: "3.5"
+        - text: MCI 4 max 5.7
+      - cell "3.8 WHU 2 max 7.4":
+        - strong: "3.8"
+        - text: WHU 2 max 7.4
+      - cell "3.5 LIV 4 max 6.7":
+        - strong: "3.5"
+        - text: LIV 4 max 6.7
+    - row "☆ Schär Def NEW £5.5M 100.0% 4.7 25.9 0.0 0.0% 25.9 2.9 2.5 AVL 4 max 4.2 2.5 LIV 4 max 4.7 3.4 LEE 2 max 4.1 3.1 WOL 2 max 5.3 2.5 BOU 3 max 4.6 2.5 ARS 4 max 4.7 3.3 NFO 3 max 4.3 2.6 BHA 3 max 4.4 3.5 FUL 3 max 4.5":
+      - cell "☆":
+        - button "☆"
+      - cell "Schär":
+        - link "Schär":
+          - /url: /player/103
+      - cell "Def"
+      - cell "NEW":
+        - link "NEW":
+          - /url: /team/15
+      - cell "£5.5M"
+      - cell "100.0%"
+      - cell "4.7"
+      - cell "25.9"
+      - cell "0.0"
+      - cell "0.0%"
+      - cell "25.9"
+      - cell "2.9":
+        - strong: "2.9"
+      - cell "2.5 AVL 4 max 4.2":
+        - strong: "2.5"
+        - text: AVL 4 max 4.2
+      - cell "2.5 LIV 4 max 4.7":
+        - strong: "2.5"
+        - text: LIV 4 max 4.7
+      - cell "3.4 LEE 2 max 4.1":
+        - strong: "3.4"
+        - text: LEE 2 max 4.1
+      - cell "3.1 WOL 2 max 5.3":
+        - strong: "3.1"
+        - text: WOL 2 max 5.3
+      - cell "2.5 BOU 3 max 4.6":
+        - strong: "2.5"
+        - text: BOU 3 max 4.6
+      - cell "2.5 ARS 4 max 4.7":
+        - strong: "2.5"
+        - text: ARS 4 max 4.7
+      - cell "3.3 NFO 3 max 4.3":
+        - strong: "3.3"
+        - text: NFO 3 max 4.3
+      - cell "2.6 BHA 3 max 4.4":
+        - strong: "2.6"
+        - text: BHA 3 max 4.4
+      - cell "3.5 FUL 3 max 4.5":
+        - strong: "3.5"
+        - text: FUL 3 max 4.5
+    - row "☆ Smith Def BOU £4.5M 100.0% 4.7 21.2 0.0 0.0% 21.2 2.4 1.5 LIV 5 max 4.2 3.0 WOL 2 max 4.7 1.8 TOT 3 max 4.1 2.7 BHA 3 max 5.3 1.9 NEW 3 max 4.6 2.8 LEE 2 max 4.7 2.7 FUL 3 max 4.3 2.2 CRY 3 max 4.4 2.6 NFO 3 max 4.5":
+      - cell "☆":
+        - button "☆"
+      - cell "Smith":
+        - link "Smith":
+          - /url: /player/156
+      - cell "Def"
+      - cell "BOU":
+        - link "BOU":
+          - /url: /team/4
+      - cell "£4.5M"
+      - cell "100.0%"
+      - cell "4.7"
+      - cell "21.2"
+      - cell "0.0"
+      - cell "0.0%"
+      - cell "21.2"
+      - cell "2.4":
+        - strong: "2.4"
+      - cell "1.5 LIV 5 max 4.2":
+        - strong: "1.5"
+        - text: LIV 5 max 4.2
+      - cell "3.0 WOL 2 max 4.7":
+        - strong: "3.0"
+        - text: WOL 2 max 4.7
+      - cell "1.8 TOT 3 max 4.1":
+        - strong: "1.8"
+        - text: TOT 3 max 4.1
+      - cell "2.7 BHA 3 max 5.3":
+        - strong: "2.7"
+        - text: BHA 3 max 5.3
+      - cell "1.9 NEW 3 max 4.6":
+        - strong: "1.9"
+        - text: NEW 3 max 4.6
+      - cell "2.8 LEE 2 max 4.7":
+        - strong: "2.8"
+        - text: LEE 2 max 4.7
+      - cell "2.7 FUL 3 max 4.3":
+        - strong: "2.7"
+        - text: FUL 3 max 4.3
+      - cell "2.2 CRY 3 max 4.4":
+        - strong: "2.2"
+        - text: CRY 3 max 4.4
+      - cell "2.6 NFO 3 max 4.5":
+        - strong: "2.6"
+        - text: NFO 3 max 4.5
+    - row "☆ Wharton Mid CRY £5.0M 100.0% 4.7 23.3 0.0 0.0% 23.3 2.6 2.5 CHE 4 max 6.7 2.9 NFO 3 max 6.1 2.4 AVL 4 max 5.6 3.0 SUN 2 max 7.0 2.6 WHU 2 max 6.6 2.5 LIV 4 max 5.9 2.5 EVE 3 max 5.7 2.7 BOU 3 max 7.4 2.2 ARS 4 max 6.7":
+      - cell "☆":
+        - button "☆"
+      - cell "Wharton":
+        - link "Wharton":
+          - /url: /player/130
+      - cell "Mid"
+      - cell "CRY":
+        - link "CRY":
+          - /url: /team/8
+      - cell "£5.0M"
+      - cell "100.0%"
+      - cell "4.7"
+      - cell "23.3"
+      - cell "0.0"
+      - cell "0.0%"
+      - cell "23.3"
+      - cell "2.6":
+        - strong: "2.6"
+      - cell "2.5 CHE 4 max 6.7":
+        - strong: "2.5"
+        - text: CHE 4 max 6.7
+      - cell "2.9 NFO 3 max 6.1":
+        - strong: "2.9"
+        - text: NFO 3 max 6.1
+      - cell "2.4 AVL 4 max 5.6":
+        - strong: "2.4"
+        - text: AVL 4 max 5.6
+      - cell "3.0 SUN 2 max 7.0":
+        - strong: "3.0"
+        - text: SUN 2 max 7.0
+      - cell "2.6 WHU 2 max 6.6":
+        - strong: "2.6"
+        - text: WHU 2 max 6.6
+      - cell "2.5 LIV 4 max 5.9":
+        - strong: "2.5"
+        - text: LIV 4 max 5.9
+      - cell "2.5 EVE 3 max 5.7":
+        - strong: "2.5"
+        - text: EVE 3 max 5.7
+      - cell "2.7 BOU 3 max 7.4":
+        - strong: "2.7"
+        - text: BOU 3 max 7.4
+      - cell "2.2 ARS 4 max 6.7":
+        - strong: "2.2"
+        - text: ARS 4 max 6.7
+    - row "☆ André Mid WOL £5.5M 100.0% 4.6 25.1 0.0 0.0% 25.1 2.8 2.6 MCI 4 max 6.7 2.8 BOU 3 max 6.1 3.0 EVE 2 max 5.6 2.6 NEW 4 max 7.0 2.9 LEE 2 max 6.6 2.7 TOT 3 max 5.9 2.8 BHA 3 max 5.7 2.6 SUN 2 max 7.4 3.1 BUR 2 max 6.7":
+      - cell "☆":
+        - button "☆"
+      - cell "André":
+        - link "André":
+          - /url: /player/114
+      - cell "Mid"
+      - cell "WOL":
+        - link "WOL":
+          - /url: /team/20
+      - cell "£5.5M"
+      - cell "100.0%"
+      - cell "4.6"
+      - cell "25.1"
+      - cell "0.0"
+      - cell "0.0%"
+      - cell "25.1"
+      - cell "2.8":
+        - strong: "2.8"
+      - cell "2.6 MCI 4 max 6.7":
+        - strong: "2.6"
+        - text: MCI 4 max 6.7
+      - cell "2.8 BOU 3 max 6.1":
+        - strong: "2.8"
+        - text: BOU 3 max 6.1
+      - cell "3.0 EVE 2 max 5.6":
+        - strong: "3.0"
+        - text: EVE 2 max 5.6
+      - cell "2.6 NEW 4 max 7.0":
+        - strong: "2.6"
+        - text: NEW 4 max 7.0
+      - cell "2.9 LEE 2 max 6.6":
+        - strong: "2.9"
+        - text: LEE 2 max 6.6
+      - cell "2.7 TOT 3 max 5.9":
+        - strong: "2.7"
+        - text: TOT 3 max 5.9
+      - cell "2.8 BHA 3 max 5.7":
+        - strong: "2.8"
+        - text: BHA 3 max 5.7
+      - cell "2.6 SUN 2 max 7.4":
+        - strong: "2.6"
+        - text: SUN 2 max 7.4
+      - cell "3.1 BUR 2 max 6.7":
+        - strong: "3.1"
+        - text: BUR 2 max 6.7
+    - row "☆ Buendía Mid AVL £5.5M 100.0% 4.6 25.3 0.0 0.0% 25.3 2.8 3.6 NEW 3 max 6.7 2.4 BRE 3 max 6.1 2.7 CRY 3 max 5.6 2.2 EVE 3 max 7.0 3.1 SUN 2 max 6.6 2.8 FUL 3 max 5.9 3.6 BUR 2 max 5.7 2.6 TOT 3 max 7.4 2.3 MCI 4 max 6.7":
+      - cell "☆":
+        - button "☆"
+      - cell "Buendía":
+        - link "Buendía":
+          - /url: /player/110
+      - cell "Mid"
+      - cell "AVL":
+        - link "AVL":
+          - /url: /team/2
+      - cell "£5.5M"
+      - cell "100.0%"
+      - cell "4.6"
+      - cell "25.3"
+      - cell "0.0"
+      - cell "0.0%"
+      - cell "25.3"
+      - cell "2.8":
+        - strong: "2.8"
+      - cell "3.6 NEW 3 max 6.7":
+        - strong: "3.6"
+        - text: NEW 3 max 6.7
+      - cell "2.4 BRE 3 max 6.1":
+        - strong: "2.4"
+        - text: BRE 3 max 6.1
+      - cell "2.7 CRY 3 max 5.6":
+        - strong: "2.7"
+        - text: CRY 3 max 5.6
+      - cell "2.2 EVE 3 max 7.0":
+        - strong: "2.2"
+        - text: EVE 3 max 7.0
+      - cell "3.1 SUN 2 max 6.6":
+        - strong: "3.1"
+        - text: SUN 2 max 6.6
+      - cell "2.8 FUL 3 max 5.9":
+        - strong: "2.8"
+        - text: FUL 3 max 5.9
+      - cell "3.6 BUR 2 max 5.7":
+        - strong: "3.6"
+        - text: BUR 2 max 5.7
+      - cell "2.6 TOT 3 max 7.4":
+        - strong: "2.6"
+        - text: TOT 3 max 7.4
+      - cell "2.3 MCI 4 max 6.7":
+        - strong: "2.3"
+        - text: MCI 4 max 6.7
+    - row "☆ C.Jones Mid LIV £5.5M 100.0% 4.6 25.4 0.0 0.0% 25.4 2.8 3.5 BOU 3 max 6.7 2.6 NEW 4 max 6.1 2.5 ARS 4 max 5.6 2.9 BUR 2 max 7.0 3.1 EVE 2 max 6.6 2.7 CRY 3 max 5.9 2.4 CHE 4 max 5.7 3.0 MUN 3 max 7.4 2.7 BRE 3 max 6.7":
+      - cell "☆":
+        - button "☆"
+      - cell "C.Jones":
+        - link "C.Jones":
+          - /url: /player/109
+      - cell "Mid"
+      - cell "LIV":
+        - link "LIV":
+          - /url: /team/12
+      - cell "£5.5M"
+      - cell "100.0%"
+      - cell "4.6"
+      - cell "25.4"
+      - cell "0.0"
+      - cell "0.0%"
+      - cell "25.4"
+      - cell "2.8":
+        - strong: "2.8"
+      - cell "3.5 BOU 3 max 6.7":
+        - strong: "3.5"
+        - text: BOU 3 max 6.7
+      - cell "2.6 NEW 4 max 6.1":
+        - strong: "2.6"
+        - text: NEW 4 max 6.1
+      - cell "2.5 ARS 4 max 5.6":
+        - strong: "2.5"
+        - text: ARS 4 max 5.6
+      - cell "2.9 BUR 2 max 7.0":
+        - strong: "2.9"
+        - text: BUR 2 max 7.0
+      - cell "3.1 EVE 2 max 6.6":
+        - strong: "3.1"
+        - text: EVE 2 max 6.6
+      - cell "2.7 CRY 3 max 5.9":
+        - strong: "2.7"
+        - text: CRY 3 max 5.9
+      - cell "2.4 CHE 4 max 5.7":
+        - strong: "2.4"
+        - text: CHE 4 max 5.7
+      - cell "3.0 MUN 3 max 7.4":
+        - strong: "3.0"
+        - text: MUN 3 max 7.4
+      - cell "2.7 BRE 3 max 6.7":
+        - strong: "2.7"
+        - text: BRE 3 max 6.7
+- status: Showing 1 to 100 of 666 entries
+- link "Previous" [disabled]
+- link "1"
+- link "2"
+- link "3"
+- link "4"
+- link "5"
+- link "6"
+- link "7"
+- link "Next"
+```

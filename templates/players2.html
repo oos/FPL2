@@ -11,6 +11,45 @@
     .views-section { background: #fff; padding: 20px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 1rem; transition: all 0.3s ease; }
     .views-section:hover { box-shadow: 0 4px 20px rgba(0,0,0,0.15); transform: translateY(-2px); }
     .views-section h5 { color: #2c3e50; margin-bottom: 1rem; }
+    /* Hide save controls until needed */
+    .save-controls { display: none; }
+    /* Column sizing and compaction to fit the entire table on screen, using auto layout like Players page */
+    #players2Table { width: 100% !important; table-layout: auto; font-size: 0.9rem; }
+    #players2Table th, #players2Table td { padding: 0.35rem 0.4rem; }
+    /* Ensure headers and data share the same alignment to avoid visual misalignment */
+    .dataTables_wrapper .dataTable thead th,
+    .dataTables_wrapper .dataTable tbody td { text-align: center; }
+    /* Left-align text-heavy columns to match data */
+    #players2Table thead th:nth-child(2), #players2Table tbody td:nth-child(2), /* Name */
+    #players2Table thead th:nth-child(4), #players2Table tbody td:nth-child(4)  /* Team */
+    { text-align: left; }
+    /* Allow header text to wrap across multiple lines (strong specificity for DataTables) */
+    .dataTables_wrapper table.dataTable thead th,
+    #players2Table thead th {
+      white-space: normal !important;
+      overflow-wrap: anywhere;
+      word-break: break-word;
+      hyphens: auto;
+      line-height: 1.1;
+    }
+    
+    /* Allow name and team to wrap to reduce width (narrower) */
+    #players2Table th:nth-child(2), #players2Table td:nth-child(2) { white-space: normal; min-width: 100px; padding-left: 0.3rem; padding-right: 0.3rem; }
+    #players2Table th:nth-child(4), #players2Table td:nth-child(4) { white-space: normal; min-width: 72px; padding-left: 0.3rem; padding-right: 0.3rem; }
+    /* Narrow star column */
+    #players2Table th:nth-child(1), #players2Table td:nth-child(1) { width: 28px; }
+    /* Compact GW columns and center align (GW1 starts at column 13: star,name,pos,team,price,chance,ppm,total,form,own,xP,Avg xP = 12) */
+    #players2Table th:nth-child(n+13), #players2Table td:nth-child(n+13) { min-width: 64px; text-align: center !important; white-space: normal; }
+    .gw-cell strong { font-size: 0.95em; }
+    .gw-cell small { font-size: 0.78em; }
+    /* Ensure wrappers also stretch full width */
+    .table-responsive { width: 100% !important; margin: 0 !important; padding: 0 !important; }
+    .dataTables_wrapper { width: 100% !important; }
+    .dataTables_wrapper .dataTable { width: 100% !important; }
+    /* Ensure native clear (x) icon shows for search inputs on WebKit */
+    input[type="search"]::-webkit-search-cancel-button {
+      -webkit-appearance: searchfield-cancel-button;
+    }
   </style>
 </head>
 <body class="p-4">
@@ -22,20 +61,77 @@
       <h5><i class="fas fa-bookmark"></i> Save & Load Views</h5>
       <div class="row g-2">
         <div class="col-md-4">
-          <label for="viewName" class="form-label">View Name:</label>
-          <input type="text" id="viewName" class="form-control" placeholder="Enter view name">
-        </div>
-        <div class="col-md-4">
-          <label for="loadView" class="form-label">Load View or Quick Sort:</label>
+          <label for="loadView" class="form-label">Select View</label>
           <select id="loadView" class="form-select">
             <option value="">Select a view or sorting option...</option>
           </select>
         </div>
-        <div class="col-md-4 d-flex align-items-end">
-          <div>
+        <div class="col-md-4 save-controls">
+          <label for="viewName" class="form-label">View Name:</label>
+          <input type="search" id="viewName" class="form-control" placeholder="Enter view name">
+        </div>
+        <div class="col-md-4 save-controls">
+          <div class="d-flex align-items-end">
             <button id="saveView" class="btn btn-success me-2"><i class="fas fa-save"></i> Save View</button>
-            <button id="loadViewBtn" class="btn btn-primary"><i class="fas fa-folder-open"></i> Load View</button>
           </div>
+        </div>
+      </div>
+    </div>
+    <!-- Filters Row: Position + Team -->
+    <div class="mb-3">
+      <div class="row g-2 align-items-end">
+        <div class="col-md-3">
+          <label for="positionFilter2" class="form-label">Position</label>
+          <select id="positionFilter2" class="form-select">
+            <option value="">All</option>
+            <option value="Goalkeeper">Goalkeeper</option>
+            <option value="Defender">Defender</option>
+            <option value="Midfielder">Midfielder</option>
+            <option value="Forward">Forward</option>
+          </select>
+        </div>
+        <div class="col-md-3">
+          <label for="teamFilter2" class="form-label">Team</label>
+          <select id="teamFilter2" class="form-select">
+            <option value="">All</option>
+            {% set teams2 = (players | map(attribute='team') | list) %}
+            {% set teams2 = teams2 | unique | sort %}
+            {% for t in teams2 %}
+              {% if t %}<option value="{{ t }}">{{ t }}</option>{% endif %}
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-md-3">
+          <label for="maxPrice2" class="form-label">Max Price (£M)</label>
+          <input type="search" inputmode="decimal" id="maxPrice2" class="form-control" placeholder="e.g. 6.5">
+        </div>
+        <div class="col-md-3 text-end">
+          <button type="button" id="clearFilters2" class="btn btn-outline-secondary">Clear all filters</button>
+        </div>
+      </div>
+    </div>
+    <!-- Advanced Numeric Filters -->
+    <div class="mb-3">
+      <div class="row g-2 align-items-end">
+        <div class="col-md-2">
+          <label for="minChance2" class="form-label">Min Chance %</label>
+          <input type="search" inputmode="decimal" id="minChance2" class="form-control" placeholder=">=75">
+        </div>
+        <div class="col-md-2">
+          <label for="minPPM2" class="form-label">Min Points/£</label>
+          <input type="search" inputmode="decimal" id="minPPM2" class="form-control" placeholder=">=50">
+        </div>
+        <div class="col-md-2">
+          <label for="minTotal2" class="form-label">Min Total Points</label>
+          <input type="search" inputmode="decimal" id="minTotal2" class="form-control" placeholder=">=100">
+        </div>
+        <div class="col-md-2">
+          <label for="minForm2" class="form-label">Min Form</label>
+          <input type="search" inputmode="decimal" id="minForm2" class="form-control" placeholder=">=5">
+        </div>
+        <div class="col-md-2">
+          <label for="minOwn2" class="form-label">Min Ownership %</label>
+          <input type="search" inputmode="decimal" id="minOwn2" class="form-control" placeholder=">=0">
         </div>
       </div>
     </div>
@@ -54,12 +150,13 @@
             <th>Position</th>
             <th>Team</th>
             <th>Price</th>
-            <th>Chance %</th>
-            <th>Points/£</th>
-            <th>Total Points</th>
+            <th>Chance<br>%</th>
+            <th>Points<br>/£</th>
+            <th>Total<br>Points</th>
             <th>Form</th>
-            <th>Ownership %</th>
-            <th>Avg xP</th>
+            <th>Own<br>%</th>
+            <th>xP</th>
+            <th>Avg<br>xP</th>
             <th>GW1</th>
             <th>GW2</th>
             <th>GW3</th>
@@ -74,20 +171,21 @@
         <tbody>
           {% set W = watch_ids or [] %}
           {% for p in players %}
-          <tr>
+          <tr data-pos="{{ p.position }}" data-team-full="{{ p.team }}">
             <td>
               <button type="button" class="btn btn-sm p-0 watch-star2 {{ 'text-warning' if p.id in W else '' }}" data-player-id="{{ p.id }}">{{ '★' if p.id in W else '☆' }}</button>
             </td>
             <td><a href="/player/{{ p.id }}" class="text-decoration-none">{{ p.name }}</a></td>
             {% set poscls = 'gk' if p.position=='Goalkeeper' else ('def' if p.position=='Defender' else ('mid' if p.position=='Midfielder' else 'fwd')) %}
             <td><span class="badge badge-pos {{ poscls }}">{{ p.position[0:3] }}</span></td>
-            <td>{% if p.team_id %}<a href="/team/{{ p.team_id }}" class="text-decoration-none">{{ p.team }}</a>{% else %}{{ p.team }}{% endif %}</td>
-            <td>£{{ '%.1f'|format(p.price or 0) }}M</td>
+            <td>{% if p.team_id %}<a href="/team/{{ p.team_id }}" class="text-decoration-none">{{ p.team_short or p.team }}</a>{% else %}{{ p.team_short or p.team }}{% endif %}</td>
+            <td data-order="{{ p.price or 0 }}">£{{ '%.1f'|format(p.price or 0) }}M</td>
             <td>{{ '%.1f'|format(p.chance_of_playing_next_round or 0) }}%</td>
             <td>{{ '%.1f'|format(p.points_per_million or 0) }}</td>
             <td>{{ '%.1f'|format(p.total_points or 0) }}</td>
             <td>{{ '%.1f'|format(p.form or 0) }}</td>
             <td>{{ '%.1f'|format(p.ownership or 0) }}%</td>
+            <td>{{ '%.1f'|format(p.total_points or 0) }}</td>
             {% set avgxp = ((p.gw1_points or 0) + (p.gw2_points or 0) + (p.gw3_points or 0) + (p.gw4_points or 0) + (p.gw5_points or 0) + (p.gw6_points or 0) + (p.gw7_points or 0) + (p.gw8_points or 0) + (p.gw9_points or 0)) / 9.0 %}
             <td><strong>{{ '%.1f'|format(avgxp) }}</strong></td>
             {# GW cells with opponent short + FDR badge if available #}
@@ -97,9 +195,13 @@
               {% set fdr = 'gw' ~ gw ~ '_fdr' %}
               {% set f = p[fdr] if fdr in p else None %}
               {% set color = 'success' if f and f <= 2 else ('warning' if f == 3 else 'danger') %}
-              <td>
+              <td class="gw-cell">
                 <strong>{{ '%.1f'|format(p[pts] or 0) }}</strong><br>
                 <small>{{ p[opp] or '' }} {% if f %}<span class="badge bg-{{ color }}">{{ f }}</span>{% endif %}</small>
+                {% set pos = p.position %}
+                {% if max_by_pos and max_by_pos.get(pos) %}
+                  <br><small class="text-muted">max {{ '%.1f'|format(max_by_pos[pos][gw] or 0) }}</small>
+                {% endif %}
               </td>
             {% endfor %}
           </tr>
@@ -114,9 +216,12 @@
   <script>
     $(function(){
       const table = $('#players2Table').DataTable({
-        order: [[6, 'desc'], [7, 'desc']], // default like Players: Points/£ then Total Points
-        pageLength: 25
+        order: [[6, 'desc'], [9, 'desc']], // default: Points/£ then xP (moved before Avg xP)
+        pageLength: 100,
+        autoWidth: false,
+        scrollX: false
       });
+      table.columns.adjust();
 
       // Watchlist toggle
       $('#players2Table').on('click', '.watch-star2', async function(e){
@@ -147,6 +252,80 @@
       $.fn.dataTable.ext.search.push(wlPred);
       $('#wlOnly').on('change', function(){ table.draw(false); });
 
+      // Position filter implementation
+      $.fn.dataTable.ext.search = $.fn.dataTable.ext.search.filter(f => f._id !== 'pos2');
+      const posPred = function(settings, data, dataIndex){
+        const sel = $('#positionFilter2').val();
+        if (!sel) return true;
+        if (!settings || !settings.nTable || settings.nTable.id !== 'players2Table') return true;
+        const node = settings.aoData[dataIndex] && settings.aoData[dataIndex].nTr;
+        const full = ($(node).data('pos') || '').toString();
+        return full === sel;
+      };
+      posPred._id = 'pos2';
+      $.fn.dataTable.ext.search.push(posPred);
+      $('#positionFilter2').on('change', function(){ table.draw(false); });
+
+      // Team filter (by full team name on the row data attribute)
+      $.fn.dataTable.ext.search = $.fn.dataTable.ext.search.filter(f => f._id !== 'team2');
+      const teamPred = function(settings, data, dataIndex){
+        const sel = $('#teamFilter2').val();
+        if (!sel) return true;
+        if (!settings || !settings.nTable || settings.nTable.id !== 'players2Table') return true;
+        const node = settings.aoData[dataIndex] && settings.aoData[dataIndex].nTr;
+        const fullTeam = ($(node).data('team-full') || '').toString();
+        return fullTeam === sel;
+      };
+      teamPred._id = 'team2';
+      $.fn.dataTable.ext.search.push(teamPred);
+      $('#teamFilter2').on('change', function(){ table.draw(false); });
+
+      // Max Price filter (numeric compare against Price column)
+      $.fn.dataTable.ext.search = $.fn.dataTable.ext.search.filter(f => f._id !== 'maxprice2');
+      const maxPricePred = function(settings, data, dataIndex){
+        const val = ($('#maxPrice2').val() || '').trim();
+        if (!val) return true;
+        if (!settings || !settings.nTable || settings.nTable.id !== 'players2Table') return true;
+        // Price column (5th, index 4) displays like '£4.5M' → extract float
+        const priceText = data[4] || '';
+        const m = priceText.match(/([0-9]+(?:\.[0-9]+)?)/);
+        const price = m ? parseFloat(m[1]) : NaN;
+        const limit = parseFloat(val);
+        if (Number.isNaN(limit)) return true;
+        if (Number.isNaN(price)) return false;
+        return price <= limit;
+      };
+      maxPricePred._id = 'maxprice2';
+      $.fn.dataTable.ext.search.push(maxPricePred);
+      $('#maxPrice2').on('input change', function(){ table.draw(false); });
+
+      // Advanced numeric filters predicate
+      $.fn.dataTable.ext.search = $.fn.dataTable.ext.search.filter(f => f._id !== 'advnum2');
+      const advNumPred = function(settings, data, dataIndex){
+        if (!settings || !settings.nTable || settings.nTable.id !== 'players2Table') return true;
+        // Column indices based on current table: price=4, chance=5, ppm=6, totalPoints=7, form=8, own=9
+        const parseNum = (txt)=>{ const m=(txt||'').toString().match(/-?[0-9]+(?:\.[0-9]+)?/); return m?parseFloat(m[0]):NaN; };
+        const chance = parseNum(data[5]);
+        const ppm = parseNum(data[6]);
+        const total = parseNum(data[7]);
+        const form = parseNum(data[8]);
+        const own = parseNum(data[9]);
+        const minChance = parseFloat(($('#minChance2').val()||'').trim());
+        const minPPM = parseFloat(($('#minPPM2').val()||'').trim());
+        const minTotal = parseFloat(($('#minTotal2').val()||'').trim());
+        const minForm = parseFloat(($('#minForm2').val()||'').trim());
+        const minOwn = parseFloat(($('#minOwn2').val()||'').trim());
+        if (!Number.isNaN(minChance) && !(chance>=minChance)) return false;
+        if (!Number.isNaN(minPPM) && !(ppm>=minPPM)) return false;
+        if (!Number.isNaN(minTotal) && !(total>=minTotal)) return false;
+        if (!Number.isNaN(minForm) && !(form>=minForm)) return false;
+        if (!Number.isNaN(minOwn) && !(own>=minOwn)) return false;
+        return true;
+      };
+      advNumPred._id = 'advnum2';
+      $.fn.dataTable.ext.search.push(advNumPred);
+      $('#minChance2,#minPPM2,#minTotal2,#minForm2,#minOwn2').on('input change', function(){ table.draw(false); });
+
       // ===== Save & Load Views (ported from Players page; adapted for Players2) =====
       function showNotification(message, type){
         try { console.log(type || 'info', message); } catch(_e) {}
@@ -154,28 +333,29 @@
 
       function createDefaultValuePointsView(){
         const saved = JSON.parse(localStorage.getItem('fplPlayerViews') || '{}');
-        if (!saved['Best Value Players']) {
-          saved['Best Value Players'] = {
-            name: 'Best Value Players',
-            description: 'Points/£ + Total Points',
-            sorting: [[6, 'desc'], [7, 'desc']],
-            pageLength: 25,
+        const defName = 'Best Value Players';
+        if (!saved[defName]) {
+          saved[defName] = {
+            name: defName,
+            description: 'Points/£ + xP',
+            sorting: [[6, 'desc'], [9, 'desc']],
+            pageLength: 100,
             search: ''
           };
-          localStorage.setItem('fplPlayerViews', JSON.stringify(saved));
+        } else {
+          // Ensure default uses 100 rows even if an older saved copy exists
+          if (saved[defName].pageLength !== 100) {
+            saved[defName].pageLength = 100;
+          }
         }
+        localStorage.setItem('fplPlayerViews', JSON.stringify(saved));
       }
 
       function updateViewsDropdown(){
         const saved = JSON.parse(localStorage.getItem('fplPlayerViews') || '{}');
         const names = Object.keys(saved);
         const sel = $('#loadView');
-        sel.empty().append('<option value="">Select a view or sorting option...</option>');
-        sel.append('<optgroup label="Quick Sorting Options">');
-        sel.append('<option value="sort_points">📊 Sort by Total Points (High to Low)</option>');
-        sel.append('<option value="sort_value">💰 Sort by Points/£ (High to Low)</option>');
-        sel.append('<option value="sort_value_points">🎯 Sort by Value + Points (Best Value First)</option>');
-        sel.append('</optgroup>');
+        sel.empty().append('<option value="">Select a view...</option>');
         if (names.length){
           sel.append('<optgroup label="Saved Views">');
           names.forEach(n=>{
@@ -185,26 +365,92 @@
           });
           sel.append('</optgroup>');
         }
+        // Hide save controls by default (existing view or quick sort are selected by default)
+        $('.save-controls').hide();
+      }
+
+      function arraysEqual(a, b){
+        try { return JSON.stringify(a) === JSON.stringify(b); } catch(_e) { return false; }
+      }
+
+      function getMatchingSavedViewName(){
+        try {
+          const saved = JSON.parse(localStorage.getItem('fplPlayerViews') || '{}');
+          const curOrder = table.order();
+          const curLen = table.page.len();
+          const curSearch = table.search();
+          for (const name of Object.keys(saved)){
+            const v = saved[name];
+            if (arraysEqual(v.sorting || [], curOrder) && (v.pageLength || 25) === curLen && (v.search || '') === curSearch){
+              return name;
+            }
+          }
+          return null;
+        } catch(_e) { return null; }
+      }
+
+      function updateSelectForCurrentView(){
+        try {
+          const match = getMatchingSavedViewName();
+          if (match && $('#loadView option[value="'+match.replace(/"/g,'\\"')+'"]').length){
+            $('#loadView').val(match);
+            return;
+          }
+          $('#loadView').val('');
+        } catch(_e) { $('#loadView').val(''); }
+      }
+
+      function getSuggestedName(){
+        try {
+          const ord = table.order();
+          if (ord && ord.length){
+            const colIdx = ord[0][0];
+            const headerText = $(table.column(colIdx).header()).text().replace(/\s+/g,' ').trim();
+            if (headerText) return `Sort by ${headerText}`;
+          }
+        } catch(_e) {}
+        return 'Custom View';
+      }
+
+      function evaluateSaveControls(){
+        try {
+          const match = getMatchingSavedViewName();
+          if (match){
+            $('.save-controls').hide();
+            return;
+          }
+          // No matching saved view → show controls and auto-suggest unless user has typed a custom name
+          $('.save-controls').show();
+          const $vn = $('#viewName');
+          const userEdited = !$vn.data('autofill') && ($vn.val() || '').length > 0;
+          if (!userEdited){
+            const suggestion = getSuggestedName();
+            $vn.val(suggestion);
+            $vn.data('autofill', true);
+          }
+        } catch(_e) { $('.save-controls').hide(); }
       }
 
       function handleQuickSort(key){
         switch(key){
           case 'sort_points':
-            table.order([7,'desc']).draw();
-            showNotification('Sorted by Total Points (High to Low)','success');
+            table.order([9,'desc']).draw();
+            showNotification('Sorted by xP (High to Low)','success');
             break;
           case 'sort_value':
             table.order([6,'desc']).draw();
             showNotification('Sorted by Points/£ (High to Low)','success');
             break;
           case 'sort_value_points':
-            table.order([[6,'desc'],[7,'desc']]).draw();
-            showNotification('Sorted by Value + Points (Best Value First)','success');
+            table.order([[6,'desc'],[9,'desc']]).draw();
+            showNotification('Sorted by Value + xP (Best Value First)','success');
             break;
           default:
             showNotification('Unknown sorting option','error');
         }
-        $('#loadView').val('');
+        // Keep dropdown reflecting the selected quick sort
+        $('#loadView').val(key);
+        updateSelectForCurrentView();
       }
 
       function saveView(){
@@ -226,8 +472,7 @@
 
       function loadView(){
         const sel = $('#loadView').val();
-        if (!sel){ showNotification('Please select a view or sorting option','info'); return; }
-        if (sel.startsWith('sort_')){ handleQuickSort(sel); return; }
+        if (!sel){ showNotification('Please select a view','info'); return; }
         const saved = JSON.parse(localStorage.getItem('fplPlayerViews') || '{}');
         const v = saved[sel];
         if (!v){ showNotification('View not found','info'); return; }
@@ -235,12 +480,86 @@
         if (v.pageLength){ table.page.len(v.pageLength).draw(); }
         if (typeof v.search === 'string'){ table.search(v.search).draw(); }
         showNotification(`View "${sel}" loaded`,'success');
+        updateSelectForCurrentView();
       }
 
-      $('#saveView').on('click', saveView);
-      $('#loadViewBtn').on('click', loadView);
+      $('#saveView').on('click', function(){ saveView(); updateSelectForCurrentView(); });
+      // Show save controls only if the current selection is not an existing saved view or quick-sort
+      $('#loadView').on('change', function(){
+        const val = $(this).val() || '';
+        const saved = JSON.parse(localStorage.getItem('fplPlayerViews') || '{}');
+        const exists = !!saved[val];
+        // Selecting from dropdown should not expose save controls; clear any typed name
+        $('#viewName').val('').data('autofill', false);
+        $('.save-controls').hide();
+        // Apply immediately if it is a saved view
+        if (exists){
+          const v = saved[val];
+          if (v.sorting){ table.order(v.sorting).draw(); }
+          if (v.pageLength){ table.page.len(v.pageLength).draw(); }
+          if (typeof v.search === 'string'){ table.search(v.search).draw(); }
+        }
+        updateSelectForCurrentView();
+        evaluateSaveControls();
+      });
+
+      // Keep dropdown synced with state; do not auto-show save controls on sort/search/length
+      table.on('order.dt search.dt length.dt', function(){
+        updateSelectForCurrentView();
+        evaluateSaveControls();
+      });
       createDefaultValuePointsView();
       updateViewsDropdown();
+      // Make "Best Value Players" the default view if present
+      try {
+        const saved = JSON.parse(localStorage.getItem('fplPlayerViews') || '{}');
+        const def = saved['Best Value Players'];
+        if (def) {
+          // select it in dropdown if option exists
+          if ($('#loadView option[value="Best Value Players"]').length) {
+            $('#loadView').val('Best Value Players');
+          }
+          if (def.sorting) { table.order(def.sorting).draw(); }
+          // force 100 entries for default
+          table.page.len(def.pageLength || 100).draw();
+          if (typeof def.search === 'string') { table.search(def.search).draw(); }
+          // hide save controls for default view
+          $('.save-controls').hide();
+        }
+      } catch(_e) {}
+      updateSelectForCurrentView();
+      evaluateSaveControls();
+
+      // Toggle Save controls when user types a new view name
+      $('#viewName').on('input', function(){
+        // mark as user-edited so we don't overwrite on next evaluation
+        $(this).data('autofill', false);
+        evaluateSaveControls();
+      });
+
+      // Show/hide clear button for view name and clear on click
+      // Native clear button in search inputs will fire 'input' event, which we already handle
+
+      // Keep dropdown synced with current state on common interactions
+      table.on('order.dt', updateSelectForCurrentView);
+      $(document).on('input', '#players2Table_filter input', updateSelectForCurrentView);
+      $(document).on('change', '#players2Table_length select', updateSelectForCurrentView);
+
+      // Clear all filters (Position, Team, Watchlist, Global search)
+      $('#clearFilters2').on('click', function(){
+        try {
+          $('#positionFilter2').val('');
+          $('#teamFilter2').val('');
+          $('#maxPrice2').val('');
+          $('#wlOnly').prop('checked', false);
+          // Clear DataTables global search and sync visible input
+          table.search('');
+          const dtInput = $('#players2Table_filter input');
+          if (dtInput.length) dtInput.val('');
+          table.draw(false);
+          updateSelectForCurrentView();
+        } catch(_e) {}
+      });
     });
   </script>
 </body>

@@ -248,8 +248,17 @@ def create_app(config_name: str | None = None):
                 pdata[f'gw{gw}_opp'] = opp
                 pdata[f'gw{gw}_fdr'] = fdr
 
+        # Compute position-wise max GW points (for displaying under FDR)
+        positions = ['Goalkeeper', 'Defender', 'Midfielder', 'Forward']
+        max_by_pos: dict[str, dict[int, float]] = {pos: {gw: 0.0 for gw in range(1, 10)} for pos in positions}
+        for pos in positions:
+            for gw in range(1, 10):
+                key = f'gw{gw}_points'
+                vals = [float(p.get(key) or 0.0) for p in players if (p.get('position') == pos)]
+                max_by_pos[pos][gw] = max(vals) if vals else 0.0
+
         watch_ids = db.get_watchlist_ids()
-        return render_template('players2.html', players=players, watch_ids=watch_ids)
+        return render_template('players2.html', players=players, watch_ids=watch_ids, max_by_pos=max_by_pos)
 
     @app.route('/players/individual')
     def players_individual_redirect():
