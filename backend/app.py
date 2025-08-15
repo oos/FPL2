@@ -30,13 +30,12 @@ def create_app():
         fixtures_by_gw = {}
         for f in fixtures:
             fixtures_by_gw.setdefault(f.gameweek, []).append(f)
-        upcoming_gw = None
-        for gw in gws:
-            if len(fixtures_by_gw.get(gw, [])) >= 10:
-                upcoming_gw = gw
-                break
-        if upcoming_gw is None:
-            upcoming_gw = gws[0] if gws else 1
+        # Choose the GW with the most fixtures overall to maximize the list.
+        # This avoids showing only a few games when data is partially populated.
+        upcoming_gw = (
+            sorted(gws, key=lambda gw: (-len(fixtures_by_gw.get(gw, [])), gw))[0]
+            if gws else 1
+        )
 
         # All fixtures for upcoming GW (sorted by combined difficulty)
         gw_fixtures = fixtures_by_gw.get(upcoming_gw, [])
@@ -61,6 +60,20 @@ def create_app():
             bench = entry.get('bench', [])
             formation = squad_service.get_formation(starting_xi)
             gw_points = sum(p.get(f"gw{upcoming_gw}_points", 0) or 0 for p in starting_xi)
+        else:
+            # Try to find the nearest GW in strategy data to avoid empty XI
+            if strategy:
+                available_gws = sorted(strategy.keys())
+                nearest = min(available_gws, key=lambda g: abs(g - upcoming_gw))
+                entry = strategy.get(nearest, {})
+                starting_xi = entry.get('starting_xi', [])
+                bench = entry.get('bench', [])
+                formation = squad_service.get_formation(starting_xi) if starting_xi else 'Unknown'
+                gw_points = sum(p.get(f"gw{nearest}_points", 0) or 0 for p in starting_xi)
+
+        # Build mapping for team name -> id for linking in templates
+        teams_all = db_manager.get_all_teams()
+        team_id_by_name = {t.name: t.id for t in teams_all}
 
         return render_template(
             'dashboard.html',
@@ -72,6 +85,7 @@ def create_app():
             formation=formation,
             gw_points=gw_points,
             all_fixtures=all_fixtures,
+            team_id_by_name=team_id_by_name,
         )
 
     # FDR page
@@ -93,9 +107,60 @@ def create_app():
         db_manager = current_app.db_manager # Access db_manager from app context
         players = db_manager.get_all_players()
         teams = db_manager.get_all_teams()
+        fixtures = db_manager.get_all_fixtures()
         
         # Convert Player objects to dictionaries for template
         players_data = [player.to_dict() for player in players]
+
+        # Build opponent/FDR mapping per team and GW
+        team_short_by_name = {t.name: t.short_name for t in teams}
+        team_id_by_name = {t.name: t.id for t in teams}
+
+        # Normalization helper to align inconsistent names like "Nott'm Forest" → "Nottingham Forest"
+        import re
+        def norm(s: str) -> str:
+            if not s:
+                return ''
+            return re.sub(r'[^a-z0-9]', '', s.lower())
+
+        # Canonical name by normalized key
+        canonical_by_norm = {norm(t.name): t.name for t in teams}
+
+        # Maps keyed by canonical team name and team id
+        fdr_map_by_name: dict[tuple[str, int], tuple[str, int]] = {}
+        fdr_map_by_id: dict[tuple[int, int], tuple[str, int]] = {}
+        for fx in fixtures:
+            # Resolve canonical names from fixtures (which may be ids-as-text or variant names)
+            home_name = canonical_by_norm.get(norm(fx.home_team), fx.home_team)
+            away_name = canonical_by_norm.get(norm(fx.away_team), fx.away_team)
+            home_id = team_id_by_name.get(home_name)
+            away_id = team_id_by_name.get(away_name)
+            # Name-keyed
+            fdr_map_by_name[(home_name, fx.gameweek)] = (away_name, fx.home_difficulty)
+            fdr_map_by_name[(away_name, fx.gameweek)] = (home_name, fx.away_difficulty)
+            # Id-keyed (only if ids are known)
+            if home_id is not None and away_id is not None:
+                fdr_map_by_id[(home_id, fx.gameweek)] = (away_name, fx.home_difficulty)
+                fdr_map_by_id[(away_id, fx.gameweek)] = (home_name, fx.away_difficulty)
+
+        # Enrich players with opponent short and FDR for GW1-9
+        for pdata in players_data:
+            # Canonical player team name
+            team_name = canonical_by_norm.get(norm(pdata.get('team')), pdata.get('team'))
+            team_id = pdata.get('team_id')
+            for gw in range(1, 10):
+                opp, fdr = None, None
+                # Prefer id-based lookup if available
+                if team_id and (team_id, gw) in fdr_map_by_id:
+                    opp_name, fdr_val = fdr_map_by_id[(team_id, gw)]
+                    opp = team_short_by_name.get(opp_name, (opp_name or '')[:3].upper())
+                    fdr = fdr_val
+                elif (team_name, gw) in fdr_map_by_name:
+                    opp_name, fdr_val = fdr_map_by_name[(team_name, gw)]
+                    opp = team_short_by_name.get(opp_name, (opp_name or '')[:3].upper())
+                    fdr = fdr_val
+                pdata[f'gw{gw}_opp'] = opp
+                pdata[f'gw{gw}_fdr'] = fdr
         
         # Get unique positions and teams for dropdowns
         positions = ['Goalkeeper', 'Defender', 'Midfielder', 'Forward']
@@ -318,7 +383,10 @@ def create_app():
             if os.path.exists(candidate):
                 logo_file = f"assets/teams/{short}.{ext}"
                 break
-        return render_template('team.html', team=team.to_dict(), squad=squad, fixtures=fixtures, team_logo_file=logo_file)
+        # Mapping of team name to id for schedule links
+        teams_all = db_manager.get_all_teams()
+        team_id_by_name = {t.name: t.id for t in teams_all}
+        return render_template('team.html', team=team.to_dict(), squad=squad, fixtures=fixtures, team_logo_file=logo_file, team_id_by_name=team_id_by_name)
     
     @app.route('/api/fdr')
     def api_fdr():

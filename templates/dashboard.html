@@ -22,16 +22,17 @@
           <h4 class="mb-1">Upcoming Gameweek</h4>
           <div class="mb-2">GW: <strong>{{ upcoming_gw }}</strong></div>
           <h5 class="mt-2">All Fixtures (GW{{ upcoming_gw }})</h5>
+          <div class="text-muted" style="font-size: 0.9rem;">Showing {{ all_fixtures|length }} fixtures</div>
           <div class="table-responsive">
             <table class="table table-sm">
               <tbody>
                 {% for f in all_fixtures %}
                 <tr>
-                  <td class="text-end pe-2">{{ f.home_team }}</td>
+                  <td class="text-end pe-2">{% if team_id_by_name.get(f.home_team) %}<a href="/team/{{ team_id_by_name.get(f.home_team) }}" class="text-decoration-none">{{ f.home_team }}</a>{% else %}{{ f.home_team }}{% endif %}</td>
                   <td><span class="fdr-badge" style="background:#4a7c59">{{ f.home_difficulty }}</span></td>
                   <td class="px-2">vs</td>
                   <td><span class="fdr-badge" style="background:#4a7c59">{{ f.away_difficulty }}</span></td>
-                  <td class="ps-2">{{ f.away_team }}</td>
+                  <td class="ps-2">{% if team_id_by_name.get(f.away_team) %}<a href="/team/{{ team_id_by_name.get(f.away_team) }}" class="text-decoration-none">{{ f.away_team }}</a>{% else %}{{ f.away_team }}{% endif %}</td>
                 </tr>
                 {% endfor %}
                 {% if all_fixtures|length == 0 %}

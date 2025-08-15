@@ -37,8 +37,8 @@
                                 {% for f in fixtures %}
                                 <tr>
                                     <td>{{ f.gameweek }}</td>
-                                    <td>{{ f.home_team }}</td>
-                                    <td>{{ f.away_team }}</td>
+                                    <td>{% if team_id_by_name and team_id_by_name.get(f.home_team) %}<a href="/team/{{ team_id_by_name.get(f.home_team) }}" class="text-decoration-none">{{ f.home_team }}</a>{% else %}{{ f.home_team }}{% endif %}</td>
+                                    <td>{% if team_id_by_name and team_id_by_name.get(f.away_team) %}<a href="/team/{{ team_id_by_name.get(f.away_team) }}" class="text-decoration-none">{{ f.away_team }}</a>{% else %}{{ f.away_team }}{% endif %}</td>
                                     <td>{{ f.home_difficulty }}</td>
                                     <td>{{ f.away_difficulty }}</td>
                                 </tr>

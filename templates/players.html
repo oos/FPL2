@@ -383,6 +383,8 @@
             box-shadow: 0 2px 10px rgba(0,0,0,0.08);
             margin-bottom: 1rem;
         }
+        /* Hide legacy filter panel to avoid duplication with header filters */
+        .filters-section { display: none !important; }
         
         .filters-section:hover {
             box-shadow: 0 4px 20px rgba(0,0,0,0.15);
@@ -623,7 +625,7 @@
                         <th>Total Points</th>
                         <th>Form</th>
                         <th>Ownership %</th>
-                        <th>GW1</th>
+                        <th>GW1<br><small>Opp/FDR</small></th>
                         <th>GW2</th>
                         <th>GW3</th>
                         <th>GW4</th>
@@ -847,75 +849,120 @@
                             }
                         },
                         { 
-                            data: 'gw1_points', 
+                            data: null,
                             className: 'text-center',
                             width: '4%',
-                            render: function(data) {
-                                return formatNumber(data, 1);
+                            render: function(row) {
+                                const pts = formatNumber(row.gw1_points, 1);
+                                const opp = row.gw1_opp ? row.gw1_opp : '';
+                                const fdr = row.gw1_fdr;
+                                const color = fdr <= 2 ? 'success' : (fdr === 3 ? 'warning' : 'danger');
+                                const fdrBadge = fdr ? `<span class="badge bg-${color}">${fdr}</span>` : '';
+                                return `${pts}<br><small>${opp} ${fdrBadge}</small>`;
                             }
                         },
                         { 
-                            data: 'gw2_points', 
+                            data: null,
                             className: 'text-center',
                             width: '4%',
-                            render: function(data) {
-                                return formatNumber(data, 1);
+                            render: function(row) {
+                                const pts = formatNumber(row.gw2_points, 1);
+                                const opp = row.gw2_opp ? row.gw2_opp : '';
+                                const fdr = row.gw2_fdr;
+                                const color = fdr <= 2 ? 'success' : (fdr === 3 ? 'warning' : 'danger');
+                                const fdrBadge = fdr ? `<span class=\"badge bg-${color}\">${fdr}</span>` : '';
+                                return `${pts}<br><small>${opp} ${fdrBadge}</small>`;
                             }
                         },
                         { 
-                            data: 'gw3_points', 
+                            data: null,
                             className: 'text-center',
                             width: '4%',
-                            render: function(data) {
-                                return formatNumber(data, 1);
+                            render: function(row) {
+                                const pts = formatNumber(row.gw3_points, 1);
+                                const opp = row.gw3_opp ? row.gw3_opp : '';
+                                const fdr = row.gw3_fdr;
+                                const color = fdr <= 2 ? 'success' : (fdr === 3 ? 'warning' : 'danger');
+                                const fdrBadge = fdr ? `<span class=\"badge bg-${color}\">${fdr}</span>` : '';
+                                return `${pts}<br><small>${opp} ${fdrBadge}</small>`;
                             }
                         },
                         { 
-                            data: 'gw4_points', 
+                            data: null,
                             className: 'text-center',
                             width: '4%',
-                            render: function(data) {
-                                return formatNumber(data, 1);
+                            render: function(row) {
+                                const pts = formatNumber(row.gw4_points, 1);
+                                const opp = row.gw4_opp ? row.gw4_opp : '';
+                                const fdr = row.gw4_fdr;
+                                const color = fdr <= 2 ? 'success' : (fdr === 3 ? 'warning' : 'danger');
+                                const fdrBadge = fdr ? `<span class=\"badge bg-${color}\">${fdr}</span>` : '';
+                                return `${pts}<br><small>${opp} ${fdrBadge}</small>`;
                             }
                         },
                         { 
-                            data: 'gw5_points', 
+                            data: null,
                             className: 'text-center',
                             width: '4%',
-                            render: function(data) {
-                                return formatNumber(data, 1);
+                            render: function(row) {
+                                const pts = formatNumber(row.gw5_points, 1);
+                                const opp = row.gw5_opp ? row.gw5_opp : '';
+                                const fdr = row.gw5_fdr;
+                                const color = fdr <= 2 ? 'success' : (fdr === 3 ? 'warning' : 'danger');
+                                const fdrBadge = fdr ? `<span class=\"badge bg-${color}\">${fdr}</span>` : '';
+                                return `${pts}<br><small>${opp} ${fdrBadge}</small>`;
                             }
                         },
                         { 
-                            data: 'gw6_points', 
+                            data: null,
                             className: 'text-center',
                             width: '4%',
-                            render: function(data) {
-                                return formatNumber(data, 1);
+                            render: function(row) {
+                                const pts = formatNumber(row.gw6_points, 1);
+                                const opp = row.gw6_opp ? row.gw6_opp : '';
+                                const fdr = row.gw6_fdr;
+                                const color = fdr <= 2 ? 'success' : (fdr === 3 ? 'warning' : 'danger');
+                                const fdrBadge = fdr ? `<span class=\"badge bg-${color}\">${fdr}</span>` : '';
+                                return `${pts}<br><small>${opp} ${fdrBadge}</small>`;
                             }
                         },
                         { 
-                            data: 'gw7_points', 
+                            data: null,
                             className: 'text-center',
                             width: '4%',
-                            render: function(data) {
-                                return formatNumber(data, 1);
+                            render: function(row) {
+                                const pts = formatNumber(row.gw7_points, 1);
+                                const opp = row.gw7_opp ? row.gw7_opp : '';
+                                const fdr = row.gw7_fdr;
+                                const color = fdr <= 2 ? 'success' : (fdr === 3 ? 'warning' : 'danger');
+                                const fdrBadge = fdr ? `<span class=\"badge bg-${color}\">${fdr}</span>` : '';
+                                return `${pts}<br><small>${opp} ${fdrBadge}</small>`;
                             }
                         },
                         { 
-                            data: 'gw8_points', 
+                            data: null,
                             className: 'text-center',
                             width: '4%',
-                            render: function(data) {
-                                return formatNumber(data, 1);
+                            render: function(row) {
+                                const pts = formatNumber(row.gw8_points, 1);
+                                const opp = row.gw8_opp ? row.gw8_opp : '';
+                                const fdr = row.gw8_fdr;
+                                const color = fdr <= 2 ? 'success' : (fdr === 3 ? 'warning' : 'danger');
+                                const fdrBadge = fdr ? `<span class=\"badge bg-${color}\">${fdr}</span>` : '';
+                                return `${pts}<br><small>${opp} ${fdrBadge}</small>`;
                             }
                         },
                         { 
-                            data: 'gw9_points', 
+                            data: null,
                             className: 'text-center',
                             width: '4%',
-                            render: function(data) {
-                                return formatNumber(data, 1);
+                            render: function(row) {
+                                const pts = formatNumber(row.gw9_points, 1);
+                                const opp = row.gw9_opp ? row.gw9_opp : '';
+                                const fdr = row.gw9_fdr;
+                                const color = fdr <= 2 ? 'success' : (fdr === 3 ? 'warning' : 'danger');
+                                const fdrBadge = fdr ? `<span class=\"badge bg-${color}\">${fdr}</span>` : '';
+                                return `${pts}<br><small>${opp} ${fdrBadge}</small>`;
                             }
                         }
                     ],
@@ -970,7 +1017,8 @@
             function applyNumericFilter(inputId, columnIndex, comparator) {
                 $(inputId).on('keyup change', function(){
                     const val = this.value.trim();
-                    $.fn.dataTable.ext.search = $.fn.dataTable.ext.search.filter(fn => !fn._col || fn._col !== columnIndex);
+                    // Remove prior header-scope numeric filter for this column
+                    $.fn.dataTable.ext.search = $.fn.dataTable.ext.search.filter(fn => !(fn._scope === 'header' && fn._col === columnIndex));
                     if (!val) { currentTable.draw(); return; }
                     let op = '>='; let num = parseFloat(val.replace(/[^0-9.]/g, ''));
                     if (val.startsWith('<=')) op = '<='; else if (val.startsWith('<')) op = '<';
@@ -981,7 +1029,7 @@
                         if (op === '<=') return cell <= num; if (op === '<') return cell < num;
                         return true;
                     };
-                    predicate._col = columnIndex;
+                    predicate._col = columnIndex; predicate._scope = 'header';
                     $.fn.dataTable.ext.search.push(predicate);
                     currentTable.draw();
                 });
@@ -1002,7 +1050,8 @@
             function addAdvancedNumericFilter(selector, fn) {
                 $(selector).on('keyup change', function(){
                     const val = this.value.trim();
-                    $.fn.dataTable.ext.search = $.fn.dataTable.ext.search.filter(f => !f._adv || f._id !== selector);
+                    // Remove any prior advanced filter with the same id
+                    $.fn.dataTable.ext.search = $.fn.dataTable.ext.search.filter(f => !(f._adv && f._id === selector));
                     if (!val) { currentTable.draw(); return; }
                     let op = '>='; let num = parseFloat(val.replace(/[^0-9.]/g, ''));
                     if (val.startsWith('<=')) op = '<='; else if (val.startsWith('<')) op = '<';
@@ -1322,15 +1371,15 @@
                 const minForm = parseFloat($('#minFormFilter').val()) || 0;
                 const minOwnership = parseFloat($('#minOwnershipFilter').val()) || 0;
                 
-                // Clear any existing custom filters
-                $.fn.dataTable.ext.search.pop();
+                // Clear any existing custom filters (remove header-scope and advanced-scope filters)
+                $.fn.dataTable.ext.search = $.fn.dataTable.ext.search.filter(fn => !(fn._scope === 'panel' || fn._scope === 'header' || fn._adv));
                 
                 // Apply filters to DataTable
                 currentTable.draw();
                 forceCenterAlignment();
                 
                 // Custom filtering function
-                $.fn.dataTable.ext.search.push(function(settings, data, dataIndex) {
+                const panelFilter = function(settings, data, dataIndex) {
                     const player = playersData[dataIndex];
                     
                     if (position && player.position !== position) return false;
@@ -1343,7 +1392,9 @@
                     if (minOwnership && player.ownership < minOwnership) return false;
                     
                     return true;
-                });
+                };
+                panelFilter._scope = 'panel';
+                $.fn.dataTable.ext.search.push(panelFilter);
                 
                 currentTable.draw();
                 forceCenterAlignment();
