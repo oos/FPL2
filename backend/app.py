@@ -200,9 +200,54 @@ def create_app(config_name: str | None = None):
 
     @app.route('/players2')
     def players2_page():
-        """Serve a simple, unmodified table of all players (no filters/customizations)."""
+        """Serve Players2: simple table with working search + enriched data (team short, GW opp/FDR)."""
         db = current_app.db_manager
         players = [p.to_dict() for p in db.get_all_players()]
+        teams = db.get_all_teams()
+        fixtures = db.get_all_fixtures()
+
+        # Build opponent/FDR mapping per team and GW (reuse logic from /players)
+        team_short_by_name = {t.name: t.short_name for t in teams}
+        team_id_by_name = {t.name: t.id for t in teams}
+
+        import re
+        def norm(s: str) -> str:
+            if not s:
+                return ''
+            return re.sub(r'[^a-z0-9]', '', s.lower())
+
+        canonical_by_norm = {norm(t.name): t.name for t in teams}
+
+        fdr_map_by_name: dict[tuple[str, int], tuple[str, int]] = {}
+        fdr_map_by_id: dict[tuple[int, int], tuple[str, int]] = {}
+        for fx in fixtures:
+            home_name = canonical_by_norm.get(norm(fx.home_team), fx.home_team)
+            away_name = canonical_by_norm.get(norm(fx.away_team), fx.away_team)
+            home_id = team_id_by_name.get(home_name)
+            away_id = team_id_by_name.get(away_name)
+            fdr_map_by_name[(home_name, fx.gameweek)] = (away_name, fx.home_difficulty)
+            fdr_map_by_name[(away_name, fx.gameweek)] = (home_name, fx.away_difficulty)
+            if home_id is not None and away_id is not None:
+                fdr_map_by_id[(home_id, fx.gameweek)] = (away_name, fx.home_difficulty)
+                fdr_map_by_id[(away_id, fx.gameweek)] = (home_name, fx.away_difficulty)
+
+        for pdata in players:
+            team_name = canonical_by_norm.get(norm(pdata.get('team')), pdata.get('team'))
+            team_id = pdata.get('team_id')
+            pdata['team_short'] = team_short_by_name.get(team_name, team_name)
+            for gw in range(1, 10):
+                opp, fdr = None, None
+                if team_id and (team_id, gw) in fdr_map_by_id:
+                    opp_name, fdr_val = fdr_map_by_id[(team_id, gw)]
+                    opp = team_short_by_name.get(opp_name, (opp_name or '')[:3].upper())
+                    fdr = fdr_val
+                elif (team_name, gw) in fdr_map_by_name:
+                    opp_name, fdr_val = fdr_map_by_name[(team_name, gw)]
+                    opp = team_short_by_name.get(opp_name, (opp_name or '')[:3].upper())
+                    fdr = fdr_val
+                pdata[f'gw{gw}_opp'] = opp
+                pdata[f'gw{gw}_fdr'] = fdr
+
         watch_ids = db.get_watchlist_ids()
         return render_template('players2.html', players=players, watch_ids=watch_ids)
 

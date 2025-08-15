@@ -4,6 +4,10 @@
   <title>Players2 - Simple Table</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
   <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+  <style>
+    .badge-pos { font-size:.8rem; padding:.35rem .5rem; }
+    .gk{background:#dc3545;color:#fff} .def{background:#007bff;color:#fff} .mid{background:#28a745;color:#fff} .fwd{background:#ffc107;color:#212529}
+  </style>
 </head>
 <body class="p-4">
   {% include '_navbar.html' %}
@@ -49,7 +53,8 @@
               <button type="button" class="btn btn-sm p-0 watch-star2 {{ 'text-warning' if p.id in W else '' }}" data-player-id="{{ p.id }}">{{ '★' if p.id in W else '☆' }}</button>
             </td>
             <td><a href="/player/{{ p.id }}" class="text-decoration-none">{{ p.name }}</a></td>
-            <td>{{ p.position }}</td>
+            {% set poscls = 'gk' if p.position=='Goalkeeper' else ('def' if p.position=='Defender' else ('mid' if p.position=='Midfielder' else 'fwd')) %}
+            <td><span class="badge badge-pos {{ poscls }}">{{ p.position[0:3] }}</span></td>
             <td>{% if p.team_id %}<a href="/team/{{ p.team_id }}" class="text-decoration-none">{{ p.team }}</a>{% else %}{{ p.team }}{% endif %}</td>
             <td>£{{ '%.1f'|format(p.price or 0) }}M</td>
             <td>{{ '%.1f'|format(p.chance_of_playing_next_round or 0) }}%</td>
@@ -59,15 +64,18 @@
             <td>{{ '%.1f'|format(p.ownership or 0) }}%</td>
             {% set avgxp = ((p.gw1_points or 0) + (p.gw2_points or 0) + (p.gw3_points or 0) + (p.gw4_points or 0) + (p.gw5_points or 0) + (p.gw6_points or 0) + (p.gw7_points or 0) + (p.gw8_points or 0) + (p.gw9_points or 0)) / 9.0 %}
             <td><strong>{{ '%.1f'|format(avgxp) }}</strong></td>
-            <td>{{ '%.1f'|format(p.gw1_points or 0) }}</td>
-            <td>{{ '%.1f'|format(p.gw2_points or 0) }}</td>
-            <td>{{ '%.1f'|format(p.gw3_points or 0) }}</td>
-            <td>{{ '%.1f'|format(p.gw4_points or 0) }}</td>
-            <td>{{ '%.1f'|format(p.gw5_points or 0) }}</td>
-            <td>{{ '%.1f'|format(p.gw6_points or 0) }}</td>
-            <td>{{ '%.1f'|format(p.gw7_points or 0) }}</td>
-            <td>{{ '%.1f'|format(p.gw8_points or 0) }}</td>
-            <td>{{ '%.1f'|format(p.gw9_points or 0) }}</td>
+            {# GW cells with opponent short + FDR badge if available #}
+            {% for gw in range(1,10) %}
+              {% set pts = 'gw' ~ gw ~ '_points' %}
+              {% set opp = 'gw' ~ gw ~ '_opp' %}
+              {% set fdr = 'gw' ~ gw ~ '_fdr' %}
+              {% set f = p[fdr] if fdr in p else None %}
+              {% set color = 'success' if f and f <= 2 else ('warning' if f == 3 else 'danger') %}
+              <td>
+                <strong>{{ '%.1f'|format(p[pts] or 0) }}</strong><br>
+                <small>{{ p[opp] or '' }} {% if f %}<span class="badge bg-{{ color }}">{{ f }}</span>{% endif %}</small>
+              </td>
+            {% endfor %}
           </tr>
           {% endfor %}
         </tbody>
