@@ -112,6 +112,12 @@
         .table-responsive:hover {
             box-shadow: 0 4px 20px rgba(0,0,0,0.15);
         }
+        /* Keep links default color across FDR tables, if any */
+        .table a,
+        .table a:visited,
+        .table a:hover,
+        .table a:active,
+        .table a:focus { color: inherit !important; text-decoration: none !important; }
         table.dataTable thead th {
             white-space: normal;
             background-color: #f8f9fa;
