@@ -7,12 +7,38 @@
   <style>
     .badge-pos { font-size:.8rem; padding:.35rem .5rem; }
     .gk{background:#dc3545;color:#fff} .def{background:#007bff;color:#fff} .mid{background:#28a745;color:#fff} .fwd{background:#ffc107;color:#212529}
+    /* Save & Load Views styles (from Players page) */
+    .views-section { background: #fff; padding: 20px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 1rem; transition: all 0.3s ease; }
+    .views-section:hover { box-shadow: 0 4px 20px rgba(0,0,0,0.15); transform: translateY(-2px); }
+    .views-section h5 { color: #2c3e50; margin-bottom: 1rem; }
   </style>
 </head>
 <body class="p-4">
   {% include '_navbar.html' %}
   <div class="container-fluid">
     <h1 class="mb-3">Players2</h1>
+    <!-- Save & Load Views Panel -->
+    <div id="viewsPanel" class="views-section">
+      <h5><i class="fas fa-bookmark"></i> Save & Load Views</h5>
+      <div class="row g-2">
+        <div class="col-md-4">
+          <label for="viewName" class="form-label">View Name:</label>
+          <input type="text" id="viewName" class="form-control" placeholder="Enter view name">
+        </div>
+        <div class="col-md-4">
+          <label for="loadView" class="form-label">Load View or Quick Sort:</label>
+          <select id="loadView" class="form-select">
+            <option value="">Select a view or sorting option...</option>
+          </select>
+        </div>
+        <div class="col-md-4 d-flex align-items-end">
+          <div>
+            <button id="saveView" class="btn btn-success me-2"><i class="fas fa-save"></i> Save View</button>
+            <button id="loadViewBtn" class="btn btn-primary"><i class="fas fa-folder-open"></i> Load View</button>
+          </div>
+        </div>
+      </div>
+    </div>
     <div class="mb-3">
       <div class="form-check">
         <input class="form-check-input" type="checkbox" id="wlOnly">
@@ -84,6 +110,7 @@
   </div>
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
   <script>
     $(function(){
       const table = $('#players2Table').DataTable({
@@ -119,6 +146,101 @@
       wlPred._id = 'wl2';
       $.fn.dataTable.ext.search.push(wlPred);
       $('#wlOnly').on('change', function(){ table.draw(false); });
+
+      // ===== Save & Load Views (ported from Players page; adapted for Players2) =====
+      function showNotification(message, type){
+        try { console.log(type || 'info', message); } catch(_e) {}
+      }
+
+      function createDefaultValuePointsView(){
+        const saved = JSON.parse(localStorage.getItem('fplPlayerViews') || '{}');
+        if (!saved['Best Value Players']) {
+          saved['Best Value Players'] = {
+            name: 'Best Value Players',
+            description: 'Points/£ + Total Points',
+            sorting: [[6, 'desc'], [7, 'desc']],
+            pageLength: 25,
+            search: ''
+          };
+          localStorage.setItem('fplPlayerViews', JSON.stringify(saved));
+        }
+      }
+
+      function updateViewsDropdown(){
+        const saved = JSON.parse(localStorage.getItem('fplPlayerViews') || '{}');
+        const names = Object.keys(saved);
+        const sel = $('#loadView');
+        sel.empty().append('<option value="">Select a view or sorting option...</option>');
+        sel.append('<optgroup label="Quick Sorting Options">');
+        sel.append('<option value="sort_points">📊 Sort by Total Points (High to Low)</option>');
+        sel.append('<option value="sort_value">💰 Sort by Points/£ (High to Low)</option>');
+        sel.append('<option value="sort_value_points">🎯 Sort by Value + Points (Best Value First)</option>');
+        sel.append('</optgroup>');
+        if (names.length){
+          sel.append('<optgroup label="Saved Views">');
+          names.forEach(n=>{
+            const v = saved[n];
+            const desc = v.description || 'Default';
+            sel.append(`<option value="${n}">${n} (${desc})</option>`);
+          });
+          sel.append('</optgroup>');
+        }
+      }
+
+      function handleQuickSort(key){
+        switch(key){
+          case 'sort_points':
+            table.order([7,'desc']).draw();
+            showNotification('Sorted by Total Points (High to Low)','success');
+            break;
+          case 'sort_value':
+            table.order([6,'desc']).draw();
+            showNotification('Sorted by Points/£ (High to Low)','success');
+            break;
+          case 'sort_value_points':
+            table.order([[6,'desc'],[7,'desc']]).draw();
+            showNotification('Sorted by Value + Points (Best Value First)','success');
+            break;
+          default:
+            showNotification('Unknown sorting option','error');
+        }
+        $('#loadView').val('');
+      }
+
+      function saveView(){
+        const nm = ($('#viewName').val() || '').trim();
+        if (!nm){ showNotification('Please enter a view name','info'); return; }
+        const saved = JSON.parse(localStorage.getItem('fplPlayerViews') || '{}');
+        saved[nm] = {
+          name: nm,
+          description: 'Custom',
+          sorting: table.order(),
+          pageLength: table.page.len(),
+          search: table.search()
+        };
+        localStorage.setItem('fplPlayerViews', JSON.stringify(saved));
+        showNotification(`View "${nm}" saved`,'success');
+        $('#viewName').val('');
+        updateViewsDropdown();
+      }
+
+      function loadView(){
+        const sel = $('#loadView').val();
+        if (!sel){ showNotification('Please select a view or sorting option','info'); return; }
+        if (sel.startsWith('sort_')){ handleQuickSort(sel); return; }
+        const saved = JSON.parse(localStorage.getItem('fplPlayerViews') || '{}');
+        const v = saved[sel];
+        if (!v){ showNotification('View not found','info'); return; }
+        if (v.sorting){ table.order(v.sorting).draw(); }
+        if (v.pageLength){ table.page.len(v.pageLength).draw(); }
+        if (typeof v.search === 'string'){ table.search(v.search).draw(); }
+        showNotification(`View "${sel}" loaded`,'success');
+      }
+
+      $('#saveView').on('click', saveView);
+      $('#loadViewBtn').on('click', loadView);
+      createDefaultValuePointsView();
+      updateViewsDropdown();
     });
   </script>
 </body>
