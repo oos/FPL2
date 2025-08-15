@@ -348,7 +348,6 @@
     {% include '_navbar.html' %}
     
     <div class="container-fluid">
-        <h1 class="text-center mb-4">FPL Optimal Squad - GW1-9</h1>
         
         <!-- Summary Section removed by request -->
         
@@ -1265,6 +1264,42 @@
                     }
                 });
             }
+
+            // Reposition Table/Pitch toggles inline with Transfers header for all GWs
+            function repositionViewToggles(){
+                try {
+                    // GW1 & GW2: move top btn-group next to transfers counts
+                    [1,2].forEach(function(gw){
+                        const $btnGroup = $(`#gw${gw}TableTop`).closest('.btn-group');
+                        if ($btnGroup.length){
+                            const $h5 = $(`#gw${gw}TransfersIn`).closest('h5');
+                            if ($h5.length){
+                                if (!$h5.parent().hasClass('transfers-flex')){
+                                    $h5.wrap('<div class="d-flex justify-content-between align-items-center transfers-flex"></div>');
+                                }
+                                // shrink buttons a bit
+                                $btnGroup.find('.btn').addClass('btn-sm');
+                                $h5.parent().append($btnGroup);
+                            }
+                        }
+                    });
+                    // GW3-9: move .view-toggle btn-group next to transfers counts, then remove original container
+                    for (let gw=3; gw<=9; gw++){
+                        const $viewToggle = $(`#gw${gw}Table`).closest('.view-toggle');
+                        const $btnGroup = $viewToggle.find('.btn-group');
+                        const $h4 = $(`#gw${gw}TransfersIn`).closest('h4');
+                        if ($btnGroup.length && $h4.length){
+                            if (!$h4.parent().hasClass('transfers-flex')){
+                                $h4.wrap('<div class="d-flex justify-content-between align-items-center transfers-flex"></div>');
+                            }
+                            $btnGroup.find('.btn').addClass('btn-sm');
+                            $h4.parent().append($btnGroup);
+                            $viewToggle.remove();
+                        }
+                    }
+                } catch(e) { console.error('reposition toggles failed', e); }
+            }
+            repositionViewToggles();
         });
         
         // Global variables accessible to all functions

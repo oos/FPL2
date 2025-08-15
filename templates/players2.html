@@ -23,14 +23,26 @@
     #players2Table thead th:nth-child(2), #players2Table tbody td:nth-child(2), /* Name */
     #players2Table thead th:nth-child(4), #players2Table tbody td:nth-child(4)  /* Team */
     { text-align: left; }
-    /* Allow header text to wrap across multiple lines (strong specificity for DataTables) */
+    /* FDR-like header styling for DataTables */
     .dataTables_wrapper table.dataTable thead th,
     #players2Table thead th {
       white-space: normal !important;
+      background-color: #f8f9fa;
+      border-color: #dee2e6;
+      font-weight: 600;
+      color: #2c3e50;
+      transition: all 0.3s ease;
+      cursor: pointer;
       overflow-wrap: anywhere;
       word-break: break-word;
       hyphens: auto;
       line-height: 1.1;
+    }
+    .dataTables_wrapper table.dataTable thead th:hover,
+    #players2Table thead th:hover {
+      background-color: #e9ecef !important;
+      transform: scale(1.02);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     }
     
     /* Allow name and team to wrap to reduce width (narrower) */
@@ -55,7 +67,7 @@
 <body class="p-4">
   {% include '_navbar.html' %}
   <div class="container-fluid">
-    <h1 class="mb-3">Players2</h1>
+    
     <!-- Save & Load Views Panel -->
     <div id="viewsPanel" class="views-section">
       <h5><i class="fas fa-bookmark"></i> Save & Load Views</h5>
@@ -132,6 +144,10 @@
         <div class="col-md-2">
           <label for="minOwn2" class="form-label">Min Ownership %</label>
           <input type="search" inputmode="decimal" id="minOwn2" class="form-control" placeholder=">=0">
+        </div>
+        <div class="col-md-2">
+          <label for="minXp2" class="form-label">Min xP</label>
+          <input type="search" inputmode="decimal" id="minXp2" class="form-control" placeholder=">=0">
         </div>
       </div>
     </div>
@@ -310,21 +326,24 @@
         const total = parseNum(data[7]);
         const form = parseNum(data[8]);
         const own = parseNum(data[9]);
+        const xp = parseNum(data[10]); // xP column
         const minChance = parseFloat(($('#minChance2').val()||'').trim());
         const minPPM = parseFloat(($('#minPPM2').val()||'').trim());
         const minTotal = parseFloat(($('#minTotal2').val()||'').trim());
         const minForm = parseFloat(($('#minForm2').val()||'').trim());
         const minOwn = parseFloat(($('#minOwn2').val()||'').trim());
+        const minXp = parseFloat(($('#minXp2').val()||'').trim());
         if (!Number.isNaN(minChance) && !(chance>=minChance)) return false;
         if (!Number.isNaN(minPPM) && !(ppm>=minPPM)) return false;
         if (!Number.isNaN(minTotal) && !(total>=minTotal)) return false;
         if (!Number.isNaN(minForm) && !(form>=minForm)) return false;
         if (!Number.isNaN(minOwn) && !(own>=minOwn)) return false;
+        if (!Number.isNaN(minXp) && !(xp>=minXp)) return false;
         return true;
       };
       advNumPred._id = 'advnum2';
       $.fn.dataTable.ext.search.push(advNumPred);
-      $('#minChance2,#minPPM2,#minTotal2,#minForm2,#minOwn2').on('input change', function(){ table.draw(false); });
+      $('#minChance2,#minPPM2,#minTotal2,#minForm2,#minOwn2,#minXp2').on('input change', function(){ table.draw(false); });
 
       // ===== Save & Load Views (ported from Players page; adapted for Players2) =====
       function showNotification(message, type){
@@ -556,6 +575,7 @@
           $('#minTotal2').val('');
           $('#minForm2').val('');
           $('#minOwn2').val('');
+          $('#minXp2').val('');
           $('#wlOnly').prop('checked', false);
           // Clear DataTables global search and sync visible input
           table.search('');
