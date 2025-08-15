@@ -27,14 +27,13 @@ def create_app():
         gws = sorted({f.gameweek for f in fixtures})
         upcoming_gw = gws[0] if gws else 1
 
-        # Easiest/toughest fixtures for upcoming GW
+        # All fixtures for upcoming GW (sorted by combined difficulty)
         gw_fixtures = [f for f in fixtures if f.gameweek == upcoming_gw]
         for_gw_sorted = sorted(
             gw_fixtures,
             key=lambda f: (f.home_difficulty + f.away_difficulty, f.home_team)
         )
         easiest = for_gw_sorted[:6]
-        toughest = list(reversed(for_gw_sorted))[:6]
         # Provide full, sorted list for dashboard "All Fixtures" panel
         all_fixtures = for_gw_sorted
 
@@ -56,7 +55,7 @@ def create_app():
             'dashboard.html',
             upcoming_gw=upcoming_gw,
             easiest=easiest,
-            toughest=toughest,
+            toughest=[],
             xi=starting_xi,
             bench=bench,
             formation=formation,
