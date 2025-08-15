@@ -203,7 +203,8 @@ def create_app(config_name: str | None = None):
         """Serve a simple, unmodified table of all players (no filters/customizations)."""
         db = current_app.db_manager
         players = [p.to_dict() for p in db.get_all_players()]
-        return render_template('players2.html', players=players)
+        watch_ids = db.get_watchlist_ids()
+        return render_template('players2.html', players=players, watch_ids=watch_ids)
 
     @app.route('/players/individual')
     def players_individual_redirect():
