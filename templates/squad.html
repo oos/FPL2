@@ -74,6 +74,13 @@
             margin-top: 5px;
             border-left: 3px solid #28a745;
         }
+        /* Make the arrow between transfer IN/OUT much larger */
+        .transfer-summary .transfer-arrow {
+            font-size: 300%;
+            line-height: 0.6;
+            vertical-align: middle;
+            display: inline-block;
+        }
         .transfer-summary small {
             font-size: 0.85em;
             line-height: 1.4;
@@ -1635,7 +1642,7 @@
                         <li class="mb-1">
                             <span class="badge bg-success me-2">IN</span>
                             <strong>${inName}</strong>${posBadge(getPosForIn(inName))}
-                            <span class="mx-2 text-muted">→</span>
+                            <span class="mx-2 text-muted transfer-arrow">→</span>
                             <span class="badge bg-danger me-2">OUT</span>
                             <span>${outName || ''}</span>${posBadge(getPosForOut(outName))}
                         </li>`;
