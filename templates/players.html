@@ -1079,6 +1079,14 @@
                     pageLength: 100,
                     responsive: true,
                     scrollX: false,
+                    initComplete: function(settings){
+                        // Ensure DataTables internal filter input mirrors our custom inputs
+                        try {
+                            const api = this.api();
+                            const val = $('#globalSearch').val() || $('#af-name').val() || '';
+                            if (val) { api.search(val).draw(); }
+                        } catch(_e) {}
+                    },
                     initComplete: function() {
                         console.log('DataTable initialization complete');
                         
@@ -1096,9 +1104,21 @@
                         console.log('Fixed column widths applied successfully');
                         
                         // Hook up global search and simple info text
-                        $('#globalSearch').on('keyup change', function(){
-                            currentTable.search(this.value).draw();
+                        const debounced = (fn, wait=120) => { let t; return function(){ const ctx=this,args=arguments; clearTimeout(t); t=setTimeout(()=>fn.apply(ctx,args), wait);} };
+                        const setAllSearchInputs = (val) => {
+                            try { $('#globalSearch').val(val); } catch(_e){}
+                            try { $('#af-name').val(val); } catch(_e){}
+                            try { $('#playersTable_filter input').val(val); } catch(_e){}
+                        };
+                        const handleGlobalSearch = debounced(function(ev){
+                            const val = $(this).val();
+                            setAllSearchInputs(val);
+                            currentTable.search(val).draw();
                         });
+                        $('#globalSearch').off('.gs').on('keyup.gs input.gs change.gs', handleGlobalSearch);
+                        $('#af-name').off('.gs2').on('keyup.gs2 input.gs2 change.gs2', handleGlobalSearch);
+                        // If DataTables default filter ever exists, bind it too
+                        $(document).on('keyup.gs3 input.gs3 change.gs3', '#playersTable_filter input', handleGlobalSearch);
                         $('#playersInfoInline').text(`Showing ${currentTable.page.info().recordsDisplay} of ${currentTable.page.info().recordsTotal} entries`);
                         currentTable.on('draw', function(){
                             const info = currentTable.page.info();
