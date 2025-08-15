@@ -25,10 +25,21 @@ def create_app():
         # Fixtures and upcoming GW
         fixtures = db_manager.get_all_fixtures()
         gws = sorted({f.gameweek for f in fixtures})
-        upcoming_gw = gws[0] if gws else 1
+        # Pick the first gameweek that appears to be complete (>=10 fixtures).
+        # If none meet that threshold, fall back to the earliest GW available.
+        fixtures_by_gw = {}
+        for f in fixtures:
+            fixtures_by_gw.setdefault(f.gameweek, []).append(f)
+        upcoming_gw = None
+        for gw in gws:
+            if len(fixtures_by_gw.get(gw, [])) >= 10:
+                upcoming_gw = gw
+                break
+        if upcoming_gw is None:
+            upcoming_gw = gws[0] if gws else 1
 
         # All fixtures for upcoming GW (sorted by combined difficulty)
-        gw_fixtures = [f for f in fixtures if f.gameweek == upcoming_gw]
+        gw_fixtures = fixtures_by_gw.get(upcoming_gw, [])
         for_gw_sorted = sorted(
             gw_fixtures,
             key=lambda f: (f.home_difficulty + f.away_difficulty, f.home_team)

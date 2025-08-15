@@ -22,19 +22,24 @@
           <h4 class="mb-1">Upcoming Gameweek</h4>
           <div class="mb-2">GW: <strong>{{ upcoming_gw }}</strong></div>
           <h5 class="mt-2">All Fixtures (GW{{ upcoming_gw }})</h5>
-          <ul class="list-group list-group-flush">
-            {% for f in all_fixtures %}
-            <li class="list-group-item d-flex justify-content-between align-items-center">
-              <span>
-                {{ f.home_team }}
-                <span class="fdr-badge ms-2" style="background:#4a7c59">{{ f.home_difficulty }}</span>
-                <span class="mx-2">vs</span>
-                <span class="fdr-badge me-2" style="background:#4a7c59">{{ f.away_difficulty }}</span>
-                {{ f.away_team }}
-              </span>
-            </li>
-            {% endfor %}
-          </ul>
+          <div class="table-responsive">
+            <table class="table table-sm">
+              <tbody>
+                {% for f in all_fixtures %}
+                <tr>
+                  <td class="text-end pe-2">{{ f.home_team }}</td>
+                  <td><span class="fdr-badge" style="background:#4a7c59">{{ f.home_difficulty }}</span></td>
+                  <td class="px-2">vs</td>
+                  <td><span class="fdr-badge" style="background:#4a7c59">{{ f.away_difficulty }}</span></td>
+                  <td class="ps-2">{{ f.away_team }}</td>
+                </tr>
+                {% endfor %}
+                {% if all_fixtures|length == 0 %}
+                <tr><td colspan="5" class="text-muted">No fixtures found for this GW.</td></tr>
+                {% endif %}
+              </tbody>
+            </table>
+          </div>
         </div>
         
       </div>
