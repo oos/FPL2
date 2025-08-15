@@ -2,19 +2,26 @@
   <div class="container-fluid">
     <a class="navbar-brand fw-bold text-decoration-none" href="/">FPL Tools</a>
     <div class="navbar-nav">
-      <a class="nav-link" href="/">Dashboard</a>
-      <a class="nav-link" href="/fdr">FDR</a>
+      <a class="nav-link {{ 'active' if request.path == '/' else '' }}" href="/">Dashboard</a>
+      <a class="nav-link {{ 'active' if request.path.startswith('/fdr') else '' }}" href="/fdr">FDR</a>
       <div class="nav-item dropdown">
-        <a class="nav-link dropdown-toggle" href="/players" id="playersDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">Players</a>
+        <a class="nav-link dropdown-toggle {{ 'active' if request.path.startswith('/players') or request.path.startswith('/watchlist') else '' }}" href="/players" id="playersDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">Players</a>
         <ul class="dropdown-menu" aria-labelledby="playersDropdown">
-          <li><a class="dropdown-item" href="/players">All</a></li>
-          <li><a class="dropdown-item" href="/players/individual">Individual</a></li>
+          <li><a class="dropdown-item {{ 'active' if request.path == '/players' else '' }}" href="/players">All</a></li>
+          <li><a class="dropdown-item {{ 'active' if request.path == '/players/individual' else '' }}" href="/players/individual">Individual</a></li>
+          <li><hr class="dropdown-divider"></li>
+          <li><a class="dropdown-item {{ 'active' if request.path == '/watchlist' else '' }}" href="/watchlist">Watchlist</a></li>
         </ul>
       </div>
-      <a class="nav-link" href="/teams">Teams</a>
-      <a class="nav-link" href="/squad">Squad</a>
+      <a class="nav-link {{ 'active' if request.path == '/teams' or request.path.startswith('/team/') else '' }}" href="/teams">Teams</a>
+      <a class="nav-link {{ 'active' if request.path.startswith('/squad') else '' }}" href="/squad">Squad</a>
     </div>
   </div>
+  <style>
+    /* Ensure active state is clearly visible */
+    .navbar .nav-link.active { background-color: #3498db !important; color: #fff !important; border-radius: 5px; }
+    .dropdown-menu .dropdown-item.active { background-color: #3498db; color: #fff; }
+  </style>
 </nav>
 
 
