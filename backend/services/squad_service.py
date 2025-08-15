@@ -167,6 +167,24 @@ class SquadService:
                 total_budget += price
                 remaining_budget = budget_cap_millions - total_budget
 
+        # Final fallback: if still not 15, relax constraints to guarantee full squad size
+        # Prefer absolute cheapest remaining players regardless of team caps/position targets/budget
+        if len(squad) < 15:
+            absolute_cheapest = sorted(
+                [p for p in players_data if p.get('id') not in used_ids],
+                key=lambda x: float(x.get('price') or 0.0)
+            )
+            for player in absolute_cheapest:
+                if len(squad) >= 15:
+                    break
+                squad.append(player)
+                used_ids.add(player.get('id'))
+                pos = player.get('position')
+                position_counts[pos] = position_counts.get(pos, 0) + 1
+                tname = player.get('team') or 'Unknown'
+                team_counts[tname] = team_counts.get(tname, 0) + 1
+                total_budget += float(player.get('price') or 0.0)
+
         # Derive XI and bench (exactly 11 + 4) using GW1 points for ranking
         starting_xi = self._select_starting_xi(squad, scoring_field='gw1_points')
         # Keep bench limited to 4, pick best remaining by GW1 points then total
@@ -215,6 +233,18 @@ class SquadService:
                 budget_cap=100.0,
             )
         )
+
+        # Ensure we maintain a full 15-player squad before selection
+        if len(updated_squad) < 15:
+            # Pad with cheapest available players not already in squad (relaxing constraints if necessary)
+            pad_pool = sorted(
+                [p for p in all_players if p.get('id') not in {x.get('id') for x in updated_squad}],
+                key=lambda x: float(x.get('price') or 0.0)
+            )
+            for p in pad_pool:
+                if len(updated_squad) >= 15:
+                    break
+                updated_squad.append(p)
 
         # Sort for XI selection
         sorted_squad = sorted(
