@@ -4,7 +4,8 @@
   "description": "A comprehensive Fantasy Premier League management application with fixture difficulty ratings, player analysis, squad optimization, and advanced filtering capabilities.",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Use: npm run test:e2e\"",
+    "test": "npm run test:api && npm run test:e2e",
+    "test:api": "node backend/tests/run_api_tests.js",
     "test:e2e": "playwright test --reporter=list",
     "test:e2e:ui": "playwright test --ui"
   },

@@ -1,15 +1,23 @@
 import json
-import pytest
+try:
+    import pytest  # type: ignore
+except Exception:
+    pytest = None
 
 from backend.app import create_app
 
 
-@pytest.fixture(scope="module")
-def client():
-    app = create_app()
+def _make_client():
+    # Use testing config with in-memory DB
+    app = create_app('testing')
     app.config.update({"TESTING": True})
-    with app.test_client() as client:
-        yield client
+    return app.test_client()
+
+if pytest:
+    @pytest.fixture(scope="module")
+    def client():
+        with _make_client() as c:
+            yield c
 
 
 def assert_keys(item: dict, required_keys: list[str]):
@@ -62,7 +70,7 @@ def test_api_fdr(client):
 
 
 def test_pages_render(client):
-    for path in ["/", "/players", "/squad"]:
+    for path in ["/", "/players", "/players2", "/fdr", "/teams", "/squad", "/watchlist"]:
         resp = client.get(path)
         assert resp.status_code == 200, f"{path} failed with {resp.status_code}"
 

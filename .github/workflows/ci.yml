@@ -1,0 +1,27 @@
+name: CI
+
+on:
+  push:
+    branches: [ "**" ]
+  pull_request:
+    branches: [ "**" ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install Node deps
+        run: |
+          npm ci || npm install
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps
+      - name: Run backend API tests
+        run: npm run test:api
+      - name: Run E2E tests (headless)
+        run: npm run test:e2e
+
+

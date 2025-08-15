@@ -8,7 +8,8 @@ test.describe('Players2 page', () => {
   });
 
   test('search filters rows', async ({ page }) => {
-    const search = page.getByRole('searchbox');
+    // Use the DataTables search box scoped to players2Table filter
+    const search = page.locator('#players2Table_filter input[type="search"]');
     await search.fill('salah');
     // Expect at least one row
     const rowsAfterSearch = page.locator('#players2Table tbody tr');
