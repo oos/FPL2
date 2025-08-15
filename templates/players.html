@@ -786,6 +786,7 @@
                     data: playersData,
                     rowId: 'id',
                     orderCellsTop: false,
+                    searchDelay: 0,
                     columns: [
                         { 
                             data: null,
@@ -1119,9 +1120,14 @@
                             setAllSearchInputs(val);
                             currentTable.search(val).draw();
                         });
-                        $('#globalSearch').off('.gs').on('keyup.gs input.gs change.gs', handleGlobalSearch);
+                        // Bind via delegation to be robust across rerenders
+                        $(document).off('keyup.gs input.gs change.gs', '#globalSearch')
+                                   .on('keyup.gs input.gs change.gs', '#globalSearch', handleGlobalSearch);
                         // If DataTables default filter ever exists, bind it too
                         $(document).on('keyup.gs3 input.gs3 change.gs3', '#playersTable_filter input', handleGlobalSearch);
+                        // Apply any pre-filled value immediately
+                        const initial = $('#globalSearch').val() || '';
+                        if (initial) { currentTable.search(initial).draw(); }
                         $('#playersInfoInline').text(`Showing ${currentTable.page.info().recordsDisplay} of ${currentTable.page.info().recordsTotal} entries`);
                         currentTable.on('draw', function(){
                             const info = currentTable.page.info();
