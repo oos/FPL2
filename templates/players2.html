@@ -20,14 +20,25 @@
         <thead class="table-dark">
           <tr>
             <th>★</th>
-            <th>ID</th>
             <th>Name</th>
             <th>Position</th>
             <th>Team</th>
             <th>Price</th>
+            <th>Chance %</th>
+            <th>Points/£</th>
             <th>Total Points</th>
             <th>Form</th>
-            <th>Ownership</th>
+            <th>Ownership %</th>
+            <th>Avg xP</th>
+            <th>GW1</th>
+            <th>GW2</th>
+            <th>GW3</th>
+            <th>GW4</th>
+            <th>GW5</th>
+            <th>GW6</th>
+            <th>GW7</th>
+            <th>GW8</th>
+            <th>GW9</th>
           </tr>
         </thead>
         <tbody>
@@ -37,14 +48,26 @@
             <td>
               <button type="button" class="btn btn-sm p-0 watch-star2 {{ 'text-warning' if p.id in W else '' }}" data-player-id="{{ p.id }}">{{ '★' if p.id in W else '☆' }}</button>
             </td>
-            <td>{{ p.id }}</td>
             <td><a href="/player/{{ p.id }}" class="text-decoration-none">{{ p.name }}</a></td>
             <td>{{ p.position }}</td>
             <td>{% if p.team_id %}<a href="/team/{{ p.team_id }}" class="text-decoration-none">{{ p.team }}</a>{% else %}{{ p.team }}{% endif %}</td>
             <td>£{{ '%.1f'|format(p.price or 0) }}M</td>
+            <td>{{ '%.1f'|format(p.chance_of_playing_next_round or 0) }}%</td>
+            <td>{{ '%.1f'|format(p.points_per_million or 0) }}</td>
             <td>{{ '%.1f'|format(p.total_points or 0) }}</td>
             <td>{{ '%.1f'|format(p.form or 0) }}</td>
             <td>{{ '%.1f'|format(p.ownership or 0) }}%</td>
+            {% set avgxp = ((p.gw1_points or 0) + (p.gw2_points or 0) + (p.gw3_points or 0) + (p.gw4_points or 0) + (p.gw5_points or 0) + (p.gw6_points or 0) + (p.gw7_points or 0) + (p.gw8_points or 0) + (p.gw9_points or 0)) / 9.0 %}
+            <td><strong>{{ '%.1f'|format(avgxp) }}</strong></td>
+            <td>{{ '%.1f'|format(p.gw1_points or 0) }}</td>
+            <td>{{ '%.1f'|format(p.gw2_points or 0) }}</td>
+            <td>{{ '%.1f'|format(p.gw3_points or 0) }}</td>
+            <td>{{ '%.1f'|format(p.gw4_points or 0) }}</td>
+            <td>{{ '%.1f'|format(p.gw5_points or 0) }}</td>
+            <td>{{ '%.1f'|format(p.gw6_points or 0) }}</td>
+            <td>{{ '%.1f'|format(p.gw7_points or 0) }}</td>
+            <td>{{ '%.1f'|format(p.gw8_points or 0) }}</td>
+            <td>{{ '%.1f'|format(p.gw9_points or 0) }}</td>
           </tr>
           {% endfor %}
         </tbody>
@@ -56,7 +79,7 @@
   <script>
     $(function(){
       const table = $('#players2Table').DataTable({
-        order: [[2, 'asc']],
+        order: [[6, 'desc'], [7, 'desc']], // default like Players: Points/£ then Total Points
         pageLength: 25
       });
 
