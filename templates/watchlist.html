@@ -4,6 +4,14 @@
   <title>Watchlist</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <style>
+    /* Keep links default color (not blue) */
+    .table a,
+    .table a:visited,
+    .table a:hover,
+    .table a:active,
+    .table a:focus { color: inherit !important; text-decoration: none !important; }
+  </style>
 </head>
 <body class="p-4">
   {% include '_navbar.html' %}
@@ -13,6 +21,7 @@
       <table class="table table-striped table-hover">
         <thead class="table-dark">
           <tr>
+            <th>★</th>
             <th>Name</th>
             <th>Position</th>
             <th>Team</th>
@@ -25,6 +34,9 @@
         <tbody>
           {% for p in players %}
           <tr>
+            <td>
+              <button type="button" class="watch-star" data-player-id="{{ p.id }}">★</button>
+            </td>
             <td><a href="/player/{{ p.id }}" class="text-decoration-none">{{ p.name }}</a></td>
             <td>{{ p.position }}</td>
             <td>{% if p.team_id %}<a href="/team/{{ p.team_id }}" class="text-decoration-none">{{ p.team }}</a>{% else %}{{ p.team }}{% endif %}</td>
@@ -40,6 +52,10 @@
   </div>
   <script>
     $(function(){
+      // Star styles similar to players page
+      const starCss = '<style>.watch-star{cursor:pointer;color:#f1c40f;background:transparent;border:none;padding:2px 6px;font-size:1.35rem;line-height:1;border-radius:6px}.watch-star:hover{background:rgba(0,0,0,0.05)}</style>';
+      $('head').append(starCss);
+
       $('table').on('click', '.btn-remove-watch', async function(){
         const el = $(this);
         const id = parseInt(el.data('player-id'));
@@ -52,6 +68,26 @@
             el.closest('tr').remove();
           }
         } catch(e) { console.error('remove failed', e); }
+      });
+
+      // Toggle by star; if toggled off, remove row from table
+      $('table').on('click', '.watch-star', async function(){
+        const el = $(this);
+        const id = parseInt(el.data('player-id'));
+        try {
+          const resp = await fetch('/api/watchlist/toggle', {
+            method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ player_id: id })
+          });
+          const data = await resp.json();
+          if (data && data.ok) {
+            if (data.watched) {
+              el.text('★');
+            } else {
+              // Remove from table when un-watching on the Watchlist page
+              el.closest('tr').remove();
+            }
+          }
+        } catch(e) { console.error('toggle star failed', e); }
       });
     });
   </script>

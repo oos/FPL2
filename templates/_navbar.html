@@ -8,6 +8,7 @@
         <a class="nav-link dropdown-toggle {{ 'active' if request.path.startswith('/players') or request.path.startswith('/watchlist') else '' }}" href="/players" id="playersDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">Players</a>
         <ul class="dropdown-menu" aria-labelledby="playersDropdown">
           <li><a class="dropdown-item {{ 'active' if request.path == '/players' else '' }}" href="/players">All</a></li>
+          <li><a class="dropdown-item {{ 'active' if request.path == '/players2' else '' }}" href="/players2">Players2 (simple)</a></li>
           <li><a class="dropdown-item {{ 'active' if request.path == '/players/individual' else '' }}" href="/players/individual">Individual</a></li>
           <li><hr class="dropdown-divider"></li>
           <li><a class="dropdown-item {{ 'active' if request.path == '/watchlist' else '' }}" href="/watchlist">Watchlist</a></li>
@@ -21,6 +22,21 @@
     /* Ensure active state is clearly visible */
     .navbar .nav-link.active { background-color: #3498db !important; color: #fff !important; border-radius: 5px; }
     .dropdown-menu .dropdown-item.active { background-color: #3498db; color: #fff; }
+
+    /* Global: keep entity links (players/teams) in content using default text color */
+    .table a,
+    .table a:visited,
+    .table a:hover,
+    .table a:active,
+    .table a:focus,
+    .card a.text-decoration-none,
+    .card a.text-decoration-none:visited,
+    .card a.text-decoration-none:hover,
+    .card a.text-decoration-none:active,
+    .card a.text-decoration-none:focus {
+      color: inherit !important;
+      text-decoration: none !important;
+    }
   </style>
 </nav>
 

@@ -1,0 +1,26 @@
+{
+  "name": "fpl",
+  "version": "1.0.0",
+  "description": "A comprehensive Fantasy Premier League management application with fixture difficulty ratings, player analysis, squad optimization, and advanced filtering capabilities.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Use: npm run test:e2e\"",
+    "test:e2e": "playwright test --reporter=list",
+    "test:e2e:ui": "playwright test --ui"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/oos/FPL2.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/oos/FPL2/issues"
+  },
+  "homepage": "https://github.com/oos/FPL2#readme",
+  "devDependencies": {
+    "@playwright/test": "^1.54.2"
+  }
+}
