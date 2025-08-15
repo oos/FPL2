@@ -20,10 +20,8 @@
       <div class="col-lg-4">
         <div class="card p-3">
           <h4 class="mb-1">Upcoming Gameweek</h4>
-          <div>GW: <strong>{{ upcoming_gw }}</strong></div>
-        </div>
-        <div class="card p-3 mt-3">
-          <h5>All Fixtures (GW{{ upcoming_gw }})</h5>
+          <div class="mb-2">GW: <strong>{{ upcoming_gw }}</strong></div>
+          <h5 class="mt-2">All Fixtures (GW{{ upcoming_gw }})</h5>
           <ul class="list-group list-group-flush">
             {% for f in all_fixtures %}
             <li class="list-group-item d-flex justify-content-between align-items-center">
