@@ -39,6 +39,22 @@
       text-decoration: none !important;
     }
   </style>
+  <script>
+    document.addEventListener('DOMContentLoaded', function(){
+      try {
+        const toggle = document.getElementById('players2Dropdown');
+        if (!toggle) return;
+        const parent = toggle.closest('.nav-item.dropdown');
+        const menu = parent && parent.querySelector('.dropdown-menu');
+        if (!parent || !menu) return;
+        const mq = window.matchMedia('(hover:hover) and (pointer:fine)');
+        function show(){ if (!mq.matches) return; toggle.classList.add('show'); menu.classList.add('show'); toggle.setAttribute('aria-expanded','true'); }
+        function hide(){ toggle.classList.remove('show'); menu.classList.remove('show'); toggle.setAttribute('aria-expanded','false'); }
+        parent.addEventListener('mouseenter', show);
+        parent.addEventListener('mouseleave', hide);
+      } catch(_e) {}
+    });
+  </script>
 </nav>
 
 

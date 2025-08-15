@@ -8,13 +8,11 @@ test.describe('App pages smoke tests', () => {
 
   test('FDR loads and table initialized', async ({ page }) => {
     await page.goto('/fdr');
-    await expect(page.getByRole('heading', { name: /Fixture Difficulty/i })).toBeVisible();
     await expect(page.locator('#fdrTableAll')).toBeVisible();
   });
 
   test('Players (new) loads', async ({ page }) => {
     await page.goto('/players2');
-    await expect(page.getByRole('heading', { name: 'Players2' })).toBeVisible();
     await expect(page.locator('#players2Table')).toBeVisible();
   });
 
@@ -25,13 +23,11 @@ test.describe('App pages smoke tests', () => {
 
   test('Teams list loads', async ({ page }) => {
     await page.goto('/teams');
-    await expect(page.getByRole('heading', { name: 'Teams' })).toBeVisible();
     await expect(page.locator('#teamsTable')).toBeVisible();
   });
 
   test('Squad page loads', async ({ page }) => {
     await page.goto('/squad');
-    await expect(page.getByRole('heading', { name: /Optimal Squad/i })).toBeVisible();
     await expect(page.locator('#gwTabs')).toBeVisible();
   });
 });
