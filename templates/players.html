@@ -1125,7 +1125,9 @@
                             currentTable.search(val).draw();
                         });
                         $('#globalSearch').off('.gs').on('keyup.gs input.gs change.gs', handleGlobalSearch);
+                        // Bind both directly and via delegated handler (covers re-renders)
                         $('#af-name').off('.gs2').on('keyup.gs2 input.gs2 change.gs2', handleGlobalSearch);
+                        $(document).off('keyup.gs2d input.gs2d change.gs2d', '#af-name').on('keyup.gs2d input.gs2d change.gs2d', '#af-name', handleGlobalSearch);
                         // If DataTables default filter ever exists, bind it too
                         $(document).on('keyup.gs3 input.gs3 change.gs3', '#playersTable_filter input', handleGlobalSearch);
                         $('#playersInfoInline').text(`Showing ${currentTable.page.info().recordsDisplay} of ${currentTable.page.info().recordsTotal} entries`);
@@ -1245,8 +1247,16 @@
             // Column filter bindings (simple contains/thresholds)
             // Note: columns shifted by +1 due to leading watch-star column
             // Bind Advanced Filters panel inputs
-            // Make Advanced Search filter global, filtering as you type
-            $('#af-name').off('.af').on('input change.af', function(){ currentTable.search(this.value).draw(); });
+            // Make Advanced Search filter global, filtering as you type (delegate to be ultra-robust)
+            $(document)
+              .off('input.aflive keyup.aflive change.aflive', '#af-name')
+              .on('input.aflive keyup.aflive change.aflive', '#af-name', function(){
+                  if (currentTable && currentTable.search) {
+                      const val = this.value || '';
+                      try { $('#globalSearch').val(val); } catch(_e) {}
+                      currentTable.search(val).draw();
+                  }
+              });
             $('#af-position').off('.af').on('input change.af', function(){ currentTable.column(2).search(this.value).draw(); });
             $('#af-team').off('.af').on('input change.af', function(){ currentTable.column(3).search(this.value).draw(); });
             const panelNumeric = (selector, idx) => {
