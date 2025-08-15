@@ -95,8 +95,28 @@ def create_app():
 
     @app.route('/players/individual')
     def players_individual_redirect():
-        """Simple forward to the players page for now; placeholder for future individual UI."""
-        return render_template('players.html', players=[p.to_dict() for p in current_app.db_manager.get_all_players()], team_names=[t.name for t in current_app.db_manager.get_all_teams()])
+        """Redirect to a default player's page (e.g., Salah) if available."""
+        db = current_app.db_manager
+        players = db.get_all_players()
+        # Try several common variants for Salah's name
+        preferred_names = [
+            'Mohamed Salah', 'M. Salah', 'M.Salah', 'Salah', 'Mo Salah'
+        ]
+        target = None
+        lower_map = {p.name.lower(): p for p in players}
+        for name in preferred_names:
+            p = lower_map.get(name.lower())
+            if p:
+                target = p
+                break
+        # Fallback: choose the highest total_points player if Salah not found
+        if not target and players:
+            target = max(players, key=lambda p: p.total_points)
+        if target:
+            from flask import redirect, url_for
+            return redirect(url_for('player_page', player_id=target.id))
+        # Last resort: go to the players list
+        return render_template('players.html', players=[p.to_dict() for p in players], team_names=[t.name for t in db.get_all_teams()])
     @app.route('/player/<int:player_id>')
     def player_page(player_id: int):
         """Serve an individual player page"""
