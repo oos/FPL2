@@ -340,6 +340,15 @@
             color: white !important;
             transform: translateY(-2px);
         }
+        /* Ensure links in the Players table use default text color (no blue) */
+        #playersTable a,
+        #playersTable a:visited,
+        #playersTable a:hover,
+        #playersTable a:active,
+        #playersTable a:focus {
+            color: inherit !important;
+            text-decoration: none !important;
+        }
         /* Using DataTables FixedHeader plugin instead of CSS sticky headers to avoid misalignment */
         
         /* Save & Load Views Section */
