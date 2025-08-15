@@ -25,16 +25,25 @@ def create_app():
         # Fixtures and upcoming GW
         fixtures = db_manager.get_all_fixtures()
         gws = sorted({f.gameweek for f in fixtures})
-        upcoming_gw = gws[0] if gws else 1
+        # Pick the first gameweek that appears to be complete (>=10 fixtures).
+        # If none meet that threshold, fall back to the earliest GW available.
+        fixtures_by_gw = {}
+        for f in fixtures:
+            fixtures_by_gw.setdefault(f.gameweek, []).append(f)
+        # Choose the GW with the most fixtures overall to maximize the list.
+        # This avoids showing only a few games when data is partially populated.
+        upcoming_gw = (
+            sorted(gws, key=lambda gw: (-len(fixtures_by_gw.get(gw, [])), gw))[0]
+            if gws else 1
+        )
 
-        # Easiest/toughest fixtures for upcoming GW
-        gw_fixtures = [f for f in fixtures if f.gameweek == upcoming_gw]
+        # All fixtures for upcoming GW (sorted by combined difficulty)
+        gw_fixtures = fixtures_by_gw.get(upcoming_gw, [])
         for_gw_sorted = sorted(
             gw_fixtures,
             key=lambda f: (f.home_difficulty + f.away_difficulty, f.home_team)
         )
         easiest = for_gw_sorted[:6]
-        toughest = list(reversed(for_gw_sorted))[:6]
         # Provide full, sorted list for dashboard "All Fixtures" panel
         all_fixtures = for_gw_sorted
 
@@ -51,17 +60,32 @@ def create_app():
             bench = entry.get('bench', [])
             formation = squad_service.get_formation(starting_xi)
             gw_points = sum(p.get(f"gw{upcoming_gw}_points", 0) or 0 for p in starting_xi)
+        else:
+            # Try to find the nearest GW in strategy data to avoid empty XI
+            if strategy:
+                available_gws = sorted(strategy.keys())
+                nearest = min(available_gws, key=lambda g: abs(g - upcoming_gw))
+                entry = strategy.get(nearest, {})
+                starting_xi = entry.get('starting_xi', [])
+                bench = entry.get('bench', [])
+                formation = squad_service.get_formation(starting_xi) if starting_xi else 'Unknown'
+                gw_points = sum(p.get(f"gw{nearest}_points", 0) or 0 for p in starting_xi)
+
+        # Build mapping for team name -> id for linking in templates
+        teams_all = db_manager.get_all_teams()
+        team_id_by_name = {t.name: t.id for t in teams_all}
 
         return render_template(
             'dashboard.html',
             upcoming_gw=upcoming_gw,
             easiest=easiest,
-            toughest=toughest,
+            toughest=[],
             xi=starting_xi,
             bench=bench,
             formation=formation,
             gw_points=gw_points,
             all_fixtures=all_fixtures,
+            team_id_by_name=team_id_by_name,
         )
 
     # FDR page
@@ -70,21 +94,104 @@ def create_app():
         """Serve the FDR page"""
         return render_template('fdr.html')
     
+    @app.route('/teams')
+    def teams_page():
+        """List all teams with links to their pages"""
+        db_manager = current_app.db_manager
+        teams = db_manager.get_all_teams()
+        return render_template('teams.html', teams=[t.to_dict() for t in teams])
+    
     @app.route('/players')
     def players_page():
         """Serve the original players page with DataTables"""
         db_manager = current_app.db_manager # Access db_manager from app context
         players = db_manager.get_all_players()
         teams = db_manager.get_all_teams()
+        fixtures = db_manager.get_all_fixtures()
         
         # Convert Player objects to dictionaries for template
         players_data = [player.to_dict() for player in players]
+
+        # Build opponent/FDR mapping per team and GW
+        team_short_by_name = {t.name: t.short_name for t in teams}
+        team_id_by_name = {t.name: t.id for t in teams}
+
+        # Normalization helper to align inconsistent names like "Nott'm Forest" → "Nottingham Forest"
+        import re
+        def norm(s: str) -> str:
+            if not s:
+                return ''
+            return re.sub(r'[^a-z0-9]', '', s.lower())
+
+        # Canonical name by normalized key
+        canonical_by_norm = {norm(t.name): t.name for t in teams}
+
+        # Maps keyed by canonical team name and team id
+        fdr_map_by_name: dict[tuple[str, int], tuple[str, int]] = {}
+        fdr_map_by_id: dict[tuple[int, int], tuple[str, int]] = {}
+        for fx in fixtures:
+            # Resolve canonical names from fixtures (which may be ids-as-text or variant names)
+            home_name = canonical_by_norm.get(norm(fx.home_team), fx.home_team)
+            away_name = canonical_by_norm.get(norm(fx.away_team), fx.away_team)
+            home_id = team_id_by_name.get(home_name)
+            away_id = team_id_by_name.get(away_name)
+            # Name-keyed
+            fdr_map_by_name[(home_name, fx.gameweek)] = (away_name, fx.home_difficulty)
+            fdr_map_by_name[(away_name, fx.gameweek)] = (home_name, fx.away_difficulty)
+            # Id-keyed (only if ids are known)
+            if home_id is not None and away_id is not None:
+                fdr_map_by_id[(home_id, fx.gameweek)] = (away_name, fx.home_difficulty)
+                fdr_map_by_id[(away_id, fx.gameweek)] = (home_name, fx.away_difficulty)
+
+        # Enrich players with opponent short and FDR for GW1-9
+        for pdata in players_data:
+            # Canonical player team name
+            team_name = canonical_by_norm.get(norm(pdata.get('team')), pdata.get('team'))
+            team_id = pdata.get('team_id')
+            for gw in range(1, 10):
+                opp, fdr = None, None
+                # Prefer id-based lookup if available
+                if team_id and (team_id, gw) in fdr_map_by_id:
+                    opp_name, fdr_val = fdr_map_by_id[(team_id, gw)]
+                    opp = team_short_by_name.get(opp_name, (opp_name or '')[:3].upper())
+                    fdr = fdr_val
+                elif (team_name, gw) in fdr_map_by_name:
+                    opp_name, fdr_val = fdr_map_by_name[(team_name, gw)]
+                    opp = team_short_by_name.get(opp_name, (opp_name or '')[:3].upper())
+                    fdr = fdr_val
+                pdata[f'gw{gw}_opp'] = opp
+                pdata[f'gw{gw}_fdr'] = fdr
         
         # Get unique positions and teams for dropdowns
         positions = ['Goalkeeper', 'Defender', 'Midfielder', 'Forward']
         team_names = [team.name for team in teams]
         
         return render_template('players.html', players=players_data, team_names=team_names)
+
+    @app.route('/players/individual')
+    def players_individual_redirect():
+        """Redirect to a default player's page (e.g., Salah) if available."""
+        db = current_app.db_manager
+        players = db.get_all_players()
+        # Try several common variants for Salah's name
+        preferred_names = [
+            'Mohamed Salah', 'M. Salah', 'M.Salah', 'Salah', 'Mo Salah'
+        ]
+        target = None
+        lower_map = {p.name.lower(): p for p in players}
+        for name in preferred_names:
+            p = lower_map.get(name.lower())
+            if p:
+                target = p
+                break
+        # Fallback: choose the highest total_points player if Salah not found
+        if not target and players:
+            target = max(players, key=lambda p: p.total_points)
+        if target:
+            from flask import redirect, url_for
+            return redirect(url_for('player_page', player_id=target.id))
+        # Last resort: go to the players list
+        return render_template('players.html', players=[p.to_dict() for p in players], team_names=[t.name for t in db.get_all_teams()])
     @app.route('/player/<int:player_id>')
     def player_page(player_id: int):
         """Serve an individual player page"""
@@ -236,7 +343,21 @@ def create_app():
     def api_teams():
         """Get all teams as JSON"""
         teams = current_app.db_manager.get_all_teams()
-        return jsonify([team.to_dict() for team in teams])
+        # Attach a best-effort local logo path if present
+        import os
+        static_root = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'static')
+        assets_dir = os.path.join(static_root, 'assets', 'teams')
+        enriched = []
+        for team in teams:
+            data = team.to_dict()
+            short = (team.short_name or team.name).lower().replace(' ', '')
+            for ext in ['svg', 'png', 'jpg', 'jpeg', 'webp']:
+                candidate = os.path.join(assets_dir, f"{short}.{ext}")
+                if os.path.exists(candidate):
+                    data['logo_path'] = f"assets/teams/{short}.{ext}"
+                    break
+            enriched.append(data)
+        return jsonify(enriched)
 
     @app.route('/team/<int:team_id>')
     def team_page(team_id: int):
@@ -250,7 +371,22 @@ def create_app():
         squad = [p.to_dict() for p in all_players if p.team == team.name]
         # Fixtures schedule
         fixtures = [f.to_dict() for f in db_manager.get_all_fixtures() if f.home_team == team.name or f.away_team == team.name]
-        return render_template('team.html', team=team.to_dict(), squad=squad, fixtures=fixtures)
+        # Resolve local team logo (downloaded into static/assets/teams)
+        import os
+        static_root = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'static')
+        assets_dir = os.path.join(static_root, 'assets', 'teams')
+        short = (team.short_name or team.name).lower().replace(' ', '')
+        possible_exts = ['svg', 'png', 'jpg', 'jpeg', 'webp']
+        logo_file = None
+        for ext in possible_exts:
+            candidate = os.path.join(assets_dir, f"{short}.{ext}")
+            if os.path.exists(candidate):
+                logo_file = f"assets/teams/{short}.{ext}"
+                break
+        # Mapping of team name to id for schedule links
+        teams_all = db_manager.get_all_teams()
+        team_id_by_name = {t.name: t.id for t in teams_all}
+        return render_template('team.html', team=team.to_dict(), squad=squad, fixtures=fixtures, team_logo_file=logo_file, team_id_by_name=team_id_by_name)
     
     @app.route('/api/fdr')
     def api_fdr():
