@@ -352,7 +352,12 @@
         
         <!-- Summary Section removed by request -->
         
-        <!-- Weekly Tabs -->
+        <!-- Weekly Tabs with GW navigation -->
+        <div class="d-flex justify-content-between align-items-center mb-2">
+        <div class="btn-group" role="group" aria-label="GW navigation">
+            <button class="btn btn-outline-secondary" id="prevGw" title="Previous GW"><i class="fas fa-chevron-left"></i></button>
+            <button class="btn btn-outline-secondary" id="nextGw" title="Next GW"><i class="fas fa-chevron-right"></i></button>
+        </div>
         <ul class="nav nav-tabs" id="gwTabs" role="tablist">
             <li class="nav-item" role="presentation">
                 <button class="nav-link active" id="gw1-tab" data-bs-toggle="tab" data-bs-target="#gw1" type="button" role="tab" data-gw="1">
@@ -400,6 +405,7 @@
                 </button>
             </li>
         </ul>
+        </div>
         
         <!-- Weekly Content -->
         <div class="tab-content" id="gwTabContent">
@@ -1186,6 +1192,18 @@
                 if (gw) {
                     updateActiveTab(gw);
                 }
+            });
+            // Arrow navigation between tabs (same UX as FDR page)
+            const getActiveIndex = () => $('#gwTabs button.nav-link').index($('#gwTabs button.nav-link.active'));
+            $('#prevGw').on('click', function(){
+                const $btns = $('#gwTabs button.nav-link');
+                const i = getActiveIndex();
+                if (i > 0) new bootstrap.Tab($btns[i-1]).show();
+            });
+            $('#nextGw').on('click', function(){
+                const $btns = $('#gwTabs button.nav-link');
+                const i = getActiveIndex();
+                if (i < $btns.length - 1) new bootstrap.Tab($btns[i+1]).show();
             });
 
             // View toggle for GW1 (top controls)
