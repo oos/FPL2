@@ -92,6 +92,11 @@ def create_app():
         team_names = [team.name for team in teams]
         
         return render_template('players.html', players=players_data, team_names=team_names)
+
+    @app.route('/players/individual')
+    def players_individual_redirect():
+        """Simple forward to the players page for now; placeholder for future individual UI."""
+        return render_template('players.html', players=[p.to_dict() for p in current_app.db_manager.get_all_players()], team_names=[t.name for t in current_app.db_manager.get_all_teams()])
     @app.route('/player/<int:player_id>')
     def player_page(player_id: int):
         """Serve an individual player page"""
@@ -243,7 +248,21 @@ def create_app():
     def api_teams():
         """Get all teams as JSON"""
         teams = current_app.db_manager.get_all_teams()
-        return jsonify([team.to_dict() for team in teams])
+        # Attach a best-effort local logo path if present
+        import os
+        static_root = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'static')
+        assets_dir = os.path.join(static_root, 'assets', 'teams')
+        enriched = []
+        for team in teams:
+            data = team.to_dict()
+            short = (team.short_name or team.name).lower().replace(' ', '')
+            for ext in ['svg', 'png', 'jpg', 'jpeg', 'webp']:
+                candidate = os.path.join(assets_dir, f"{short}.{ext}")
+                if os.path.exists(candidate):
+                    data['logo_path'] = f"assets/teams/{short}.{ext}"
+                    break
+            enriched.append(data)
+        return jsonify(enriched)
 
     @app.route('/team/<int:team_id>')
     def team_page(team_id: int):
@@ -257,7 +276,19 @@ def create_app():
         squad = [p.to_dict() for p in all_players if p.team == team.name]
         # Fixtures schedule
         fixtures = [f.to_dict() for f in db_manager.get_all_fixtures() if f.home_team == team.name or f.away_team == team.name]
-        return render_template('team.html', team=team.to_dict(), squad=squad, fixtures=fixtures)
+        # Resolve local team logo (downloaded into static/assets/teams)
+        import os
+        static_root = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'static')
+        assets_dir = os.path.join(static_root, 'assets', 'teams')
+        short = (team.short_name or team.name).lower().replace(' ', '')
+        possible_exts = ['svg', 'png', 'jpg', 'jpeg', 'webp']
+        logo_file = None
+        for ext in possible_exts:
+            candidate = os.path.join(assets_dir, f"{short}.{ext}")
+            if os.path.exists(candidate):
+                logo_file = f"assets/teams/{short}.{ext}"
+                break
+        return render_template('team.html', team=team.to_dict(), squad=squad, fixtures=fixtures, team_logo_file=logo_file)
     
     @app.route('/api/fdr')
     def api_fdr():

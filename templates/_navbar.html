@@ -4,7 +4,13 @@
     <div class="navbar-nav">
       <a class="nav-link" href="/">Dashboard</a>
       <a class="nav-link" href="/fdr">FDR</a>
-      <a class="nav-link" href="/players">Players</a>
+      <div class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" href="/players" id="playersDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">Players</a>
+        <ul class="dropdown-menu" aria-labelledby="playersDropdown">
+          <li><a class="dropdown-item" href="/players">All</a></li>
+          <li><a class="dropdown-item" href="/players/individual">Individual</a></li>
+        </ul>
+      </div>
       <a class="nav-link" href="/teams">Teams</a>
       <a class="nav-link" href="/squad">Squad</a>
     </div>

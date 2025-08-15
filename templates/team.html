@@ -12,22 +12,18 @@
     </style>
 </head>
 <body class="p-4">
-    <nav class="navbar navbar-expand-lg navbar-light bg-light mb-4">
-        <div class="container-fluid">
-            <a class="navbar-brand fw-bold text-decoration-none" href="/">FPL Tools</a>
-            <div class="navbar-nav">
-                <a class="nav-link" href="/">FDR</a>
-                <a class="nav-link" href="/players">Players</a>
-                <a class="nav-link" href="/squad">Squad</a>
-            </div>
-        </div>
-    </nav>
+    {% include '_navbar.html' %}
 
     <div class="container">
         <div class="row g-3">
             <div class="col-lg-5">
                 <div class="card p-3">
-                    <h3 class="mb-1">{{ team.name }}</h3>
+                    <div class="d-flex align-items-center gap-3 mb-2">
+                        {% if team_logo_file %}
+                            <img src="/static/{{ team_logo_file }}" alt="{{ team.name }} logo" style="height:48px;width:auto;"/>
+                        {% endif %}
+                        <h3 class="mb-0">{{ team.name }}</h3>
+                    </div>
                     <div>Short Name: <strong>{{ team.short_name }}</strong></div>
                     <div>Code: <strong>{{ team.code }}</strong></div>
                     <div>Strength: <strong>{{ team.strength }}</strong></div>
