@@ -383,6 +383,8 @@
             margin-bottom: 2rem;
             transition: all 0.3s ease;
         }
+        /* Hide legacy filters since we move filters under headers */
+        .filters-section, .views-section { display: none !important; }
         
         .filters-section:hover {
             box-shadow: 0 4px 20px rgba(0,0,0,0.15);
@@ -562,6 +564,38 @@
                         <th>GW7</th>
                         <th>GW8</th>
                         <th>GW9</th>
+                    </tr>
+                    <tr class="filters-row">
+                        <th><input id="filter-name" type="text" class="form-control form-control-sm" placeholder="Search name"></th>
+                        <th>
+                            <select id="filter-position" class="form-select form-select-sm">
+                                <option value="">All</option>
+                                <option value="Goalkeeper">Goalkeeper</option>
+                                <option value="Defender">Defender</option>
+                                <option value="Midfielder">Midfielder</option>
+                                <option value="Forward">Forward</option>
+                            </select>
+                        </th>
+                        <th>
+                            <select id="filter-team" class="form-select form-select-sm">
+                                <option value="">All</option>
+                            </select>
+                        </th>
+                        <th><input id="filter-price" type="text" class="form-control form-control-sm" placeholder="e.g. 7.0"></th>
+                        <th><input id="filter-chance" type="text" class="form-control form-control-sm" placeholder=">=75"></th>
+                        <th><input id="filter-ppm" type="text" class="form-control form-control-sm" placeholder=">=50"></th>
+                        <th><input id="filter-total" type="text" class="form-control form-control-sm" placeholder=">=100"></th>
+                        <th><input id="filter-form" type="text" class="form-control form-control-sm" placeholder=">=5"></th>
+                        <th><input id="filter-own" type="text" class="form-control form-control-sm" placeholder=">=10%"></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -871,6 +905,12 @@
                         $('.dt-top-info').addClass('d-flex align-items-center');
                         $('.dt-top-search').addClass('d-flex justify-content-end');
 
+                        // Populate team filter options
+                        const teams = [...new Set(playersData.map(p => p.team))].sort();
+                        teams.forEach(team => {
+                            $('#filter-team').append(`<option value="${team}">${team}</option>`);
+                        });
+
                         // Now that DataTable is ready, update the dropdown
                         updateViewsDropdown();
                         
@@ -879,6 +919,38 @@
                     }
                 });
             }
+
+            // Column filter bindings (simple contains/thresholds)
+            $('#filter-name').on('keyup change', function(){ currentTable.column(0).search(this.value).draw(); });
+            $('#filter-position').on('change', function(){ currentTable.column(1).search(this.value).draw(); });
+            $('#filter-team').on('change', function(){ currentTable.column(2).search(this.value).draw(); });
+
+            function applyNumericFilter(inputId, columnIndex, comparator) {
+                $(inputId).on('keyup change', function(){
+                    const val = this.value.trim();
+                    $.fn.dataTable.ext.search = $.fn.dataTable.ext.search.filter(fn => !fn._col || fn._col !== columnIndex);
+                    if (!val) { currentTable.draw(); return; }
+                    let op = '>='; let num = parseFloat(val.replace(/[^0-9.]/g, ''));
+                    if (val.startsWith('<=')) op = '<='; else if (val.startsWith('<')) op = '<';
+                    else if (val.startsWith('>=')) op = '>='; else if (val.startsWith('>')) op = '>';
+                    const predicate = function(settings, data){
+                        const cell = parseFloat((data[columnIndex]||'').toString().replace(/[^0-9.]/g,'')) || 0;
+                        if (op === '>=') return cell >= num; if (op === '>') return cell > num;
+                        if (op === '<=') return cell <= num; if (op === '<') return cell < num;
+                        return true;
+                    };
+                    predicate._col = columnIndex;
+                    $.fn.dataTable.ext.search.push(predicate);
+                    currentTable.draw();
+                });
+            }
+
+            applyNumericFilter('#filter-price', 3);
+            applyNumericFilter('#filter-chance', 4);
+            applyNumericFilter('#filter-ppm', 5);
+            applyNumericFilter('#filter-total', 6);
+            applyNumericFilter('#filter-form', 7);
+            applyNumericFilter('#filter-own', 8);
             
             function setupEventHandlers() {
                 // Save view button
