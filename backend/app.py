@@ -17,8 +17,55 @@ def create_app():
     with app.app_context():
         app.db_manager = DatabaseManager()
     
-    # Root route - FDR page
+    # Dashboard (Home)
     @app.route('/')
+    def dashboard():
+        """Serve the dashboard page with key summaries for upcoming weeks"""
+        db_manager = current_app.db_manager
+        # Fixtures and upcoming GW
+        fixtures = db_manager.get_all_fixtures()
+        gws = sorted({f.gameweek for f in fixtures})
+        upcoming_gw = gws[0] if gws else 1
+
+        # Easiest/toughest fixtures for upcoming GW
+        gw_fixtures = [f for f in fixtures if f.gameweek == upcoming_gw]
+        for_gw_sorted = sorted(
+            gw_fixtures,
+            key=lambda f: (f.home_difficulty + f.away_difficulty, f.home_team)
+        )
+        easiest = for_gw_sorted[:6]
+        toughest = list(reversed(for_gw_sorted))[:6]
+        # Provide full, sorted list for dashboard "All Fixtures" panel
+        all_fixtures = for_gw_sorted
+
+        # Suggested XI for upcoming GW using SquadService
+        squad_service = SquadService(db_manager)
+        strategy = squad_service.get_optimal_squad_for_gw1_9()
+        starting_xi = []
+        bench = []
+        formation = 'Unknown'
+        gw_points = 0.0
+        if strategy and upcoming_gw in strategy:
+            entry = strategy[upcoming_gw]
+            starting_xi = entry.get('starting_xi', [])
+            bench = entry.get('bench', [])
+            formation = squad_service.get_formation(starting_xi)
+            gw_points = sum(p.get(f"gw{upcoming_gw}_points", 0) or 0 for p in starting_xi)
+
+        return render_template(
+            'dashboard.html',
+            upcoming_gw=upcoming_gw,
+            easiest=easiest,
+            toughest=toughest,
+            xi=starting_xi,
+            bench=bench,
+            formation=formation,
+            gw_points=gw_points,
+            all_fixtures=all_fixtures,
+        )
+
+    # FDR page
+    @app.route('/fdr')
     def fdr_page():
         """Serve the FDR page"""
         return render_template('fdr.html')
@@ -38,6 +85,36 @@ def create_app():
         team_names = [team.name for team in teams]
         
         return render_template('players.html', players=players_data, team_names=team_names)
+    @app.route('/player/<int:player_id>')
+    def player_page(player_id: int):
+        """Serve an individual player page"""
+        db_manager = current_app.db_manager
+        player = db_manager.get_player_by_id(player_id)
+        if not player:
+            return f"Player with id {player_id} not found", 404
+        # Convert to dict for simple rendering
+        pdata = player.to_dict() if hasattr(player, 'to_dict') else {
+            'id': player.id,
+            'name': player.name,
+            'position': player.position,
+            'team': player.team,
+            'price': player.price,
+            'total_points': player.total_points,
+            'form': getattr(player, 'form', 0),
+            'ownership': getattr(player, 'ownership', 0),
+            'chance_of_playing_next_round': getattr(player, 'chance_of_playing_next_round', 100),
+            'points_per_million': getattr(player, 'points_per_million', 0),
+            'gw1_points': getattr(player, 'gw1_points', 0),
+            'gw2_points': getattr(player, 'gw2_points', 0),
+            'gw3_points': getattr(player, 'gw3_points', 0),
+            'gw4_points': getattr(player, 'gw4_points', 0),
+            'gw5_points': getattr(player, 'gw5_points', 0),
+            'gw6_points': getattr(player, 'gw6_points', 0),
+            'gw7_points': getattr(player, 'gw7_points', 0),
+            'gw8_points': getattr(player, 'gw8_points', 0),
+            'gw9_points': getattr(player, 'gw9_points', 0),
+        }
+        return render_template('player.html', player=pdata)
     
     @app.route('/squad')
     def squad_page():
@@ -57,14 +134,20 @@ def create_app():
             total_points = 0
             total_transfers = 0
             
+            running_cumulative_total = 0.0
             for gw in range(1, 10):  # GW1-9
                 gw_data = strategy_data[gw]
                 starting_xi = gw_data["starting_xi"]
                 bench = gw_data["bench"]
                 
                 # Calculate points for this GW
-                gw_points = sum(player.get(f"gw{gw}_points", 0) or 0 for player in starting_xi)
-                total_points += gw_points
+                gw_points_field = f"gw{gw}_points"
+                gw_points = sum(player.get(gw_points_field, 0) or 0 for player in starting_xi)
+                
+                # Captaincy: select best scorer in XI and add bonus equal to their GW points
+                captain_player = max(starting_xi, key=lambda p: p.get(gw_points_field, 0) or 0) if starting_xi else None
+                captain_name = captain_player.get("name") if captain_player else None
+                captain_bonus = (captain_player.get(gw_points_field, 0) or 0) if captain_player else 0
                 
                 # Get transfer information
                 transfers_in = gw_data.get("transfers", {}).get("in", [])
@@ -73,6 +156,16 @@ def create_app():
                 if gw > 1:  # GW1 has no transfers
                     total_transfers += len(transfers_in)
                 
+                # Hits: -4 per transfer beyond 1 free transfer each week (GW>1)
+                free_transfers = 1 if gw > 1 else 0
+                hits_over_free = max(0, len(transfers_in) - free_transfers)
+                hits_points = -4 * hits_over_free
+                
+                # Total points with captaincy and hits
+                total_gw_points = gw_points + captain_bonus + hits_points
+                total_points += total_gw_points
+                running_cumulative_total += total_gw_points
+
                 # Create transfer mapping (who replaced whom)
                 transfer_mapping = {}
                 if gw > 1 and len(transfers_in) > 0 and len(transfers_out) > 0:
@@ -107,6 +200,12 @@ def create_app():
                     "bench_promotions": bench_promotions,
                     "bench_demotions": bench_demotions,
                     "points": gw_points,
+                    "captain_name": captain_name,
+                    "captain_bonus": captain_bonus,
+                    "hits_points": hits_points,
+                    "total_with_captain_and_hits": total_gw_points,
+                    "squad_value": sum((p.get("price",0) or 0) for p in starting_xi + bench),
+                    "cumulative_total": running_cumulative_total,
                     "formation": squad_service.get_formation(starting_xi)
                 })
             
@@ -138,6 +237,20 @@ def create_app():
         """Get all teams as JSON"""
         teams = current_app.db_manager.get_all_teams()
         return jsonify([team.to_dict() for team in teams])
+
+    @app.route('/team/<int:team_id>')
+    def team_page(team_id: int):
+        """Serve a team page with squad and fixtures"""
+        db_manager = current_app.db_manager
+        team = db_manager.get_team_by_id(team_id)
+        if not team:
+            return f"Team with id {team_id} not found", 404
+        # Squad
+        all_players = db_manager.get_all_players()
+        squad = [p.to_dict() for p in all_players if p.team == team.name]
+        # Fixtures schedule
+        fixtures = [f.to_dict() for f in db_manager.get_all_fixtures() if f.home_team == team.name or f.away_team == team.name]
+        return render_template('team.html', team=team.to_dict(), squad=squad, fixtures=fixtures)
     
     @app.route('/api/fdr')
     def api_fdr():

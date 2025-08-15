@@ -1,0 +1,129 @@
+{
+  "timestamp": "20250814_231951",
+  "squad_optimization": {
+    "total_expected_points": 149.70000000000002,
+    "formation": "0-0-2-1",
+    "squad": [
+      {
+        "name": "M.Salah",
+        "position": "Midfielder",
+        "team": "Unknown",
+        "total_points": 57.0,
+        "price": 14.5,
+        "gw1_points": 6.7,
+        "gw2_points": 6.1,
+        "gw3_points": 5.6,
+        "gw4_points": 7.0,
+        "gw5_points": 6.6,
+        "gw6_points": 5.7,
+        "gw7_points": 5.7,
+        "gw8_points": 7.4,
+        "gw9_points": 6.2
+      },
+      {
+        "name": "Haaland",
+        "position": "Forward",
+        "team": "Unknown",
+        "total_points": 47.0,
+        "price": 14.0,
+        "gw1_points": 5.1,
+        "gw2_points": 6.3,
+        "gw3_points": 5.1,
+        "gw4_points": 5.8,
+        "gw5_points": 3.8,
+        "gw6_points": 6.6,
+        "gw7_points": 4.8,
+        "gw8_points": 5.1,
+        "gw9_points": 4.4
+      },
+      {
+        "name": "Palmer",
+        "position": "Midfielder",
+        "team": "Unknown",
+        "total_points": 45.7,
+        "price": 10.5,
+        "gw1_points": 5.1,
+        "gw2_points": 4.9,
+        "gw3_points": 5.5,
+        "gw4_points": 4.6,
+        "gw5_points": 4.3,
+        "gw6_points": 5.9,
+        "gw7_points": 4.4,
+        "gw8_points": 4.3,
+        "gw9_points": 6.7
+      }
+    ],
+    "starting_xi": [
+      {
+        "name": "M.Salah",
+        "position": "Midfielder",
+        "team": "Unknown",
+        "total_points": 57.0,
+        "price": 14.5
+      },
+      {
+        "name": "Haaland",
+        "position": "Forward",
+        "team": "Unknown",
+        "total_points": 47.0,
+        "price": 14.0
+      },
+      {
+        "name": "Palmer",
+        "position": "Midfielder",
+        "team": "Unknown",
+        "total_points": 45.7,
+        "price": 10.5
+      }
+    ],
+    "team_distribution": {
+      "Unknown": 3
+    },
+    "position_distribution": {
+      "Midfielder": 2,
+      "Forward": 1
+    },
+    "gameweek_breakdown": {
+      "1": 16.9,
+      "2": 17.299999999999997,
+      "3": 16.2,
+      "4": 17.4,
+      "5": 14.7,
+      "6": 18.200000000000003,
+      "7": 14.9,
+      "8": 16.8,
+      "9": 17.3
+    },
+    "optimization_stats": {
+      "iterations": 50000,
+      "improvements": 0
+    }
+  },
+  "transfer_optimization": {
+    "total_hits_taken": 0,
+    "total_net_benefit": 0,
+    "cumulative_points": {
+      "0": 0,
+      "1": 0,
+      "2": 0,
+      "3": 0,
+      "4": 0,
+      "5": 0,
+      "6": 0,
+      "7": 0,
+      "8": 0,
+      "9": 0
+    },
+    "gameweek_strategies": {
+      "1": [],
+      "2": [],
+      "3": [],
+      "4": [],
+      "5": [],
+      "6": [],
+      "7": [],
+      "8": [],
+      "9": []
+    }
+  }
+}

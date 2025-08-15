@@ -141,7 +141,7 @@
         <div class="container-fluid">
             <span class="navbar-brand"><i class="fas fa-chart-line"></i> FPL Tools</span>
             <div class="navbar-nav">
-                <a class="nav-link active" href="/">FDR Table</a>
+                <a class="nav-link active" href="/">FDR</a>
                 <a class="nav-link" href="/players">Players</a>
                 <a class="nav-link" href="/squad">Squad</a>
             </div>
@@ -151,70 +151,34 @@
     <div class="container-fluid">
         <h1 class="text-center">Fixture Difficulty Ratings (FDR)</h1>
         
-        <!-- FDR Legend -->
-        <div class="legend">
-            <h5>FDR Color Legend:</h5>
-            <div class="legend-item">
-                <span class="legend-color" style="background-color: #234f1e;"></span>
-                <strong>1 - Very Easy</strong> (Green)
+        <!-- Weekly Tabs + GW navigation -->
+        <div class="d-flex justify-content-between align-items-center mb-2">
+            <div class="btn-group" role="group" aria-label="GW navigation">
+                <button class="btn btn-outline-secondary" id="prevGw" title="Previous GW"><i class="fas fa-chevron-left"></i></button>
+                <button class="btn btn-outline-secondary" id="nextGw" title="Next GW"><i class="fas fa-chevron-right"></i></button>
             </div>
-            <div class="legend-item">
-                <span class="legend-color" style="background-color: #4a7c59;"></span>
-                <strong>2 - Easy</strong> (Light Green)
-            </div>
-            <div class="legend-item">
-                <span class="legend-color" style="background-color: #f39c12;"></span>
-                <strong>3 - Medium</strong> (Orange)
-            </div>
-            <div class="legend-item">
-                <span class="legend-color" style="background-color: #e74c3c;"></span>
-                <strong>4 - Hard</strong> (Red)
-            </div>
-            <div class="legend-item">
-                <span class="legend-color" style="background-color: #8b0000;"></span>
-                <strong>5 - Very Hard</strong> (Dark Red)
-            </div>
+            <ul class="nav nav-tabs" id="gwTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="all-tab" data-bs-toggle="tab" data-bs-target="#all" type="button" role="tab">ALL</button>
+                </li>
+                <!-- GW tabs will be injected here up to GW38 -->
+            </ul>
         </div>
-        
-        <!-- Weekly Tabs -->
-        <ul class="nav nav-tabs" id="gwTabs" role="tablist">
-            <li class="nav-item" role="presentation">
-                <button class="nav-link active" id="all-tab" data-bs-toggle="tab" data-bs-target="#all" type="button" role="tab">ALL</button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="gw1-tab" data-bs-toggle="tab" data-bs-target="#gw1" type="button" role="tab">GW1</button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="gw2-tab" data-bs-toggle="tab" data-bs-target="#gw2" type="button" role="tab">GW2</button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="gw3-tab" data-bs-toggle="tab" data-bs-target="#gw3" type="button" role="tab">GW3</button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="gw4-tab" data-bs-toggle="tab" data-bs-target="#gw4" type="button" role="tab">GW4</button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="gw5-tab" data-bs-toggle="tab" data-bs-target="#gw5" type="button" role="tab">GW5</button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="gw6-tab" data-bs-toggle="tab" data-bs-target="#gw6" type="button" role="tab">GW6</button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="gw7-tab" data-bs-toggle="tab" data-bs-target="#gw7" type="button" role="tab">GW7</button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="gw8-tab" data-bs-toggle="tab" data-bs-target="#gw8" type="button" role="tab">GW8</button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="gw9-tab" data-bs-toggle="tab" data-bs-target="#gw9" type="button" role="tab">GW9</button>
-            </li>
-        </ul>
         
         <!-- Weekly Content -->
         <div class="tab-content" id="gwTabContent">
             <div class="tab-pane fade show active" id="all" role="tabpanel">
                 <div class="gw-card">
-                    <h3>All Fixtures (GW1-9)</h3>
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h3 class="mb-0">All Fixtures (GW1-9)</h3>
+                        <div class="legend d-inline-block p-2 m-0" style="box-shadow:none; background:transparent;">
+                            <span class="legend-item"><span class="legend-color" style="background-color: #234f1e;"></span><strong>1 - Very Easy</strong></span>
+                            <span class="legend-item"><span class="legend-color" style="background-color: #4a7c59;"></span><strong>2 - Easy</strong></span>
+                            <span class="legend-item"><span class="legend-color" style="background-color: #f39c12;"></span><strong>3 - Medium</strong></span>
+                            <span class="legend-item"><span class="legend-color" style="background-color: #e74c3c;"></span><strong>4 - Hard</strong></span>
+                            <span class="legend-item"><span class="legend-color" style="background-color: #8b0000;"></span><strong>5 - Very Hard</strong></span>
+                        </div>
+                    </div>
                     <div class="table-responsive">
                         <table id="fdrTableAll" class="table table-striped table-hover">
                             <thead>
@@ -233,186 +197,7 @@
                     </div>
                 </div>
             </div>
-            <div class="tab-pane fade" id="gw1" role="tabpanel">
-                <div class="gw-card">
-                    <h3>GW1 Fixtures</h3>
-                    <div class="table-responsive">
-                        <table id="fdrTable1" class="table table-striped table-hover">
-                            <thead>
-                                <tr>
-                                    <th>Home Team</th>
-                                    <th>Home FDR</th>
-                                    <th>Away Team</th>
-                                    <th>Away FDR</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <!-- Data will be populated by JavaScript -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-            <div class="tab-pane fade" id="gw2" role="tabpanel">
-                <div class="gw-card">
-                    <h3>GW2 Fixtures</h3>
-                    <div class="table-responsive">
-                        <table id="fdrTable2" class="table table-striped table-hover">
-                            <thead>
-                                <tr>
-                                    <th>Home Team</th>
-                                    <th>Home FDR</th>
-                                    <th>Away Team</th>
-                                    <th>Away FDR</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <!-- Data will be populated by JavaScript -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-            <div class="tab-pane fade" id="gw3" role="tabpanel">
-                <div class="gw-card">
-                    <h3>GW3 Fixtures</h3>
-                    <div class="table-responsive">
-                        <table id="fdrTable3" class="table table-striped table-hover">
-                            <thead>
-                                <tr>
-                                    <th>Home Team</th>
-                                    <th>Home FDR</th>
-                                    <th>Away Team</th>
-                                    <th>Away FDR</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <!-- Data will be populated by JavaScript -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-            <div class="tab-pane fade" id="gw4" role="tabpanel">
-                <div class="gw-card">
-                    <h3>GW4 Fixtures</h3>
-                    <div class="table-responsive">
-                        <table id="fdrTable4" class="table table-striped table-hover">
-                            <thead>
-                                <tr>
-                                    <th>Home Team</th>
-                                    <th>Home FDR</th>
-                                    <th>Away Team</th>
-                                    <th>Away FDR</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <!-- Data will be populated by JavaScript -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-            <div class="tab-pane fade" id="gw5" role="tabpanel">
-                <div class="gw-card">
-                    <h3>GW5 Fixtures</h3>
-                    <div class="table-responsive">
-                        <table id="fdrTable5" class="table table-striped table-hover">
-                            <thead>
-                                <tr>
-                                    <th>Home Team</th>
-                                    <th>Home FDR</th>
-                                    <th>Away Team</th>
-                                    <th>Away FDR</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <!-- Data will be populated by JavaScript -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-            <div class="tab-pane fade" id="gw6" role="tabpanel">
-                <div class="gw-card">
-                    <h3>GW6 Fixtures</h3>
-                    <div class="table-responsive">
-                        <table id="fdrTable6" class="table table-striped table-hover">
-                            <thead>
-                                <tr>
-                                    <th>Home Team</th>
-                                    <th>Home FDR</th>
-                                    <th>Away Team</th>
-                                    <th>Away FDR</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <!-- Data will be populated by JavaScript -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-            <div class="tab-pane fade" id="gw7" role="tabpanel">
-                <div class="gw-card">
-                    <h3>GW7 Fixtures</h3>
-                    <div class="table-responsive">
-                        <table id="fdrTable7" class="table table-striped table-hover">
-                            <thead>
-                                <tr>
-                                    <th>Home Team</th>
-                                    <th>Home FDR</th>
-                                    <th>Away Team</th>
-                                    <th>Away FDR</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <!-- Data will be populated by JavaScript -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-            <div class="tab-pane fade" id="gw8" role="tabpanel">
-                <div class="gw-card">
-                    <h3>GW8 Fixtures</h3>
-                    <div class="table-responsive">
-                        <table id="fdrTable8" class="table table-striped table-hover">
-                            <thead>
-                                <tr>
-                                    <th>Home Team</th>
-                                    <th>Home FDR</th>
-                                    <th>Away Team</th>
-                                    <th>Away FDR</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <!-- Data will be populated by JavaScript -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-            <div class="tab-pane fade" id="gw9" role="tabpanel">
-                <div class="gw-card">
-                    <h3>GW9 Fixtures</h3>
-                    <div class="table-responsive">
-                        <table id="fdrTable9" class="table table-striped table-hover">
-                            <thead>
-                                <tr>
-                                    <th>Home Team</th>
-                                    <th>Home FDR</th>
-                                    <th>Away Team</th>
-                                    <th>Away FDR</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <!-- Data will be populated by JavaScript -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
+            <!-- GW panes will be injected here by JS -->
         </div>
     </div>
     

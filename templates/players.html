@@ -441,7 +441,7 @@
         <div class="container-fluid">
             <span class="navbar-brand"><i class="fas fa-users"></i> FPL Tools</span>
             <div class="navbar-nav">
-                <a class="nav-link" href="/">FDR Table</a>
+                <a class="nav-link" href="/">FDR</a>
                 <a class="nav-link active" href="/players">Players</a>
                 <a class="nav-link" href="/squad">Squad</a>
             </div>
@@ -546,19 +546,7 @@
             </div>
         </div>
         
-        <!-- Filter Summary -->
-        <div id="filterSummary" class="filter-summary mb-3">
-            <div class="row">
-                <div class="col-12">
-                    <div class="alert alert-info">
-                        <i class="fas fa-info-circle me-2"></i>
-                        <strong>Filter Summary:</strong> 
-                        <span id="filterSummaryText">Showing all 666 players</span>
-                        <span id="filterSummaryDetails" class="ms-3 text-muted"></span>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <!-- Filter Summary removed; info will be inline with search via DataTables DOM -->
         
         <!-- Players Table -->
         <div class="table-responsive scale-in table-wrapper">
@@ -709,12 +697,20 @@
                 }
                 
                 currentTable = $('#playersTable').DataTable({
+                    // place info text on top-left and search on top-right
+                    dom: '<"row align-items-center mb-2"<"col-md-6 dt-top-info"i><"col-md-6 dt-top-search"f>>rt<"row mt-2"<"col-md-6"l><"col-md-6"p>>',
                     data: playersData,
                     columns: [
                         { 
                             data: 'name', 
                             className: 'text-center',
-                            width: '12%'
+                            width: '12%',
+                            render: function(data, type, row) {
+                                if (type === 'display') {
+                                    return `<a href="/player/${row.id}" class="text-decoration-none">${data}</a>`;
+                                }
+                                return data;
+                            }
                         },
                         { 
                             data: 'position',
@@ -733,7 +729,13 @@
                         { 
                             data: 'team', 
                             className: 'text-center',
-                            width: '8%'
+                            width: '8%',
+                            render: function(data, type, row) {
+                                if (type === 'display' && row.team_id) {
+                                    return `<a href="/team/${row.team_id}" class="text-decoration-none">${data}</a>`;
+                                }
+                                return data;
+                            }
                         },
                         { 
                             data: 'price', 
@@ -874,6 +876,10 @@
                         // Column widths are now fixed, no need to adjust
                         console.log('Fixed column widths applied successfully');
                         
+                        // Ensure info is inline at top next to the search
+                        $('.dt-top-info').addClass('d-flex align-items-center');
+                        $('.dt-top-search').addClass('d-flex justify-content-end');
+
                         // Now that DataTable is ready, update the dropdown
                         updateViewsDropdown();
                         

@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>FPL Dashboard</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <style>
+    body{background:#f8f9fa}
+    .card{box-shadow:0 2px 10px rgba(0,0,0,.08)}
+    .badge-pos{font-size:.75rem;padding:.3rem .45rem}
+    .gk{background:#dc3545;color:#fff}.def{background:#007bff;color:#fff}.mid{background:#28a745;color:#fff}.fwd{background:#ffc107;color:#212529}
+    .fdr-badge{padding:4px 8px;border-radius:6px;color:#fff;font-weight:700}
+  </style>
+</head>
+<body class="p-4">
+  <nav class="navbar navbar-expand-lg navbar-light bg-light mb-4">
+    <div class="container-fluid">
+      <a class="navbar-brand fw-bold text-decoration-none" href="/">FPL Tools</a>
+      <div class="navbar-nav">
+        <a class="nav-link active" href="/">Dashboard</a>
+        <a class="nav-link" href="/fdr">FDR</a>
+        <a class="nav-link" href="/players">Players</a>
+        <a class="nav-link" href="/squad">Squad</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container">
+    <div class="row g-3">
+      <div class="col-lg-4">
+        <div class="card p-3">
+          <h4 class="mb-1">Upcoming Gameweek</h4>
+          <div>GW: <strong>{{ upcoming_gw }}</strong></div>
+        </div>
+        <div class="card p-3 mt-3">
+          <h5>All Fixtures (GW{{ upcoming_gw }})</h5>
+          <ul class="list-group list-group-flush">
+            {% for f in all_fixtures %}
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              <span>
+                {{ f.home_team }}
+                <span class="fdr-badge ms-2" style="background:#4a7c59">{{ f.home_difficulty }}</span>
+                <span class="mx-2">vs</span>
+                <span class="fdr-badge me-2" style="background:#4a7c59">{{ f.away_difficulty }}</span>
+                {{ f.away_team }}
+              </span>
+            </li>
+            {% endfor %}
+          </ul>
+        </div>
+        <div class="card p-3 mt-3">
+          <h5>Toughest Fixtures (GW{{ upcoming_gw }})</h5>
+          <ul class="list-group list-group-flush">
+            {% for f in toughest %}
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              <span>
+                {{ f.home_team }}
+                <span class="fdr-badge ms-2" style="background:#e74c3c">{{ f.home_difficulty }}</span>
+                <span class="mx-2">vs</span>
+                <span class="fdr-badge me-2" style="background:#e74c3c">{{ f.away_difficulty }}</span>
+                {{ f.away_team }}
+              </span>
+            </li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+      <div class="col-lg-8">
+        <div class="card p-3">
+          <h4 class="mb-2">Suggested XI (GW{{ upcoming_gw }})</h4>
+          <div class="mb-2">Formation: <strong>{{ formation }}</strong> | Team Points: <strong>{{ '%.1f'|format(gw_points) }}</strong></div>
+          <div class="table-responsive">
+            <table class="table table-sm table-striped">
+              <thead><tr><th>Name</th><th>Pos</th><th>Team</th><th>xP</th></tr></thead>
+              <tbody>
+                {% for p in xi %}
+                {% set poscls = 'gk' if p.position=='Goalkeeper' else ('def' if p.position=='Defender' else ('mid' if p.position=='Midfielder' else 'fwd')) %}
+                <tr>
+                  <td><a href="/player/{{ p.id }}" class="text-decoration-none">{{ p.name }}</a></td>
+                  <td><span class="badge badge-pos {{ poscls }}">{{ p.position[0:3] }}</span></td>
+                  <td>{% if p.team_id %}<a href="/team/{{ p.team_id }}" class="text-decoration-none">{{ p.team }}</a>{% else %}{{ p.team }}{% endif %}</td>
+                  <td>{{ '%.1f'|format(p['gw' ~ upcoming_gw ~ '_points'] | default(0.0)) }}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          <h5 class="mt-3">Bench</h5>
+          <ul>
+            {% for p in bench %}
+            <li><a href="/player/{{ p.id }}" class="text-decoration-none">{{ p.name }}</a> ({{ p.position }})</li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
+
+
