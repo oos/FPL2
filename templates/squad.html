@@ -74,6 +74,13 @@
             margin-top: 5px;
             border-left: 3px solid #28a745;
         }
+        /* Make the arrow between transfer IN/OUT much larger */
+        .transfer-summary .transfer-arrow {
+            font-size: 300%;
+            line-height: 0.6;
+            vertical-align: middle;
+            display: inline-block;
+        }
         .transfer-summary small {
             font-size: 0.85em;
             line-height: 1.4;
@@ -348,12 +355,16 @@
     {% include '_navbar.html' %}
     
     <div class="container-fluid">
-        <h1 class="text-center mb-4">FPL Optimal Squad - GW1-9</h1>
         
         <!-- Summary Section removed by request -->
         
-        <!-- Weekly Tabs -->
-        <ul class="nav nav-tabs" id="gwTabs" role="tablist">
+        <!-- Weekly Tabs with GW navigation (tabs placed immediately to the right of arrows) -->
+        <div class="d-flex align-items-center mb-2 flex-wrap" style="gap:8px;">
+        <div class="btn-group" role="group" aria-label="GW navigation">
+            <button class="btn btn-outline-secondary" id="prevGw" title="Previous GW"><i class="fas fa-chevron-left"></i></button>
+            <button class="btn btn-outline-secondary" id="nextGw" title="Next GW"><i class="fas fa-chevron-right"></i></button>
+        </div>
+        <ul class="nav nav-tabs ms-2" id="gwTabs" role="tablist">
             <li class="nav-item" role="presentation">
                 <button class="nav-link active" id="gw1-tab" data-bs-toggle="tab" data-bs-target="#gw1" type="button" role="tab" data-gw="1">
                     GW1
@@ -400,6 +411,7 @@
                 </button>
             </li>
         </ul>
+        </div>
         
         <!-- Weekly Content -->
         <div class="tab-content" id="gwTabContent">
@@ -432,6 +444,12 @@
                     </div>
                     
                     
+                    
+                    <!-- Transfers summary (always visible counts) -->
+                    <div class="mb-2">
+                        <h5 class="mb-0">Transfers: <span id="gw1TransfersIn">0</span> IN, <span id="gw1TransfersOut">0</span> OUT</h5>
+                        <div id="gw1TransferSummary" class="transfer-summary" style="display: none;"></div>
+                    </div>
                     
                     <!-- Compact Table View -->
                     <div id="gw1TableView" class="table-view">
@@ -516,6 +534,12 @@
                     </div>
                     
                     
+                    
+                    <!-- Transfers summary (always visible counts) -->
+                    <div class="mb-2">
+                        <h5 class="mb-0">Transfers: <span id="gw2TransfersIn">0</span> IN, <span id="gw2TransfersOut">0</span> OUT</h5>
+                        <div id="gw2TransferSummary" class="transfer-summary" style="display: none;"></div>
+                    </div>
                     
                     <!-- Compact Table View -->
                     <div id="gw2TableView" class="table-view">
@@ -1187,6 +1211,18 @@
                     updateActiveTab(gw);
                 }
             });
+            // Arrow navigation between tabs (same UX as FDR page)
+            const getActiveIndex = () => $('#gwTabs button.nav-link').index($('#gwTabs button.nav-link.active'));
+            $('#prevGw').on('click', function(){
+                const $btns = $('#gwTabs button.nav-link');
+                const i = getActiveIndex();
+                if (i > 0) new bootstrap.Tab($btns[i-1]).show();
+            });
+            $('#nextGw').on('click', function(){
+                const $btns = $('#gwTabs button.nav-link');
+                const i = getActiveIndex();
+                if (i < $btns.length - 1) new bootstrap.Tab($btns[i+1]).show();
+            });
 
             // View toggle for GW1 (top controls)
             $('#gw1TableTop').on('change', function() {
@@ -1235,6 +1271,42 @@
                     }
                 });
             }
+
+            // Reposition Table/Pitch toggles inline with Transfers header for all GWs
+            function repositionViewToggles(){
+                try {
+                    // GW1 & GW2: move top btn-group next to transfers counts
+                    [1,2].forEach(function(gw){
+                        const $btnGroup = $(`#gw${gw}TableTop`).closest('.btn-group');
+                        if ($btnGroup.length){
+                            const $h5 = $(`#gw${gw}TransfersIn`).closest('h5');
+                            if ($h5.length){
+                                if (!$h5.parent().hasClass('transfers-flex')){
+                                    $h5.wrap('<div class="d-flex justify-content-between align-items-center transfers-flex"></div>');
+                                }
+                                // shrink buttons a bit
+                                $btnGroup.find('.btn').addClass('btn-sm');
+                                $h5.parent().append($btnGroup);
+                            }
+                        }
+                    });
+                    // GW3-9: move .view-toggle btn-group next to transfers counts, then remove original container
+                    for (let gw=3; gw<=9; gw++){
+                        const $viewToggle = $(`#gw${gw}Table`).closest('.view-toggle');
+                        const $btnGroup = $viewToggle.find('.btn-group');
+                        const $h4 = $(`#gw${gw}TransfersIn`).closest('h4');
+                        if ($btnGroup.length && $h4.length){
+                            if (!$h4.parent().hasClass('transfers-flex')){
+                                $h4.wrap('<div class="d-flex justify-content-between align-items-center transfers-flex"></div>');
+                            }
+                            $btnGroup.find('.btn').addClass('btn-sm');
+                            $h4.parent().append($btnGroup);
+                            $viewToggle.remove();
+                        }
+                    }
+                } catch(e) { console.error('reposition toggles failed', e); }
+            }
+            repositionViewToggles();
         });
         
         // Global variables accessible to all functions
@@ -1570,7 +1642,7 @@
                         <li class="mb-1">
                             <span class="badge bg-success me-2">IN</span>
                             <strong>${inName}</strong>${posBadge(getPosForIn(inName))}
-                            <span class="mx-2 text-muted">→</span>
+                            <span class="mx-2 text-muted transfer-arrow">→</span>
                             <span class="badge bg-danger me-2">OUT</span>
                             <span>${outName || ''}</span>${posBadge(getPosForOut(outName))}
                         </li>`;

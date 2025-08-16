@@ -2,19 +2,59 @@
   <div class="container-fluid">
     <a class="navbar-brand fw-bold text-decoration-none" href="/">FPL Tools</a>
     <div class="navbar-nav">
-      <a class="nav-link" href="/">Dashboard</a>
-      <a class="nav-link" href="/fdr">FDR</a>
+      <a class="nav-link {{ 'active' if request.path == '/' else '' }}" href="/">Dashboard</a>
+      <a class="nav-link {{ 'active' if request.path.startswith('/fdr') else '' }}" href="/fdr">FDR</a>
       <div class="nav-item dropdown">
-        <a class="nav-link dropdown-toggle" href="/players" id="playersDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">Players</a>
-        <ul class="dropdown-menu" aria-labelledby="playersDropdown">
-          <li><a class="dropdown-item" href="/players">All</a></li>
-          <li><a class="dropdown-item" href="/players/individual">Individual</a></li>
+        <a class="nav-link dropdown-toggle {{ 'active' if request.path.startswith('/players2') or request.path.startswith('/players') or request.path.startswith('/watchlist') else '' }}" href="/players2" id="players2Dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">Players</a>
+        <ul class="dropdown-menu" aria-labelledby="players2Dropdown">
+          <li><a class="dropdown-item {{ 'active' if request.path == '/players2' else '' }}" href="/players2">Players</a></li>
+          <li><a class="dropdown-item {{ 'active' if request.path == '/players' else '' }}" href="/players">PlayersSS</a></li>
+          <li><a class="dropdown-item {{ 'active' if request.path == '/players/individual' else '' }}" href="/players/individual">Individual</a></li>
+          <li><hr class="dropdown-divider"></li>
+          <li><a class="dropdown-item {{ 'active' if request.path == '/watchlist' else '' }}" href="/watchlist">Watchlist</a></li>
         </ul>
       </div>
-      <a class="nav-link" href="/teams">Teams</a>
-      <a class="nav-link" href="/squad">Squad</a>
+      
+      <a class="nav-link {{ 'active' if request.path == '/teams' or request.path.startswith('/team/') else '' }}" href="/teams">Teams</a>
+      <a class="nav-link {{ 'active' if request.path.startswith('/squad') else '' }}" href="/squad">Squad</a>
     </div>
   </div>
+  <style>
+    /* Ensure active state is clearly visible */
+    .navbar .nav-link.active { background-color: #3498db !important; color: #fff !important; border-radius: 5px; }
+    .dropdown-menu .dropdown-item.active { background-color: #3498db; color: #fff; }
+
+    /* Global: keep entity links (players/teams) in content using default text color */
+    .table a,
+    .table a:visited,
+    .table a:hover,
+    .table a:active,
+    .table a:focus,
+    .card a.text-decoration-none,
+    .card a.text-decoration-none:visited,
+    .card a.text-decoration-none:hover,
+    .card a.text-decoration-none:active,
+    .card a.text-decoration-none:focus {
+      color: inherit !important;
+      text-decoration: none !important;
+    }
+  </style>
+  <script>
+    document.addEventListener('DOMContentLoaded', function(){
+      try {
+        const toggle = document.getElementById('players2Dropdown');
+        if (!toggle) return;
+        const parent = toggle.closest('.nav-item.dropdown');
+        const menu = parent && parent.querySelector('.dropdown-menu');
+        if (!parent || !menu) return;
+        const mq = window.matchMedia('(hover:hover) and (pointer:fine)');
+        function show(){ if (!mq.matches) return; toggle.classList.add('show'); menu.classList.add('show'); toggle.setAttribute('aria-expanded','true'); }
+        function hide(){ toggle.classList.remove('show'); menu.classList.remove('show'); toggle.setAttribute('aria-expanded','false'); }
+        parent.addEventListener('mouseenter', show);
+        parent.addEventListener('mouseleave', hide);
+      } catch(_e) {}
+    });
+  </script>
 </nav>
 
 

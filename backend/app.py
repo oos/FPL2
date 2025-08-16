@@ -1,11 +1,21 @@
 from flask import Flask, render_template, jsonify, current_app
+from flask import request
+import os
+from .config import config as app_config
 from .database.manager import DatabaseManager
 from .services.player_service import PlayerService
 from .services.squad_service import SquadService
 from .routes.players import players_bp
 
-def create_app():
+def create_app(config_name: str | None = None):
     app = Flask(__name__, template_folder='../templates')
+
+    # Apply configuration profile
+    selected_profile = (
+        config_name or os.environ.get('FLASK_CONFIG') or 'default'
+    )
+    cfg_cls = app_config.get(selected_profile, app_config['default'])
+    app.config.from_object(cfg_cls)
     
     # Initialize database manager
     app.db_manager = DatabaseManager()
@@ -93,6 +103,22 @@ def create_app():
     def fdr_page():
         """Serve the FDR page"""
         return render_template('fdr.html')
+
+    # Health check (used by docs/tests)
+    @app.route('/health')
+    def health():
+        try:
+            db_stats = current_app.db_manager.get_database_stats()
+            return jsonify({
+                'status': 'ok',
+                'config': {
+                    'DEBUG': app.config.get('DEBUG'),
+                    'PORT': app.config.get('PORT')
+                },
+                'database': db_stats,
+            })
+        except Exception:
+            return jsonify({'status': 'ok'}), 200
     
     @app.route('/teams')
     def teams_page():
@@ -143,11 +169,13 @@ def create_app():
                 fdr_map_by_id[(home_id, fx.gameweek)] = (away_name, fx.home_difficulty)
                 fdr_map_by_id[(away_id, fx.gameweek)] = (home_name, fx.away_difficulty)
 
-        # Enrich players with opponent short and FDR for GW1-9
+        # Enrich players with team short name, opponent short and FDR for GW1-9
         for pdata in players_data:
             # Canonical player team name
             team_name = canonical_by_norm.get(norm(pdata.get('team')), pdata.get('team'))
             team_id = pdata.get('team_id')
+            # Attach short name for display while keeping full name for filtering
+            pdata['team_short'] = team_short_by_name.get(team_name, team_name)
             for gw in range(1, 10):
                 opp, fdr = None, None
                 # Prefer id-based lookup if available
@@ -166,7 +194,71 @@ def create_app():
         positions = ['Goalkeeper', 'Defender', 'Midfielder', 'Forward']
         team_names = [team.name for team in teams]
         
-        return render_template('players.html', players=players_data, team_names=team_names)
+        # watchlist
+        watch_ids = db_manager.get_watchlist_ids()
+        return render_template('players.html', players=players_data, team_names=team_names, watch_ids=watch_ids)
+
+    @app.route('/players2')
+    def players2_page():
+        """Serve Players2: simple table with working search + enriched data (team short, GW opp/FDR)."""
+        db = current_app.db_manager
+        players = [p.to_dict() for p in db.get_all_players()]
+        teams = db.get_all_teams()
+        fixtures = db.get_all_fixtures()
+
+        # Build opponent/FDR mapping per team and GW (reuse logic from /players)
+        team_short_by_name = {t.name: t.short_name for t in teams}
+        team_id_by_name = {t.name: t.id for t in teams}
+
+        import re
+        def norm(s: str) -> str:
+            if not s:
+                return ''
+            return re.sub(r'[^a-z0-9]', '', s.lower())
+
+        canonical_by_norm = {norm(t.name): t.name for t in teams}
+
+        fdr_map_by_name: dict[tuple[str, int], tuple[str, int]] = {}
+        fdr_map_by_id: dict[tuple[int, int], tuple[str, int]] = {}
+        for fx in fixtures:
+            home_name = canonical_by_norm.get(norm(fx.home_team), fx.home_team)
+            away_name = canonical_by_norm.get(norm(fx.away_team), fx.away_team)
+            home_id = team_id_by_name.get(home_name)
+            away_id = team_id_by_name.get(away_name)
+            fdr_map_by_name[(home_name, fx.gameweek)] = (away_name, fx.home_difficulty)
+            fdr_map_by_name[(away_name, fx.gameweek)] = (home_name, fx.away_difficulty)
+            if home_id is not None and away_id is not None:
+                fdr_map_by_id[(home_id, fx.gameweek)] = (away_name, fx.home_difficulty)
+                fdr_map_by_id[(away_id, fx.gameweek)] = (home_name, fx.away_difficulty)
+
+        for pdata in players:
+            team_name = canonical_by_norm.get(norm(pdata.get('team')), pdata.get('team'))
+            team_id = pdata.get('team_id')
+            pdata['team_short'] = team_short_by_name.get(team_name, team_name)
+            for gw in range(1, 10):
+                opp, fdr = None, None
+                if team_id and (team_id, gw) in fdr_map_by_id:
+                    opp_name, fdr_val = fdr_map_by_id[(team_id, gw)]
+                    opp = team_short_by_name.get(opp_name, (opp_name or '')[:3].upper())
+                    fdr = fdr_val
+                elif (team_name, gw) in fdr_map_by_name:
+                    opp_name, fdr_val = fdr_map_by_name[(team_name, gw)]
+                    opp = team_short_by_name.get(opp_name, (opp_name or '')[:3].upper())
+                    fdr = fdr_val
+                pdata[f'gw{gw}_opp'] = opp
+                pdata[f'gw{gw}_fdr'] = fdr
+
+        # Compute position-wise max GW points (for displaying under FDR)
+        positions = ['Goalkeeper', 'Defender', 'Midfielder', 'Forward']
+        max_by_pos: dict[str, dict[int, float]] = {pos: {gw: 0.0 for gw in range(1, 10)} for pos in positions}
+        for pos in positions:
+            for gw in range(1, 10):
+                key = f'gw{gw}_points'
+                vals = [float(p.get(key) or 0.0) for p in players if (p.get('position') == pos)]
+                max_by_pos[pos][gw] = max(vals) if vals else 0.0
+
+        watch_ids = db.get_watchlist_ids()
+        return render_template('players2.html', players=players, watch_ids=watch_ids, max_by_pos=max_by_pos)
 
     @app.route('/players/individual')
     def players_individual_redirect():
@@ -191,7 +283,33 @@ def create_app():
             from flask import redirect, url_for
             return redirect(url_for('player_page', player_id=target.id))
         # Last resort: go to the players list
-        return render_template('players.html', players=[p.to_dict() for p in players], team_names=[t.name for t in db.get_all_teams()])
+        return render_template(
+            'players.html', 
+            players=[p.to_dict() for p in players], 
+            team_names=[t.name for t in db.get_all_teams()],
+            watch_ids=db.get_watchlist_ids()
+        )
+
+    @app.route('/watchlist')
+    def watchlist_page():
+        db = current_app.db_manager
+        players = [p.to_dict() for p in db.get_watchlist_players()]
+        return render_template('watchlist.html', players=players)
+
+    @app.route('/api/watchlist/toggle', methods=['POST'])
+    def api_watchlist_toggle():
+        db = current_app.db_manager
+        data = request.get_json(force=True) or {}
+        player_id = data.get('player_id')
+        if not isinstance(player_id, int):
+            return jsonify({'ok': False, 'error': 'player_id required'}), 400
+        ids = set(db.get_watchlist_ids())
+        if player_id in ids:
+            ok = db.remove_from_watchlist(player_id)
+            return jsonify({'ok': ok, 'watched': False})
+        else:
+            ok = db.add_to_watchlist(player_id)
+            return jsonify({'ok': ok, 'watched': True})
     @app.route('/player/<int:player_id>')
     def player_page(player_id: int):
         """Serve an individual player page"""
@@ -221,7 +339,9 @@ def create_app():
             'gw8_points': getattr(player, 'gw8_points', 0),
             'gw9_points': getattr(player, 'gw9_points', 0),
         }
-        return render_template('player.html', player=pdata)
+        # Pass watch status for filled star on load
+        is_watched = db_manager.is_on_watchlist(player_id)
+        return render_template('player.html', player=pdata, is_watched=is_watched)
     
     @app.route('/squad')
     def squad_page():
@@ -399,4 +519,7 @@ def create_app():
 def run_app():
     """Run the Flask application"""
     app = create_app()
-    app.run(host='0.0.0.0', port=5001, debug=True)
+    # Prefer configured PORT/DEBUG if provided
+    port = app.config.get('PORT', 5001)
+    debug = app.config.get('DEBUG', True)
+    app.run(host='0.0.0.0', port=port, debug=debug)

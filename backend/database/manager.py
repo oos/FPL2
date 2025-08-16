@@ -88,6 +88,13 @@ class DatabaseManager:
             )
         """)
         
+        # Watchlist table
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS watchlist (
+                player_id INTEGER PRIMARY KEY
+            )
+        """)
+        
         # Create indexes for better performance (only if tables exist)
         try:
             cursor.execute("CREATE INDEX IF NOT EXISTS idx_players_team_id ON players(team_id)")
@@ -366,3 +373,52 @@ class DatabaseManager:
                 'database_path': self.db_path,
                 'database_size_mb': os.path.getsize(self.db_path) / (1024 * 1024) if os.path.exists(self.db_path) else 0
             }
+
+    # Watchlist operations
+    def get_watchlist_ids(self) -> List[int]:
+        with self._get_connection() as conn:
+            cur = conn.cursor()
+            cur.execute('SELECT player_id FROM watchlist')
+            return [row[0] for row in cur.fetchall()]
+
+    def add_to_watchlist(self, player_id: int) -> bool:
+        try:
+            with self._get_connection() as conn:
+                cur = conn.cursor()
+                cur.execute('INSERT OR IGNORE INTO watchlist (player_id) VALUES (?)', (player_id,))
+                conn.commit()
+                return True
+        except Exception:
+            return False
+
+    def remove_from_watchlist(self, player_id: int) -> bool:
+        try:
+            with self._get_connection() as conn:
+                cur = conn.cursor()
+                cur.execute('DELETE FROM watchlist WHERE player_id = ?', (player_id,))
+                conn.commit()
+                return True
+        except Exception:
+            return False
+
+    def get_watchlist_players(self) -> List[Player]:
+        with self._get_connection() as conn:
+            cur = conn.cursor()
+            cur.execute(
+                """
+                SELECT p.id, p.name, p.position, p.team, p.price, p.total_points,
+                       p.form, p.ownership, p.team_id, p.gw1_points, p.gw2_points, p.gw3_points,
+                       p.gw4_points, p.gw5_points, p.gw6_points, p.gw7_points, p.gw8_points, p.gw9_points,
+                       p.chance_of_playing_next_round, p.points_per_million
+                FROM players p
+                JOIN watchlist w ON w.player_id = p.id
+                ORDER BY p.name
+                """
+            )
+            return [Player.from_db_row(row) for row in cur.fetchall()]
+
+    def is_on_watchlist(self, player_id: int) -> bool:
+        with self._get_connection() as conn:
+            cur = conn.cursor()
+            cur.execute('SELECT 1 FROM watchlist WHERE player_id = ? LIMIT 1', (player_id,))
+            return cur.fetchone() is not None

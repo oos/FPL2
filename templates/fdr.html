@@ -112,6 +112,12 @@
         .table-responsive:hover {
             box-shadow: 0 4px 20px rgba(0,0,0,0.15);
         }
+        /* Keep links default color across FDR tables, if any */
+        .table a,
+        .table a:visited,
+        .table a:hover,
+        .table a:active,
+        .table a:focus { color: inherit !important; text-decoration: none !important; }
         table.dataTable thead th {
             white-space: normal;
             background-color: #f8f9fa;
@@ -140,7 +146,6 @@
     {% include '_navbar.html' %}
     
     <div class="container-fluid">
-        <h1 class="text-center">Fixture Difficulty Ratings (FDR)</h1>
         
         <!-- Weekly Tabs + GW navigation -->
         <div class="d-flex justify-content-between align-items-center mb-2">
@@ -227,11 +232,51 @@
                         responsive: true
                     });
 
-                    // Create DataTables for each gameweek
-                    for (let gw = 1; gw <= 9; gw++) {
-                        const gwData = data.filter(fixture => fixture.gameweek === gw);
+                    // Build tabs and tables for every gameweek present in data
+                    const gwList = [...new Set(data.map(f => f.gameweek))].sort((a,b) => a - b);
+                    const $tabs = $('#gwTabs');
+                    const $tabContent = $('#gwTabContent');
 
-                        $('#fdrTable' + gw).DataTable({
+                    gwList.forEach(gw => {
+                        // Add tab button
+                        $tabs.append(`
+                            <li class="nav-item" role="presentation">
+                              <button class="nav-link" id="gw${gw}-tab" data-bs-toggle="tab" data-bs-target="#gw${gw}" type="button" role="tab">GW${gw}</button>
+                            </li>
+                        `);
+                        // Add pane with table
+                        $tabContent.append(`
+                          <div class="tab-pane fade" id="gw${gw}" role="tabpanel">
+                            <div class="gw-card">
+                              <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h3 class="mb-0">GW${gw} Fixtures</h3>
+                                <div class="legend d-inline-block p-2 m-0" style="box-shadow:none; background:transparent;">
+                                  <span class="legend-item"><span class="legend-color" style="background-color: #234f1e;"></span><strong>1 - Very Easy</strong></span>
+                                  <span class="legend-item"><span class="legend-color" style="background-color: #4a7c59;"></span><strong>2 - Easy</strong></span>
+                                  <span class="legend-item"><span class="legend-color" style="background-color: #f39c12;"></span><strong>3 - Medium</strong></span>
+                                  <span class="legend-item"><span class="legend-color" style="background-color: #e74c3c;"></span><strong>4 - Hard</strong></span>
+                                  <span class="legend-item"><span class="legend-color" style="background-color: #8b0000;"></span><strong>5 - Very Hard</strong></span>
+                                </div>
+                              </div>
+                              <div class="table-responsive">
+                                <table id="fdrTableGW${gw}" class="table table-striped table-hover" style="width:100%">
+                                  <thead>
+                                    <tr>
+                                      <th>Home Team</th>
+                                      <th>Home FDR</th>
+                                      <th>Away Team</th>
+                                      <th>Away FDR</th>
+                                    </tr>
+                                  </thead>
+                                  <tbody></tbody>
+                                </table>
+                              </div>
+                            </div>
+                          </div>
+                        `);
+
+                        const gwData = data.filter(fixture => fixture.gameweek === gw);
+                        $('#fdrTableGW' + gw).DataTable({
                             data: gwData,
                             columns: [
                                 { data: 'home_team' },
@@ -255,9 +300,23 @@
                             ],
                             order: [[0, 'asc']],
                             pageLength: 25,
-                            responsive: true
+                            responsive: true,
+                            autoWidth: false
                         });
-                    }
+                    });
+
+                    // Arrow navigation between tabs
+                    const getActiveIndex = () => $('#gwTabs button.nav-link').index($('#gwTabs button.nav-link.active'));
+                    $('#prevGw').on('click', function(){
+                        const $btns = $('#gwTabs button.nav-link');
+                        let i = getActiveIndex();
+                        if (i > 0) new bootstrap.Tab($btns[i-1]).show();
+                    });
+                    $('#nextGw').on('click', function(){
+                        const $btns = $('#gwTabs button.nav-link');
+                        let i = getActiveIndex();
+                        if (i < $btns.length - 1) new bootstrap.Tab($btns[i+1]).show();
+                    });
                 })
                 .catch(error => {
                     console.error('Error fetching FDR data:', error);
