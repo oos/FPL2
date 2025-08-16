@@ -80,16 +80,18 @@
   <div class="container-fluid">
     
     
-    <!-- Filters Row: Watchlist + Position + Team -->
+    <!-- Filters: order follows table columns (★, Pos, Team, Price, Points/£, Total, Form, Chance %, Own %, xP) -->
     <div class="mb-3">
       <div class="row g-2 align-items-end">
+        <!-- ★ Watchlist only -->
         <div class="col-md-2 d-flex align-items-center">
           <div class="form-check m-0">
             <input class="form-check-input" type="checkbox" id="wlOnly">
             <label class="form-check-label" for="wlOnly">Watchlist only</label>
           </div>
         </div>
-        <div class="col-md-3">
+        <!-- Pos -->
+        <div class="col-md-2">
           <label for="positionFilter2" class="form-label">Position</label>
           <select id="positionFilter2" class="form-select">
             <option value="">All</option>
@@ -99,6 +101,7 @@
             <option value="Forward">Forward</option>
           </select>
         </div>
+        <!-- Team -->
         <div class="col-md-3">
           <label for="teamFilter2" class="form-label">Team</label>
           <select id="teamFilter2" class="form-select">
@@ -110,41 +113,48 @@
             {% endfor %}
           </select>
         </div>
+        <!-- Price (Max) -->
         <div class="col-md-2">
           <label for="maxPrice2" class="form-label">Max Price (£M)</label>
           <input type="search" inputmode="decimal" id="maxPrice2" class="form-control" placeholder="e.g. 6.5">
         </div>
-        <div class="col-md-2 text-end">
-          <button type="button" id="clearFilters2" class="btn btn-outline-secondary">Clear all filters</button>
-        </div>
-      </div>
-    </div>
-    <!-- Advanced Numeric Filters -->
-    <div class="mb-3">
-      <div class="row g-2 align-items-end">
-        <div class="col-md-2">
-          <label for="minChance2" class="form-label">Min Chance %</label>
-          <input type="search" inputmode="decimal" id="minChance2" class="form-control" placeholder=">=75">
-        </div>
-        <div class="col-md-2">
+        <!-- Points/£ -->
+        <div class="col-md-3">
           <label for="minPPM2" class="form-label">Min Points/£</label>
           <input type="search" inputmode="decimal" id="minPPM2" class="form-control" placeholder=">=50">
         </div>
+      </div>
+    </div>
+    <div class="mb-3">
+      <div class="row g-2 align-items-end">
+        <!-- Total Points -->
         <div class="col-md-2">
           <label for="minTotal2" class="form-label">Min Total Points</label>
           <input type="search" inputmode="decimal" id="minTotal2" class="form-control" placeholder=">=100">
         </div>
+        <!-- Form -->
         <div class="col-md-2">
           <label for="minForm2" class="form-label">Min Form</label>
           <input type="search" inputmode="decimal" id="minForm2" class="form-control" placeholder=">=5">
         </div>
+        <!-- Chance % -->
+        <div class="col-md-2">
+          <label for="minChance2" class="form-label">Min Chance %</label>
+          <input type="search" inputmode="decimal" id="minChance2" class="form-control" placeholder=">=75">
+        </div>
+        <!-- Own % -->
         <div class="col-md-2">
           <label for="minOwn2" class="form-label">Min Ownership %</label>
           <input type="search" inputmode="decimal" id="minOwn2" class="form-control" placeholder=">=0">
         </div>
+        <!-- xP -->
         <div class="col-md-2">
           <label for="minXp2" class="form-label">Min xP</label>
           <input type="search" inputmode="decimal" id="minXp2" class="form-control" placeholder=">=0">
+        </div>
+        <!-- Clear all at the end -->
+        <div class="col-md-2 text-end">
+          <button type="button" id="clearFilters2" class="btn btn-outline-secondary">Clear all filters</button>
         </div>
       </div>
     </div>
@@ -158,10 +168,10 @@
             <th>Pos</th>
             <th>Team</th>
             <th>Price</th>
-            <th>Chance<br>%</th>
             <th>Points<br>/£</th>
             <th>Total<br>Points</th>
             <th>Form</th>
+            <th>Chance<br>%</th>
             <th>Own<br>%</th>
             <th>xP</th>
             <th>Avg<br>xP</th>
@@ -188,10 +198,10 @@
             <td><span class="badge badge-pos {{ poscls }}">{{ p.position[0:3] }}</span></td>
             <td>{% if p.team_id %}<a href="/team/{{ p.team_id }}" class="text-decoration-none">{{ p.team_short or p.team }}</a>{% else %}{{ p.team_short or p.team }}{% endif %}</td>
             <td data-order="{{ p.price or 0 }}">£{{ '%.1f'|format(p.price or 0) }}M</td>
-            <td>{{ '%.1f'|format(p.chance_of_playing_next_round or 0) }}%</td>
             <td>{{ '%.1f'|format(p.points_per_million or 0) }}</td>
             <td>{{ '%.1f'|format(p.total_points or 0) }}</td>
             <td>{{ '%.1f'|format(p.form or 0) }}</td>
+            <td>{{ '%.1f'|format(p.chance_of_playing_next_round or 0) }}%</td>
             <td>{{ '%.1f'|format(p.ownership or 0) }}%</td>
             <td>{{ '%.1f'|format(p.total_points or 0) }}</td>
             {% set avgxp = ((p.gw1_points or 0) + (p.gw2_points or 0) + (p.gw3_points or 0) + (p.gw4_points or 0) + (p.gw5_points or 0) + (p.gw6_points or 0) + (p.gw7_points or 0) + (p.gw8_points or 0) + (p.gw9_points or 0)) / 9.0 %}
@@ -224,7 +234,7 @@
   <script>
     $(function(){
       const table = $('#players2Table').DataTable({
-        order: [[6, 'desc'], [9, 'desc']], // default: Points/£ then xP (moved before Avg xP)
+        order: [[6, 'desc'], [10, 'desc']], // default: Points/£ then xP (indexes updated after column reordering)
         pageLength: 100,
         autoWidth: false,
         scrollX: false
@@ -328,12 +338,12 @@
       $.fn.dataTable.ext.search = $.fn.dataTable.ext.search.filter(f => f._id !== 'advnum2');
       const advNumPred = function(settings, data, dataIndex){
         if (!settings || !settings.nTable || settings.nTable.id !== 'players2Table') return true;
-        // Column indices based on current table: price=4, chance=5, ppm=6, totalPoints=7, form=8, own=9
+        // Column indices based on current table: price=4, ppm=5, totalPoints=6, form=7, chance=8, own=9, xp=10
         const parseNum = (txt)=>{ const m=(txt||'').toString().match(/-?[0-9]+(?:\.[0-9]+)?/); return m?parseFloat(m[0]):NaN; };
-        const chance = parseNum(data[5]);
-        const ppm = parseNum(data[6]);
-        const total = parseNum(data[7]);
-        const form = parseNum(data[8]);
+        const ppm = parseNum(data[5]);
+        const total = parseNum(data[6]);
+        const form = parseNum(data[7]);
+        const chance = parseNum(data[8]);
         const own = parseNum(data[9]);
         const xp = parseNum(data[10]); // xP column
         const minChance = parseFloat(($('#minChance2').val()||'').trim());
