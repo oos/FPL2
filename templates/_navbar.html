@@ -5,7 +5,7 @@
       <a class="nav-link {{ 'active' if request.path == '/' else '' }}" href="/">Dashboard</a>
       <a class="nav-link {{ 'active' if request.path.startswith('/fdr') else '' }}" href="/fdr">FDR</a>
       <div class="nav-item dropdown">
-        <a class="nav-link dropdown-toggle {{ 'active' if request.path.startswith('/players2') or request.path.startswith('/players') or request.path.startswith('/watchlist') else '' }}" href="/players2" id="players2Dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">Players</a>
+        <a class="nav-link dropdown-toggle {{ 'active' if request.path.startswith('/players2') or request.path.startswith('/players') or request.path.startswith('/watchlist') else '' }}" href="/players2" id="players2Dropdown" role="button" aria-expanded="false">Players</a>
         <ul class="dropdown-menu" aria-labelledby="players2Dropdown">
           <li><a class="dropdown-item {{ 'active' if request.path == '/players2' else '' }}" href="/players2">Players</a></li>
           
@@ -48,10 +48,22 @@
         const menu = parent && parent.querySelector('.dropdown-menu');
         if (!parent || !menu) return;
         const mq = window.matchMedia('(hover:hover) and (pointer:fine)');
-        function show(){ if (!mq.matches) return; toggle.classList.add('show'); menu.classList.add('show'); toggle.setAttribute('aria-expanded','true'); }
-        function hide(){ toggle.classList.remove('show'); menu.classList.remove('show'); toggle.setAttribute('aria-expanded','false'); }
-        parent.addEventListener('mouseenter', show);
-        parent.addEventListener('mouseleave', hide);
+        function openMenu(){ toggle.classList.add('show'); menu.classList.add('show'); toggle.setAttribute('aria-expanded','true'); }
+        function closeMenu(){ toggle.classList.remove('show'); menu.classList.remove('show'); toggle.setAttribute('aria-expanded','false'); }
+        // Hover opens menu on desktops
+        parent.addEventListener('mouseenter', function(){ if (mq.matches) openMenu(); });
+        parent.addEventListener('mouseleave', function(){ if (mq.matches) closeMenu(); });
+        // Click top-level navigates to first submenu (Players) and also opens menu so user can pick others quickly
+        toggle.addEventListener('click', function(e){
+          e.preventDefault();
+          openMenu();
+          const firstLink = menu.querySelector('a.dropdown-item');
+          if (firstLink && firstLink.getAttribute('href')) {
+            window.location.href = firstLink.getAttribute('href');
+          }
+        });
+        // Allow clicking submenu items as normal
+        menu.addEventListener('click', function(){ closeMenu(); });
       } catch(_e) {}
     });
   </script>
