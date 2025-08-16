@@ -52,7 +52,7 @@ test.describe('Players2 page', () => {
     await page.locator('#viewName').fill('My Custom View');
     await page.locator('#saveView').click();
     // Now ensure it appears and loads
-    const select = page.locator('#players2Table_filter #loadView');
+    const select = page.locator('#players2Table_length #loadView');
     await expect(select).toBeVisible();
     await select.selectOption('My Custom View');
     await expect(page.locator('#players2Table')).toBeVisible();

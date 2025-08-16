@@ -241,11 +241,12 @@
       });
       table.columns.adjust();
 
-      // Inject compact View selector inline with DataTables Search box
-      const $filter = $('#players2Table_filter');
-      $filter.addClass('d-flex align-items-center gap-2');
+      // Place View controls directly to the right of the "Show X entries" length control
+      const $length = $('#players2Table_length');
+      $length.addClass('d-flex align-items-center gap-2 flex-wrap');
+      $length.find('label').addClass('mb-0 me-2');
       const $viewInline = $(
-        '<div class="d-flex align-items-center flex-wrap gap-2 me-2">'
+        '<div class="d-flex align-items-center flex-wrap gap-2">'
         +   '<div class="d-flex align-items-center gap-1">'
         +     '<label class="mb-0 small" for="loadView">View:</label>'
         +     '<select id="loadView" class="form-select form-select-sm" style="min-width: 220px"></select>'
@@ -256,7 +257,7 @@
         +   '</div>'
         + '</div>'
       );
-      $filter.prepend($viewInline);
+      $length.append($viewInline);
 
       // Watchlist toggle
       $('#players2Table').on('click', '.watch-star2', async function(e){

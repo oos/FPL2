@@ -44,7 +44,7 @@ test.describe('Players2 filters and view controls', () => {
     // Click Price header to create an unsaved state
     await page.locator('#players2Table thead th').nth(4).click();
     // Save controls inline in filter: viewName + saveView should be present
-    const viewName = page.locator('#players2Table_filter #viewName');
+    const viewName = page.locator('#players2Table_length #viewName');
     await expect(viewName).toBeEditable();
     // Clear via native X or programmatically
     await viewName.fill('');
