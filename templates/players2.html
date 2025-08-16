@@ -201,7 +201,7 @@
             <td>{{ '%.1f'|format(p.points_per_million or 0) }}</td>
             <td>{{ '%.1f'|format(p.total_points or 0) }}</td>
             <td>{{ '%.1f'|format(p.form or 0) }}</td>
-            <td>{{ '%.1f'|format(p.chance_of_playing_next_round or 0) }}%</td>
+            <td>{{ '%.0f'|format(p.chance_of_playing_next_round or 0) }}%</td>
             <td>{{ '%.1f'|format(p.ownership or 0) }}%</td>
             <td>{{ '%.1f'|format(p.total_points or 0) }}</td>
             {% set avgxp = ((p.gw1_points or 0) + (p.gw2_points or 0) + (p.gw3_points or 0) + (p.gw4_points or 0) + (p.gw5_points or 0) + (p.gw6_points or 0) + (p.gw7_points or 0) + (p.gw8_points or 0) + (p.gw9_points or 0)) / 9.0 %}
