@@ -37,6 +37,10 @@
       word-break: break-word;
       hyphens: auto;
       line-height: 1.1;
+      /* Reserve space so header text never overlaps sort arrows */
+      padding-right: 1.25rem;
+      background-position: right 0.5rem center !important;
+      background-repeat: no-repeat !important;
     }
     .dataTables_wrapper table.dataTable thead th:hover,
     #players2Table thead th:hover {
@@ -47,11 +51,16 @@
     
     /* Allow name and team to wrap to reduce width (narrower) */
     #players2Table th:nth-child(2), #players2Table td:nth-child(2) { white-space: normal; min-width: 100px; padding-left: 0.3rem; padding-right: 0.3rem; }
-    #players2Table th:nth-child(4), #players2Table td:nth-child(4) { white-space: normal; min-width: 72px; padding-left: 0.3rem; padding-right: 0.3rem; }
+    /* Team column narrower */
+    #players2Table th:nth-child(4), #players2Table td:nth-child(4) { white-space: normal; min-width: 56px; padding-left: 0.3rem; padding-right: 0.3rem; }
+
+    /* Make Price through Avg xP wider for readability (cols 5..12) */
+    #players2Table th:nth-child(n+5):nth-child(-n+12),
+    #players2Table td:nth-child(n+5):nth-child(-n+12) { min-width: 100px; }
     /* Narrow star column */
     #players2Table th:nth-child(1), #players2Table td:nth-child(1) { width: 28px; }
     /* Compact GW columns and center align (GW1 starts at column 13: star,name,pos,team,price,chance,ppm,total,form,own,xP,Avg xP = 12) */
-    #players2Table th:nth-child(n+13), #players2Table td:nth-child(n+13) { min-width: 64px; text-align: center !important; white-space: normal; }
+    #players2Table th:nth-child(n+13), #players2Table td:nth-child(n+13) { min-width: 52px; text-align: center !important; white-space: normal; }
     .gw-cell strong { font-size: 0.95em; }
     .gw-cell small { font-size: 0.78em; }
     /* Ensure wrappers also stretch full width */
