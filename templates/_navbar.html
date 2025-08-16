@@ -38,6 +38,24 @@
       color: inherit !important;
       text-decoration: none !important;
     }
+
+    /* Unified table header styling across the app (match FDR page) */
+    table.dataTable thead th,
+    table thead th {
+      white-space: normal;
+      background-color: #f8f9fa;
+      border-color: #dee2e6;
+      font-weight: 600;
+      color: #2c3e50;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+    table.dataTable thead th:hover,
+    table thead th:hover {
+      background-color: #e9ecef !important;
+      transform: scale(1.02);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
   </style>
   <script>
     document.addEventListener('DOMContentLoaded', function(){
