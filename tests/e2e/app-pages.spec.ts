@@ -16,9 +16,10 @@ test.describe('App pages smoke tests', () => {
     await expect(page.locator('#players2Table')).toBeVisible();
   });
 
-  test('PlayersSS (legacy) loads', async ({ page }) => {
+  test('Players legacy route redirects to new page', async ({ page }) => {
     await page.goto('/players');
-    await expect(page.locator('#playersTable, table')).toBeVisible();
+    await expect(page).toHaveURL(/\/players2$/);
+    await expect(page.locator('#players2Table')).toBeVisible();
   });
 
   test('Teams list loads', async ({ page }) => {

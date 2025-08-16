@@ -129,74 +129,9 @@ def create_app(config_name: str | None = None):
     
     @app.route('/players')
     def players_page():
-        """Serve the original players page with DataTables"""
-        db_manager = current_app.db_manager # Access db_manager from app context
-        players = db_manager.get_all_players()
-        teams = db_manager.get_all_teams()
-        fixtures = db_manager.get_all_fixtures()
-        
-        # Convert Player objects to dictionaries for template
-        players_data = [player.to_dict() for player in players]
-
-        # Build opponent/FDR mapping per team and GW
-        team_short_by_name = {t.name: t.short_name for t in teams}
-        team_id_by_name = {t.name: t.id for t in teams}
-
-        # Normalization helper to align inconsistent names like "Nott'm Forest" → "Nottingham Forest"
-        import re
-        def norm(s: str) -> str:
-            if not s:
-                return ''
-            return re.sub(r'[^a-z0-9]', '', s.lower())
-
-        # Canonical name by normalized key
-        canonical_by_norm = {norm(t.name): t.name for t in teams}
-
-        # Maps keyed by canonical team name and team id
-        fdr_map_by_name: dict[tuple[str, int], tuple[str, int]] = {}
-        fdr_map_by_id: dict[tuple[int, int], tuple[str, int]] = {}
-        for fx in fixtures:
-            # Resolve canonical names from fixtures (which may be ids-as-text or variant names)
-            home_name = canonical_by_norm.get(norm(fx.home_team), fx.home_team)
-            away_name = canonical_by_norm.get(norm(fx.away_team), fx.away_team)
-            home_id = team_id_by_name.get(home_name)
-            away_id = team_id_by_name.get(away_name)
-            # Name-keyed
-            fdr_map_by_name[(home_name, fx.gameweek)] = (away_name, fx.home_difficulty)
-            fdr_map_by_name[(away_name, fx.gameweek)] = (home_name, fx.away_difficulty)
-            # Id-keyed (only if ids are known)
-            if home_id is not None and away_id is not None:
-                fdr_map_by_id[(home_id, fx.gameweek)] = (away_name, fx.home_difficulty)
-                fdr_map_by_id[(away_id, fx.gameweek)] = (home_name, fx.away_difficulty)
-
-        # Enrich players with team short name, opponent short and FDR for GW1-9
-        for pdata in players_data:
-            # Canonical player team name
-            team_name = canonical_by_norm.get(norm(pdata.get('team')), pdata.get('team'))
-            team_id = pdata.get('team_id')
-            # Attach short name for display while keeping full name for filtering
-            pdata['team_short'] = team_short_by_name.get(team_name, team_name)
-            for gw in range(1, 10):
-                opp, fdr = None, None
-                # Prefer id-based lookup if available
-                if team_id and (team_id, gw) in fdr_map_by_id:
-                    opp_name, fdr_val = fdr_map_by_id[(team_id, gw)]
-                    opp = team_short_by_name.get(opp_name, (opp_name or '')[:3].upper())
-                    fdr = fdr_val
-                elif (team_name, gw) in fdr_map_by_name:
-                    opp_name, fdr_val = fdr_map_by_name[(team_name, gw)]
-                    opp = team_short_by_name.get(opp_name, (opp_name or '')[:3].upper())
-                    fdr = fdr_val
-                pdata[f'gw{gw}_opp'] = opp
-                pdata[f'gw{gw}_fdr'] = fdr
-        
-        # Get unique positions and teams for dropdowns
-        positions = ['Goalkeeper', 'Defender', 'Midfielder', 'Forward']
-        team_names = [team.name for team in teams]
-        
-        # watchlist
-        watch_ids = db_manager.get_watchlist_ids()
-        return render_template('players.html', players=players_data, team_names=team_names, watch_ids=watch_ids)
+        """Legacy route: redirect to the new Players page."""
+        from flask import redirect, url_for
+        return redirect(url_for('players2_page'))
 
     @app.route('/players2')
     def players2_page():
@@ -282,13 +217,9 @@ def create_app(config_name: str | None = None):
         if target:
             from flask import redirect, url_for
             return redirect(url_for('player_page', player_id=target.id))
-        # Last resort: go to the players list
-        return render_template(
-            'players.html', 
-            players=[p.to_dict() for p in players], 
-            team_names=[t.name for t in db.get_all_teams()],
-            watch_ids=db.get_watchlist_ids()
-        )
+        # Last resort: go to the players list (new page)
+        from flask import redirect, url_for
+        return redirect(url_for('players2_page'))
 
     @app.route('/watchlist')
     def watchlist_page():
