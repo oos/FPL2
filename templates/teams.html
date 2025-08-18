@@ -11,6 +11,14 @@
     .table a:hover,
     .table a:active,
     .table a:focus { color: inherit !important; text-decoration: none !important; }
+
+    /* FDR color badges for any difficulty display on this page (e.g., schedules) */
+    .fdr-badge { padding: 4px 8px; border-radius: 6px; color: #fff; font-weight: 700; }
+    .fdr-1 { background: #234f1e; }
+    .fdr-2 { background: #4a7c59; }
+    .fdr-3 { background: #f39c12; }
+    .fdr-4 { background: #e74c3c; }
+    .fdr-5 { background: #8b0000; }
   </style>
 </head>
 <body class="p-4">
@@ -32,7 +40,14 @@
           <tr>
             <td>{{ t.name }}</td>
             <td>{{ t.short_name }}</td>
-            <td>{{ t.strength }}</td>
+            <td>
+              {% set s = (t.strength or 0)|int %}
+              {% if s in [1,2,3,4,5] %}
+                <span class="fdr-badge fdr-{{ s }}">{{ s }}</span>
+              {% else %}
+                <span class="badge bg-secondary">{{ t.strength }}</span>
+              {% endif %}
+            </td>
             <td><a class="btn btn-sm btn-outline-primary" href="/team/{{ t.id }}">View</a></td>
           </tr>
           {% endfor %}

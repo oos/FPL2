@@ -7,8 +7,8 @@ test.describe('Navbar navigation', () => {
     await playersToggle.hover();
     const dropdown = page.locator('#players2Dropdown').locator('xpath=following-sibling::ul[contains(@class,"dropdown-menu")]');
     await expect(dropdown).toBeVisible();
-    await dropdown.getByRole('link', { name: /^Players$/ }).click();
-    await expect(page).toHaveURL(/\/players2$/);
+    await dropdown.getByRole('link', { name: /^All Players$/ }).click();
+    await expect(page).toHaveURL(/\/players$/);
     await page.locator('#players2Table').isVisible();
   });
 });

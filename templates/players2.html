@@ -27,7 +27,7 @@
     .dataTables_wrapper table.dataTable thead th,
     #players2Table thead th {
       white-space: normal !important;
-      background-color: #f8f9fa;
+      background-color: #eaf4ff; /* slight blue fill */
       border-color: #dee2e6;
       font-weight: 600;
       color: #2c3e50;
@@ -67,12 +67,34 @@
     .gw-cell small { font-size: 0.78em; }
     /* Ensure wrappers also stretch full width */
     .table-responsive { width: 100% !important; margin: 0 !important; padding: 0 !important; }
+    /* small spacing above the table */
+    .table-responsive { margin-top: 0.5rem !important; }
     .dataTables_wrapper { width: 100% !important; }
     .dataTables_wrapper .dataTable { width: 100% !important; }
     /* Ensure native clear (x) icon shows for search inputs on WebKit */
     input[type="search"]::-webkit-search-cancel-button {
       -webkit-appearance: searchfield-cancel-button;
     }
+    /* Ensure Save button icon and text sit inline (wider, less tall) */
+    #saveView { display: inline-flex; align-items: center; gap: 0.35rem; white-space: nowrap; line-height: 1.1; }
+    #saveView i { display: inline-block; }
+    /* Responsive View controls panel */
+    .view-controls-card { display: inline-flex; width: auto; max-width: none; flex: 0 0 auto; white-space: nowrap; }
+    .view-controls-body { display: flex; align-items: center; gap: 0.5rem; flex-wrap: nowrap; padding: 0.25rem 0.5rem; }
+    /* Constrain View select width so panel stays compact; show ellipsis for long labels */
+    #loadView { width: auto !important; min-width: 180px; max-width: 260px; display: inline-block; }
+    #loadView, #loadView option { white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }
+    /* Keep name input compact by default */
+    #viewName { width: 200px; max-width: 40vw; }
+    /* Subtle grey background for panels */
+    .filters-card,
+    .view-controls-card { background-color: #f7f7f7; }
+    /* Nudge Watchlist switch slightly upward to align with select centers */
+    .wlOnlyWrap { transform: translateY(-12px); }
+    /* Inline info to the left of Search */
+    #players2Table_filter { display: flex; align-items: center; gap: .5rem; justify-content: flex-end; flex-wrap: wrap; }
+    #players2InlineInfo { white-space: nowrap; color: #6c757d; font-size: .9rem; margin-right: .25rem; }
+    
   </style>
 </head>
 <body class="p-4">
@@ -80,81 +102,83 @@
   <div class="container-fluid">
     
     
-    <!-- Filters: order follows table columns (★, Pos, Team, Price, Points/£, Total, Form, Chance %, Own %, xP) -->
-    <div class="mb-3">
-      <div class="row g-2 align-items-end">
-        <!-- ★ Watchlist only -->
-        <div class="col-md-2 d-flex align-items-center">
-          <div class="form-check m-0">
-            <input class="form-check-input" type="checkbox" id="wlOnly">
-            <label class="form-check-label" for="wlOnly">Watchlist only</label>
+    <!-- Filters panel: visually grouped -->
+    <div class="filters-card card shadow-sm mb-3">
+      <div class="card-body py-2">
+        <!-- Row 1: order follows columns (★, Pos, Team, Price, Points/£) -->
+        <div class="row g-2 align-items-end mb-2">
+          <!-- ★ Watchlist only -->
+          <div class="col-md-2 d-flex align-items-center">
+            <div class="form-check form-switch m-0 wlOnlyWrap">
+              <input class="form-check-input" type="checkbox" id="wlOnly">
+              <label class="form-check-label" for="wlOnly">Watchlist only</label>
+            </div>
+          </div>
+          <!-- Pos -->
+          <div class="col-md-2">
+            <label for="positionFilter2" class="form-label">Position</label>
+            <select id="positionFilter2" class="form-select">
+              <option value="">All</option>
+              <option value="Goalkeeper">Goalkeeper</option>
+              <option value="Defender">Defender</option>
+              <option value="Midfielder">Midfielder</option>
+              <option value="Forward">Forward</option>
+            </select>
+          </div>
+          <!-- Team -->
+          <div class="col-md-3">
+            <label for="teamFilter2" class="form-label">Team</label>
+            <select id="teamFilter2" class="form-select">
+              <option value="">All</option>
+              {% set teams2 = (players | map(attribute='team') | list) %}
+              {% set teams2 = teams2 | unique | sort %}
+              {% for t in teams2 %}
+                {% if t %}<option value="{{ t }}">{{ t }}</option>{% endif %}
+              {% endfor %}
+            </select>
+          </div>
+          <!-- Price (Max) -->
+          <div class="col-md-2">
+            <label for="maxPrice2" class="form-label">Max Price (£M)</label>
+            <input type="search" inputmode="decimal" id="maxPrice2" class="form-control" placeholder="e.g. 6.5">
+          </div>
+          <!-- Points/£ -->
+          <div class="col-md-3">
+            <label for="minPPM2" class="form-label">Min Points/£</label>
+            <input type="search" inputmode="decimal" id="minPPM2" class="form-control" placeholder=">=50">
           </div>
         </div>
-        <!-- Pos -->
-        <div class="col-md-2">
-          <label for="positionFilter2" class="form-label">Position</label>
-          <select id="positionFilter2" class="form-select">
-            <option value="">All</option>
-            <option value="Goalkeeper">Goalkeeper</option>
-            <option value="Defender">Defender</option>
-            <option value="Midfielder">Midfielder</option>
-            <option value="Forward">Forward</option>
-          </select>
-        </div>
-        <!-- Team -->
-        <div class="col-md-3">
-          <label for="teamFilter2" class="form-label">Team</label>
-          <select id="teamFilter2" class="form-select">
-            <option value="">All</option>
-            {% set teams2 = (players | map(attribute='team') | list) %}
-            {% set teams2 = teams2 | unique | sort %}
-            {% for t in teams2 %}
-              {% if t %}<option value="{{ t }}">{{ t }}</option>{% endif %}
-            {% endfor %}
-          </select>
-        </div>
-        <!-- Price (Max) -->
-        <div class="col-md-2">
-          <label for="maxPrice2" class="form-label">Max Price (£M)</label>
-          <input type="search" inputmode="decimal" id="maxPrice2" class="form-control" placeholder="e.g. 6.5">
-        </div>
-        <!-- Points/£ -->
-        <div class="col-md-3">
-          <label for="minPPM2" class="form-label">Min Points/£</label>
-          <input type="search" inputmode="decimal" id="minPPM2" class="form-control" placeholder=">=50">
-        </div>
-      </div>
-    </div>
-    <div class="mb-3">
-      <div class="row g-2 align-items-end">
-        <!-- Total Points -->
-        <div class="col-md-2">
-          <label for="minTotal2" class="form-label">Min Total Points</label>
-          <input type="search" inputmode="decimal" id="minTotal2" class="form-control" placeholder=">=100">
-        </div>
-        <!-- Form -->
-        <div class="col-md-2">
-          <label for="minForm2" class="form-label">Min Form</label>
-          <input type="search" inputmode="decimal" id="minForm2" class="form-control" placeholder=">=5">
-        </div>
-        <!-- Chance % -->
-        <div class="col-md-2">
-          <label for="minChance2" class="form-label">Min Chance %</label>
-          <input type="search" inputmode="decimal" id="minChance2" class="form-control" placeholder=">=75">
-        </div>
-        <!-- Own % -->
-        <div class="col-md-2">
-          <label for="minOwn2" class="form-label">Min Ownership %</label>
-          <input type="search" inputmode="decimal" id="minOwn2" class="form-control" placeholder=">=0">
-        </div>
-        <!-- xP -->
-        <div class="col-md-2">
-          <label for="minXp2" class="form-label">Min xP</label>
-          <input type="search" inputmode="decimal" id="minXp2" class="form-control" placeholder=">=0">
-        </div>
-        <!-- Clear all at the end -->
-        <div class="col-md-2 text-end">
-          <button type="button" id="clearFilters2" class="btn btn-outline-secondary">Clear all filters</button>
+        <!-- Row 2: Total, Form, Chance %, Own %, xP, Clear all -->
+        <div class="row g-2 align-items-end">
+          <!-- Total Points -->
+          <div class="col-md-2">
+            <label for="minTotal2" class="form-label">Min Total Points</label>
+            <input type="search" inputmode="decimal" id="minTotal2" class="form-control" placeholder=">=100">
+          </div>
+          <!-- Form -->
+          <div class="col-md-2">
+            <label for="minForm2" class="form-label">Min Form</label>
+            <input type="search" inputmode="decimal" id="minForm2" class="form-control" placeholder=">=5">
+          </div>
+          <!-- Chance % -->
+          <div class="col-md-2">
+            <label for="minChance2" class="form-label">Min Chance %</label>
+            <input type="search" inputmode="decimal" id="minChance2" class="form-control" placeholder=">=75">
+          </div>
+          <!-- Own % -->
+          <div class="col-md-2">
+            <label for="minOwn2" class="form-label">Min Ownership %</label>
+            <input type="search" inputmode="decimal" id="minOwn2" class="form-control" placeholder=">=0">
+          </div>
+          <!-- xP -->
+          <div class="col-md-2">
+            <label for="minXp2" class="form-label">Min xP</label>
+            <input type="search" inputmode="decimal" id="minXp2" class="form-control" placeholder=">=0">
+          </div>
+          <!-- Clear all at the end -->
+          <div class="col-md-2 text-end">
+            <button type="button" id="clearFilters2" class="btn btn-outline-secondary">Clear all filters</button>
+          </div>
         </div>
       </div>
     </div>
@@ -233,6 +257,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
   <script>
     $(function(){
+      let isInitializing = true;
       const table = $('#players2Table').DataTable({
         order: [[6, 'desc'], [10, 'desc']], // default: Points/£ then xP (indexes updated after column reordering)
         pageLength: 100,
@@ -241,20 +266,41 @@
       });
       table.columns.adjust();
 
+      // Add inline info text to the left of the Search input
+      const $filter = $('#players2Table_filter');
+      const $inlineInfo = $('<span id="players2InlineInfo" class="text-muted"></span>');
+      // Insert before DataTables label (which contains the input)
+      $filter.prepend($inlineInfo);
+      function refreshInlineInfo(){
+        try {
+          const info = table.page.info();
+          const start = info.recordsDisplay ? (info.start + 1) : 0;
+          const end = info.end;
+          const total = info.recordsTotal;
+          $('#players2InlineInfo').text(`Showing ${start} to ${end} of ${total} entries`);
+        } catch(_e) {}
+      }
+      table.on('draw.dt', refreshInlineInfo);
+      refreshInlineInfo();
+
       // Place View controls directly to the right of the "Show X entries" length control
       const $length = $('#players2Table_length');
       $length.addClass('d-flex align-items-center gap-2 flex-wrap');
       $length.find('label').addClass('mb-0 me-2');
       const $viewInline = $(
-        '<div class="d-flex align-items-center flex-wrap gap-2">'
-        +   '<div class="d-flex align-items-center gap-1">'
-        +     '<label class="mb-0 small" for="loadView">View:</label>'
-        +     '<select id="loadView" class="form-select form-select-sm" style="min-width: 220px"></select>'
-        +   '</div>'
-        +   '<div class="d-flex align-items-center gap-1 save-controls" style="display:none;">'
-        +     '<input type="search" id="viewName" class="form-control form-control-sm" placeholder="Enter view name" style="min-width: 200px;">'
-        +     '<button id="saveView" class="btn btn-success btn-sm"><i class="fas fa-save"></i> Save</button>'
-        +   '</div>'
+        '<div class="ms-2 d-inline-block" style="flex-shrink:0;">'
+        +  '<div class="view-controls-card card shadow-sm">'
+        +    '<div class="view-controls-body card-body py-1 px-2">'
+        +      '<div class="d-flex align-items-center gap-1">'
+        +        '<label class="mb-0 small" for="loadView">View:</label>'
+        +        '<select id="loadView" class="form-select form-select-sm" style="min-width: 220px"></select>'
+        +      '</div>'
+        +      '<div class="d-flex align-items-center gap-1 save-controls" style="display:none; visibility:hidden;">'
+        +        '<input type="search" id="viewName" class="form-control form-control-sm" placeholder="Enter view name" style="min-width: 200px;">'
+        +        '<button id="saveView" class="btn btn-success btn-sm"><i class="fas fa-save"></i> Save</button>'
+        +      '</div>'
+        +    '</div>'
+        +  '</div>'
         + '</div>'
       );
       $length.append($viewInline);
@@ -377,7 +423,7 @@
           saved[defName] = {
             name: defName,
             description: 'Points/£ + xP',
-            sorting: [[6, 'desc'], [9, 'desc']],
+            sorting: [[6, 'desc'], [10, 'desc']],
             pageLength: 100,
             search: ''
           };
@@ -386,6 +432,14 @@
           if (saved[defName].pageLength !== 100) {
             saved[defName].pageLength = 100;
           }
+          // Migrate sorting indices if schema changed
+          try {
+            const sort = saved[defName].sorting || [];
+            // If it was previously [6, desc], [9, desc], update second index to 10
+            if (Array.isArray(sort) && sort.length === 2 && sort[0][0] === 6 && sort[1][0] === 9) {
+              saved[defName].sorting = [[6, 'desc'], [10, 'desc']];
+            }
+          } catch(_e) {}
         }
         localStorage.setItem('fplPlayerViews', JSON.stringify(saved));
       }
@@ -406,7 +460,15 @@
           sel.append('</optgroup>');
         }
         // Hide save controls by default (existing view or quick sort are selected by default)
-        $('.save-controls').hide();
+        $('.save-controls').css({display:'none', visibility:'hidden'});
+      }
+
+      function setSaveControlsVisible(isVisible){
+        if (isVisible) {
+          $('.save-controls').css({display:'flex', visibility:'visible'});
+        } else {
+          $('.save-controls').css({display:'none', visibility:'hidden'});
+        }
       }
 
       function arraysEqual(a, b){
@@ -472,16 +534,20 @@
         try {
           const match = getMatchingSavedViewName();
           if (match){
-            $('.save-controls').hide();
+            setSaveControlsVisible(false);
             return;
           }
-          // No matching saved view → show controls and suggest a name unless user typed one
-          $('.save-controls').show();
+          // No matching saved view → show controls
+          setSaveControlsVisible(true);
           const $vn = $('#viewName');
-          if (!($vn.val()||'').trim()){
-            $vn.val(getSuggestedName());
+          const userEdited = ($vn.data('autofill') === false);
+          const suggested = getSuggestedName();
+          // If not user-edited, keep the suggestion in sync with current sort every time
+          if (!userEdited) {
+            $vn.val(suggested);
+            $vn.data('autofill', true);
           }
-        } catch(_e) { $('.save-controls').hide(); }
+        } catch(_e) { setSaveControlsVisible(false); }
       }
 
       function handleQuickSort(key){
@@ -543,11 +609,13 @@
         const saved = JSON.parse(localStorage.getItem('fplPlayerViews') || '{}');
         const exists = !!saved[val];
         // Selecting from dropdown should not expose save controls; clear any typed name
-        $('#viewName').val('').data('autofill', false);
-        $('.save-controls').hide();
+        $('#viewName').val('').data('autofill', true);
+        setSaveControlsVisible(false);
         if (val === '_new') {
-          $('.save-controls').show();
-          $('#viewName').focus();
+          setSaveControlsVisible(true);
+          // Seed with suggested name for convenience and mark as autofill
+          const suggested = getSuggestedName();
+          $('#viewName').val(suggested).data('autofill', true).focus();
           return;
         }
         // Apply immediately if it is a saved view
@@ -563,6 +631,7 @@
 
       // Keep dropdown synced with state; do not auto-show save controls on sort/search/length
       table.on('order.dt search.dt length.dt', function(){
+        if (isInitializing) return;
         updateSelectForCurrentView();
         // Auto-show when current state is not a saved view
         evaluateSaveControls();
@@ -583,11 +652,14 @@
           table.page.len(def.pageLength || 100).draw();
           if (typeof def.search === 'string') { table.search(def.search).draw(); }
           // hide save controls for default view
-          $('.save-controls').hide();
+          $('.save-controls').css({display:'none', visibility:'hidden'});
         }
       } catch(_e) {}
       updateSelectForCurrentView();
-      evaluateSaveControls();
+      // Keep hidden by default on load; will auto-show on unsaved changes via event handlers
+      $('.save-controls').css({display:'none', visibility:'hidden'});
+      // End init phase
+      isInitializing = false;
 
       // Toggle Save controls when user types a new view name
       $('#viewName').on('input', function(){

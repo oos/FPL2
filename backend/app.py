@@ -129,19 +129,13 @@ def create_app(config_name: str | None = None):
     
     @app.route('/players')
     def players_page():
-        """Legacy route: redirect to the new Players page."""
-        from flask import redirect, url_for
-        return redirect(url_for('players2_page'))
-
-    @app.route('/players2')
-    def players2_page():
-        """Serve Players2: simple table with working search + enriched data (team short, GW opp/FDR)."""
+        """Serve the All Players page (formerly players2)."""
         db = current_app.db_manager
         players = [p.to_dict() for p in db.get_all_players()]
         teams = db.get_all_teams()
         fixtures = db.get_all_fixtures()
 
-        # Build opponent/FDR mapping per team and GW (reuse logic from /players)
+        # Build opponent/FDR mapping per team and GW (reuse logic)
         team_short_by_name = {t.name: t.short_name for t in teams}
         team_id_by_name = {t.name: t.id for t in teams}
 
@@ -194,6 +188,12 @@ def create_app(config_name: str | None = None):
 
         watch_ids = db.get_watchlist_ids()
         return render_template('players2.html', players=players, watch_ids=watch_ids, max_by_pos=max_by_pos)
+
+    @app.route('/players2')
+    def players2_page():
+        """Legacy URL: redirect to /players."""
+        from flask import redirect, url_for
+        return redirect(url_for('players_page'))
 
     @app.route('/players/individual')
     def players_individual_redirect():
@@ -303,8 +303,15 @@ def create_app(config_name: str | None = None):
                 gw_points = sum(player.get(gw_points_field, 0) or 0 for player in starting_xi)
                 
                 # Captaincy: select best scorer in XI and add bonus equal to their GW points
-                captain_player = max(starting_xi, key=lambda p: p.get(gw_points_field, 0) or 0) if starting_xi else None
+                xi_sorted_for_captain = sorted(
+                    starting_xi,
+                    key=lambda p: (float(p.get(gw_points_field, 0) or 0), float(p.get('total_points', 0) or 0)),
+                    reverse=True
+                ) if starting_xi else []
+                captain_player = xi_sorted_for_captain[0] if xi_sorted_for_captain else None
+                vice_captain_player = xi_sorted_for_captain[1] if len(xi_sorted_for_captain) > 1 else None
                 captain_name = captain_player.get("name") if captain_player else None
+                vice_captain_name = vice_captain_player.get("name") if vice_captain_player else None
                 captain_bonus = (captain_player.get(gw_points_field, 0) or 0) if captain_player else 0
                 
                 # Get transfer information
@@ -360,6 +367,7 @@ def create_app(config_name: str | None = None):
                     "points": gw_points,
                     "captain_name": captain_name,
                     "captain_bonus": captain_bonus,
+                    "vice_captain_name": vice_captain_name,
                     "hits_points": hits_points,
                     "total_with_captain_and_hits": total_gw_points,
                     "squad_value": sum((p.get("price",0) or 0) for p in starting_xi + bench),

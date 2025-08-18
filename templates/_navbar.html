@@ -1,13 +1,20 @@
 <nav class="navbar navbar-expand-lg navbar-light bg-light mb-4">
   <div class="container-fluid">
-    <a class="navbar-brand fw-bold text-decoration-none" href="/">FPL Tools</a>
-    <div class="navbar-nav">
+    <div class="d-flex align-items-center">
+      <a class="navbar-brand fw-bold text-decoration-none d-flex align-items-center" href="/">
+        <img src="{{ url_for('static', filename='assets/FPLove_logo_4.png') }}?v=2"
+             alt="FPLove" loading="eager"
+             style="height:28px; width:auto; margin-right:8px; display:inline-block; vertical-align:middle;"
+             onerror="this.onerror=null; this.src='{{ url_for('static', filename='assets/FPLove_logo_2.png') }}?v=5';"/>
+        <span class="visually-hidden">FPLove</span>
+      </a>
+      <div class="navbar-nav ms-3">
       <a class="nav-link {{ 'active' if request.path == '/' else '' }}" href="/">Dashboard</a>
       <a class="nav-link {{ 'active' if request.path.startswith('/fdr') else '' }}" href="/fdr">FDR</a>
       <div class="nav-item dropdown">
         <a class="nav-link dropdown-toggle {{ 'active' if request.path.startswith('/players2') or request.path.startswith('/players') or request.path.startswith('/watchlist') else '' }}" href="/players2" id="players2Dropdown" role="button" aria-expanded="false">Players</a>
         <ul class="dropdown-menu" aria-labelledby="players2Dropdown">
-          <li><a class="dropdown-item {{ 'active' if request.path == '/players2' else '' }}" href="/players2">Players</a></li>
+          <li><a class="dropdown-item {{ 'active' if request.path == '/players' else '' }}" href="/players">All Players</a></li>
           
           <li><a class="dropdown-item {{ 'active' if request.path == '/players/individual' else '' }}" href="/players/individual">Individual</a></li>
           <li><hr class="dropdown-divider"></li>
@@ -17,6 +24,7 @@
       
       <a class="nav-link {{ 'active' if request.path == '/teams' or request.path.startswith('/team/') else '' }}" href="/teams">Teams</a>
       <a class="nav-link {{ 'active' if request.path.startswith('/squad') else '' }}" href="/squad">Squad</a>
+      </div>
     </div>
   </div>
   <style>
@@ -39,11 +47,11 @@
       text-decoration: none !important;
     }
 
-    /* Unified table header styling across the app (match FDR page) */
+    /* Unified table header styling across the app (match FDR page) + very light blue tint */
     table.dataTable thead th,
     table thead th {
       white-space: normal;
-      background-color: #f8f9fa;
+      background-color: #eef7ff; /* light blue tint */
       border-color: #dee2e6;
       font-weight: 600;
       color: #2c3e50;
@@ -52,7 +60,7 @@
     }
     table.dataTable thead th:hover,
     table thead th:hover {
-      background-color: #e9ecef !important;
+      background-color: #e3f0ff !important; /* slightly deeper on hover */
       transform: scale(1.02);
       box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     }

@@ -32,12 +32,13 @@
           <div class="table-responsive">
             <table class="table table-sm">
               <tbody>
+                {% set color_map = {1:'#234f1e', 2:'#4a7c59', 3:'#f39c12', 4:'#e74c3c', 5:'#8b0000'} %}
                 {% for f in all_fixtures %}
                 <tr>
                   <td class="text-end pe-2">{% if team_id_by_name.get(f.home_team) %}<a href="/team/{{ team_id_by_name.get(f.home_team) }}" class="text-decoration-none">{{ f.home_team }}</a>{% else %}{{ f.home_team }}{% endif %}</td>
-                  <td><span class="fdr-badge" style="background:#4a7c59">{{ f.home_difficulty }}</span></td>
+                  <td><span class="fdr-badge" style="background: {{ color_map.get(f.home_difficulty, '#6c757d') }}">{{ f.home_difficulty }}</span></td>
                   <td class="px-2">vs</td>
-                  <td><span class="fdr-badge" style="background:#4a7c59">{{ f.away_difficulty }}</span></td>
+                  <td><span class="fdr-badge" style="background: {{ color_map.get(f.away_difficulty, '#6c757d') }}">{{ f.away_difficulty }}</span></td>
                   <td class="ps-2">{% if team_id_by_name.get(f.away_team) %}<a href="/team/{{ team_id_by_name.get(f.away_team) }}" class="text-decoration-none">{{ f.away_team }}</a>{% else %}{{ f.away_team }}{% endif %}</td>
                 </tr>
                 {% endfor %}

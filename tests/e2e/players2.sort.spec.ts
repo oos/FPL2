@@ -19,7 +19,7 @@ test.describe('Players2 column sorting', () => {
   });
 
   test('clicking Form header sorts by Form desc then asc', async ({ page }) => {
-    const formHeader = page.locator('#players2Table thead th').nth(8); // Form column (indexing from 0)
+    const formHeader = page.locator('#players2Table thead th').nth(7); // Form column moved left by one
     // Click once => desc by default
     await formHeader.click();
     let nums = await getColumnNumbers(page, 9);
@@ -33,7 +33,7 @@ test.describe('Players2 column sorting', () => {
   });
 
   test('clicking Points/£ header sorts', async ({ page }) => {
-    const ppmHeader = page.locator('#players2Table thead th').nth(6); // Points/£
+    const ppmHeader = page.locator('#players2Table thead th').nth(5); // Points/£ moved left by one
     await ppmHeader.click();
     const nums = await getColumnNumbers(page, 7);
     const sortedDesc = [...nums].sort((a,b)=>b-a);

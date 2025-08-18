@@ -4,6 +4,12 @@ test.describe('App pages smoke tests', () => {
   test('Dashboard loads', async ({ page }) => {
     await page.goto('/');
     await expect(page.getByRole('heading', { name: /Upcoming Gameweek/i })).toBeVisible();
+    // Verify FDR color mapping shows different backgrounds for different difficulties
+    const badges = page.locator('.fdr-badge');
+    await expect(badges.first()).toBeVisible();
+    const colors = await badges.evaluateAll(nodes => nodes.map(n => getComputedStyle(n).backgroundColor));
+    // Expect at least 2 distinct colors present if fixtures exist
+    expect(new Set(colors).size).toBeGreaterThanOrEqual(2);
   });
 
   test('FDR loads and table initialized', async ({ page }) => {
@@ -16,9 +22,8 @@ test.describe('App pages smoke tests', () => {
     await expect(page.locator('#players2Table')).toBeVisible();
   });
 
-  test('Players legacy route redirects to new page', async ({ page }) => {
+  test('Players URL serves new page', async ({ page }) => {
     await page.goto('/players');
-    await expect(page).toHaveURL(/\/players2$/);
     await expect(page.locator('#players2Table')).toBeVisible();
   });
 
@@ -30,6 +35,8 @@ test.describe('App pages smoke tests', () => {
   test('Squad page loads', async ({ page }) => {
     await page.goto('/squad');
     await expect(page.locator('#gwTabs')).toBeVisible();
+    // Ensure bottom transfers panel exists
+    await expect(page.locator('#bottomTransfersPanel')).toBeVisible();
   });
 });
 
