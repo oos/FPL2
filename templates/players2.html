@@ -66,9 +66,13 @@
     .gw-cell strong { font-size: 0.95em; }
     .gw-cell small { font-size: 0.78em; }
     /* Ensure wrappers also stretch full width */
-    .table-responsive { width: 100% !important; margin: 0 !important; padding: 0 !important; }
-    /* small spacing above the table */
-    .table-responsive { margin-top: 0.5rem !important; }
+    .table-responsive { 
+      width: 100% !important; 
+      margin: 0 !important; 
+      padding: 0 !important; 
+      position: relative; 
+      margin-top: 60px !important; 
+    }
     .dataTables_wrapper { width: 100% !important; }
     .dataTables_wrapper .dataTable { width: 100% !important; }
     /* Ensure native clear (x) icon shows for search inputs on WebKit */
@@ -92,9 +96,24 @@
     /* Nudge Watchlist switch slightly upward to align with select centers */
     .wlOnlyWrap { transform: translateY(-12px); }
     /* Inline info to the left of Search */
-    #players2Table_filter { display: flex; align-items: center; gap: .5rem; justify-content: flex-end; flex-wrap: wrap; }
+    #players2Table_filter { 
+      display: flex; 
+      align-items: center; 
+      gap: .5rem; 
+      justify-content: flex-end; 
+      flex-wrap: wrap; 
+      position: absolute;
+      top: -50px;
+      right: 0;
+      z-index: 10;
+    }
     #players2InlineInfo { white-space: nowrap; color: #6c757d; font-size: .9rem; margin-right: .25rem; }
     
+    /* Position the table wrapper to accommodate the search field above */
+    .table-responsive { 
+      position: relative; 
+      margin-top: 60px !important; 
+    }
   </style>
 </head>
 <body class="p-4">
@@ -223,7 +242,7 @@
             <td>{% if p.team_id %}<a href="/team/{{ p.team_id }}" class="text-decoration-none">{{ p.team_short or p.team }}</a>{% else %}{{ p.team_short or p.team }}{% endif %}</td>
             <td data-order="{{ p.price or 0 }}">£{{ '%.1f'|format(p.price or 0) }}M</td>
             <td>{{ '%.1f'|format(p.points_per_million or 0) }}</td>
-            <td>{{ '%.1f'|format(p.total_points or 0) }}</td>
+            <td class="{{ 'text-primary' if p.get('historical_total') else '' }}">{{ '%.1f'|format(p.total_points or 0) }}</td>
             <td>{{ '%.1f'|format(p.form or 0) }}</td>
             <td>{{ '%.0f'|format(p.chance_of_playing_next_round or 0) }}%</td>
             <td>{{ '%.1f'|format(p.ownership or 0) }}%</td>
@@ -237,7 +256,7 @@
               {% set fdr = 'gw' ~ gw ~ '_fdr' %}
               {% set f = p[fdr] if fdr in p else None %}
               {% set color = 'success' if f and f <= 2 else ('warning' if f == 3 else 'danger') %}
-              <td class="gw-cell">
+              <td class="gw-cell {{ 'text-primary' if gw==1 and p.get('historical_gw1') else '' }}">
                 <strong>{{ '%.1f'|format(p[pts] or 0) }}</strong><br>
                 <small>{{ p[opp] or '' }} {% if f %}<span class="badge bg-{{ color }}">{{ f }}</span>{% endif %}</small>
                 {% set pos = p.position %}

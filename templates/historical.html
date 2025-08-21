@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Historical FPL Data</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+  <style>
+    /* Wrap long header text in the historical detailed table */
+    #histDetail thead th {
+      white-space: normal !important;
+      word-break: break-word;
+      overflow-wrap: anywhere;
+      hyphens: auto;
+      max-width: 160px;
+    }
+    #histDetail { table-layout: fixed; }
+    #histDetail td, #histDetail th { vertical-align: top; }
+    /* Ensure DataTables header/body tables align perfectly */
+    .dataTables_wrapper .dataTables_scrollHead table,
+    .dataTables_wrapper .dataTables_scrollBody table { margin: 0 !important; width: 100% !important; }
+    .dataTables_scrollHeadInner { width: 100% !important; }
+  </style>
+</head>
+<body class="p-4">
+  {% include '_navbar.html' %}
+
+  <div class="container-fluid">
+    <div class="d-flex align-items-center mb-3 gap-2">
+      <h4 class="mb-0">Historical Data</h4>
+      <select id="seasonSelect" class="form-select form-select-sm" style="width:auto;">
+        <option value="2025/26" {% if summary.season=='2025/26' %}selected{% endif %}>2025/26</option>
+      </select>
+      <button id="deleteBtn" class="btn btn-outline-danger btn-sm">Delete Data</button>
+      <button id="fetchLatestBtn" class="btn btn-primary btn-sm">Fetch Data</button>
+      <span id="lastRun" class="text-muted ms-2">Last run: {{ summary.last_run or 'never' }}</span>
+      <div class="ms-auto d-flex align-items-center gap-2">
+        <label for="gwSelect" class="mb-0 small">GW</label>
+        <select id="gwSelect" class="form-select form-select-sm" style="width:auto;">
+          {% for row in summary.by_gw %}
+            <option value="{{ row.gameweek }}">{{ row.gameweek }}</option>
+          {% endfor %}
+        </select>
+        <button id="loadGwBtn" class="btn btn-outline-secondary btn-sm">Load GW</button>
+        <input id="histSearch" type="search" class="form-control form-control-sm" placeholder="Search name or team" style="width:220px;" />
+        <span id="progressText" class="text-muted small"></span>
+      </div>
+    </div>
+
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <div class="row mb-2">
+          <div class="col-sm-4"><strong>Season:</strong> <span id="seasonVal">{{ summary.season }}</span></div>
+          <div class="col-sm-4"><strong>Total Rows:</strong> <span id="totalRows">{{ summary.total_rows }}</span></div>
+        </div>
+        <div class="table-responsive">
+          <table class="table table-striped table-hover" id="histGwTable">
+            <thead>
+              <tr>
+                <th>GW</th>
+                <th>Rows</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for row in summary.by_gw %}
+              <tr><td>{{ row.gameweek }}</td><td>{{ row.rows }}</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="card shadow-sm mt-3">
+      <div class="card-body">
+        <h5 class="mb-2">Detailed GW Data</h5>
+        <div>
+          <table class="table table-sm table-striped" id="histDetail" style="width:100%">
+            <thead>
+              <tr><th>Name</th><th>Team</th><th>Raw JSON</th></tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Raw JSON Modal -->
+    <div class="modal fade" id="histRawModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Gameweek Entry (Raw JSON)</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div class="row g-3">
+              <div class="col-md-4">
+                <div class="card"><div class="card-body p-2">
+                  <div class="mb-1"><strong>Name:</strong> <span id="histRawName"></span></div>
+                  <div class="mb-1"><strong>Team:</strong> <span id="histRawTeam"></span></div>
+                  <div class="mb-1"><strong>Position:</strong> <span id="histRawPos"></span></div>
+                  <div class="mb-1"><strong>Price:</strong> <span id="histRawPrice"></span></div>
+                  <div class="mb-1"><strong>Ownership:</strong> <span id="histRawOwn"></span></div>
+                  <div class="mb-1"><strong>Form:</strong> <span id="histRawForm"></span></div>
+                  <div class="mb-1"><strong>Element ID:</strong> <span id="histRawElem"></span></div>
+                </div></div>
+              </div>
+              <div class="col-md-8">
+                <pre id="histRawContent" class="mb-0" style="white-space:pre-wrap;word-break:break-word;font-size:.85rem;"></pre>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    $(function(){
+      $('#fetchLatestBtn').on('click', function(){
+        const season = $('#seasonSelect').val();
+        // If no GW options (e.g., just deleted), default to 1 so user sees data immediately
+        const selGw = $('#gwSelect').val() || '1';
+        const $btn = $(this).prop('disabled', true).text('Fetching...');
+        $('#progressText').text('');
+        $.ajax({
+          url: '/api/historical/fetch',
+          method: 'POST',
+          data: { season, gw: selGw }
+        }).done(function(res){
+          $('#lastRun').text('Last run: ' + (res.last_run || 'now'));
+          $('#seasonVal').text(res.season);
+          // Reload summary counts and GW options without full page refresh
+          if (res && res.by_gw) {
+            const $tbody = $('#histGwTable tbody').empty();
+            res.by_gw.forEach(row => { $tbody.append(`<tr><td>${row.gw || row.gameweek}</td><td>${row.rows || row.count || 0}</td></tr>`); });
+            const $gwSel = $('#gwSelect').empty();
+            res.by_gw.forEach(row => { $gwSel.append(`<option value="${row.gw || row.gameweek}">${row.gw || row.gameweek}</option>`); });
+            // Update total rows
+            let total = 0; try { total = res.total_rows || res.by_gw.reduce((a,b)=>a + (b.rows||b.count||0),0); } catch(_e) {}
+            if (!Number.isNaN(total)) $('#totalRows').text(total);
+          }
+          loadGw();
+          // If more GWs exist after the one we fetched, start progressive import loop
+          progressiveImport(res);
+        }).fail(function(){
+          alert('Failed to fetch historical data');
+        }).always(function(){
+          $btn.prop('disabled', false).text('Fetch Data');
+        });
+      });
+
+      $('#deleteBtn').on('click', function(){
+        if (!confirm('This will delete all historical rows. Continue?')) return;
+        const season = $('#seasonSelect').val();
+        const $btn = $(this).prop('disabled', true).text('Deleting...');
+        $.ajax({
+          url: '/api/historical/delete',
+          method: 'POST',
+          data: { season }
+        }).done(function(res){
+          $('#lastRun').text('Last run: never');
+          $('#seasonVal').text(res.season || season);
+          $('#histGwTable tbody').empty();
+          $('#gwSelect').empty();
+          $('#histDetail tbody').empty();
+          $('#totalRows').text('0');
+        }).fail(function(){ alert('Delete failed'); })
+          .always(function(){ $btn.prop('disabled', false).text('Delete Data'); });
+      });
+
+      function loadGw(){
+        const season = $('#seasonSelect').val();
+        const gw = $('#gwSelect').val();
+        $.getJSON('/api/historical/gw', { season, gw }, function(res){
+          const $tb = $('#histDetail tbody').empty();
+          // Build dynamic columns for ALL JSON keys across rows
+          const rows = res.rows || [];
+          const allKeys = new Set();
+          rows.forEach(r => { try { const o = r.raw_json ? JSON.parse(r.raw_json) : {}; Object.keys(o).forEach(k => allKeys.add(k)); } catch(_e){} });
+          const keys = Array.from(allKeys).sort();
+          // Build header: Name, Team, each key, Raw JSON
+          const $thead = $('#histDetail thead').empty();
+          const headTr = $('<tr>');
+          headTr.append('<th>Name</th><th>Team</th>');
+          keys.forEach(k => { const label = (k || '').toString().replace(/_/g,' '); headTr.append(`<th>${label}</th>`); });
+          headTr.append('<th>Raw JSON</th>');
+          $thead.append(headTr);
+          // Build body
+          rows.forEach(r => {
+            let raw = {};
+            try { raw = r.raw_json ? JSON.parse(r.raw_json) : {}; } catch(_e) { raw = {}; }
+            const meta = {
+              name: r.name || '',
+              team: r.team_short || '',
+              position: (r.local && r.local.position) || r.position || '',
+              price: (r.local && r.local.price) || '',
+              ownership: (r.local && r.local.ownership) || '',
+              form: (r.local && r.local.form) || '',
+              fpl_element_id: r.fpl_element_id || ''
+            };
+            const tr = $('<tr>');
+            tr.append(`<td>${r.name || ''}</td><td>${r.team_short || ''}</td>`);
+            keys.forEach(k => tr.append(`<td>${raw[k] != null ? raw[k] : ''}</td>`));
+            tr.append(`<td class="raw-json" data-raw="${r.raw_json ? encodeURIComponent(r.raw_json) : ''}"><button type="button" class="btn btn-sm btn-outline-primary">View</button></td>`);
+            tr.data('meta', meta);
+            $tb.append(tr);
+          });
+          // Init DataTable sortable
+          try { if ($.fn.DataTable.isDataTable('#histDetail')) { $('#histDetail').DataTable().destroy(); } } catch(_e) {}
+          let orderIdx = -1;
+          $('#histDetail thead th').each(function(i){ if ($(this).text().trim().toLowerCase() === 'total points') { orderIdx = i; return false; } });
+          const dtOpts = { scrollX: true, pageLength: 50, autoWidth: true, deferRender: true, info: true, fixedHeader: false };
+          if (orderIdx >= 0) dtOpts.order = [[orderIdx, 'desc']];
+          const dt = $('#histDetail').DataTable(dtOpts);
+          // Force column recalculation after draw to sync header/body widths
+          setTimeout(() => { try { dt.columns.adjust(); } catch(_e) {} }, 0);
+          applyHistFilter();
+        });
+      }
+      $('#loadGwBtn').on('click', loadGw);
+      // Auto-load first GW if available
+      if ($('#gwSelect option').length){
+        loadGw();
+      }
+
+      // Simple client-side search filter for detailed table
+      function applyHistFilter(){
+        const q = ($('#histSearch').val() || '').toString().trim().toLowerCase();
+        const $rows = $('#histDetail tbody tr');
+        if (!q){ $rows.show(); return; }
+        $rows.each(function(){
+          const txt = $(this).text().toLowerCase();
+          $(this).toggle(txt.indexOf(q) !== -1);
+        });
+      }
+      $('#histSearch').on('input', applyHistFilter);
+
+      // Open JSON modal on click
+      $('#histDetail').on('click', 'td.raw-json', function(){
+        const enc = $(this).data('raw');
+        if (!enc) return;
+        let rawStr = '';
+        try { rawStr = decodeURIComponent(enc); } catch(_e) { rawStr = $(this).text() || ''; }
+        let pretty = rawStr;
+        try { pretty = JSON.stringify(JSON.parse(rawStr), null, 2); } catch(_e) {}
+        $('#histRawContent').text(pretty);
+        // Fill player details from row cells if available
+        const $tr = $(this).closest('tr');
+        const name = $tr.find('td').eq(0).text();
+        const team = $tr.find('td').eq(1).text();
+        // Extract additional details from the data attributes if present in JSON response
+        // We embed local details in a hidden span for robustness
+        const meta = $tr.data('meta') || {};
+        $('#histRawName').text(meta.name || name || '');
+        $('#histRawTeam').text(meta.team || team || '');
+        $('#histRawPos').text(meta.position || '');
+        $('#histRawPrice').text(meta.price != null ? `£${meta.price}M` : '');
+        $('#histRawOwn').text(meta.ownership != null ? `${meta.ownership}%` : '');
+        $('#histRawForm').text(meta.form != null ? `${meta.form}` : '');
+        $('#histRawElem').text(meta.fpl_element_id || '');
+        const modal = new bootstrap.Modal(document.getElementById('histRawModal'));
+        modal.show();
+      });
+
+      // Progressive import: fetch subsequent GWs one by one to populate quickly and update UI
+      function progressiveImport(summary){
+        try {
+          const season = $('#seasonSelect').val();
+          const present = new Set((summary.by_gw || []).map(r => parseInt(r.gw || r.gameweek)));
+          // If we just fetched one GW (e.g., 1), pull next few up to 9 by default
+          const targetMaxGw = 9;
+          const gws = [];
+          for (let gw=1; gw<=targetMaxGw; gw++) if (!present.has(gw)) gws.push(gw);
+          if (!gws.length) return;
+          let i = 0;
+          const step = () => {
+            if (i >= gws.length) { $('#progressText').text(''); refreshSummary(); return; }
+            const gw = gws[i++];
+            $('#progressText').text(`Importing GW ${gw}/${targetMaxGw}…`);
+            $.ajax({ url:'/api/historical/fetch', method:'POST', data:{ season, gw } })
+              .done(function(res){
+                // Update UI incrementally
+                if (res && res.by_gw){
+                  const $tbody = $('#histGwTable tbody').empty();
+                  res.by_gw.forEach(row => { $tbody.append(`<tr><td>${row.gw || row.gameweek}</td><td>${row.rows || row.count || 0}</td></tr>`); });
+                  const $gwSel = $('#gwSelect').empty();
+                  res.by_gw.forEach(row => { $gwSel.append(`<option value="${row.gw || row.gameweek}">${row.gw || row.gameweek}</option>`); });
+                }
+                step();
+              })
+              .fail(function(){ step(); });
+          };
+          step();
+        } catch(_e) {}
+      }
+
+      function refreshSummary(){
+        const season = $('#seasonSelect').val();
+        $.getJSON('/api/historical/summary', { season }, function(res){
+          if (res && res.by_gw){
+            const $tbody = $('#histGwTable tbody').empty();
+            res.by_gw.forEach(row => { $tbody.append(`<tr><td>${row.gw || row.gameweek}</td><td>${row.rows || row.count || 0}</td></tr>`); });
+            const $gwSel = $('#gwSelect').empty();
+            res.by_gw.forEach(row => { $gwSel.append(`<option value="${row.gw || row.gameweek}">${row.gw || row.gameweek}</option>`); });
+          }
+          $('#progressText').text('');
+        });
+      }
+    });
+  </script>
+</body>
+<html>
+
+

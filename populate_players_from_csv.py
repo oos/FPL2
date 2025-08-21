@@ -20,8 +20,8 @@ def main():
     """Main function to populate players from CSV"""
     
     # Configuration
-    csv_file_path = "players_data.csv"  # Update this path to your CSV file
-    db_path = "fpl.db"  # Update this path to your database file
+    csv_file_path = "misc/MASTER - FFF Players Predicted Points.csv"  # Updated path to the correct CSV file
+    db_path = "backend/fpl.db"  # Updated path to the correct database file
     batch_size = 1000  # Process 1000 records at a time
     
     # Check if CSV file exists
@@ -39,25 +39,13 @@ def main():
         logger.info("Initializing CSV service...")
         csv_service = CSVService(db_manager)
         
-        # Validate CSV structure
-        logger.info("Validating CSV structure...")
-        if not csv_service.validate_csv_structure(csv_file_path):
-            logger.error("CSV validation failed. Please check the file structure.")
-            sys.exit(1)
-        
         # Process CSV file
         logger.info(f"Processing CSV file: {csv_file_path}")
         logger.info(f"Batch size: {batch_size}")
         
-        # Choose processing method based on file size
-        file_size = Path(csv_file_path).stat().st_size
-        
-        if file_size > 100 * 1024 * 1024:  # 100MB
-            logger.info("Large file detected, using streaming approach...")
-            total_inserted = csv_service.process_csv_streaming(csv_file_path, batch_size)
-        else:
-            logger.info("Using standard processing approach...")
-            total_inserted = csv_service.process_csv_file(csv_file_path, batch_size)
+        # Use the FFF-specific CSV processing method
+        logger.info("Using FFF Players CSV processing method...")
+        total_inserted = csv_service.process_fff_players_csv(csv_file_path, batch_size)
         
         logger.info(f"✅ Successfully processed CSV file!")
         logger.info(f"📊 Total players inserted: {total_inserted}")

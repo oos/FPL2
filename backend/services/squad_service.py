@@ -6,8 +6,8 @@ class SquadService:
     def __init__(self, db_manager: DatabaseManager):
         self.db_manager = db_manager
     
-    def get_optimal_squad_for_gw1_9(self) -> Dict[int, Dict[str, Any]]:
-        """Generate optimal squad strategy for GW1-9"""
+    def get_optimal_squad_for_gw1_9(self, max_transfers_per_gw: int = 1) -> Dict[int, Dict[str, Any]]:
+        """Generate optimal squad strategy for GW1-9 with FPL rule compliance"""
         try:
             # Get all players from database
             players_data = self.db_manager.get_all_players()
@@ -36,9 +36,9 @@ class SquadService:
                     gw1["free_transfers_remaining"] = 1
                     strategy_data[gw] = gw1
                 else:
-                    # GW2-9: Apply transfers and optimize
+                    # GW2-9: Apply transfers and optimize with FPL rule compliance
                     strategy_data[gw] = self._create_optimized_gw_squad(
-                        strategy_data[gw-1], unique_players, gw
+                        strategy_data[gw-1], unique_players, gw, max_transfers_per_gw
                     )
             
             return strategy_data
@@ -48,13 +48,13 @@ class SquadService:
             return {}
     
     def _create_gw1_squad(self, players_data: List[Dict[str, Any]]) -> Dict[str, Any]:
-        """Create initial 15-player squad for GW1 enforcing FPL rules"""
-        # Desired squad composition and limits
+        """Create initial 15-player squad for GW1 enforcing FPL rules strictly"""
+        # FPL squad composition rules
         target_by_position = {
-            'Goalkeeper': 2,
-            'Defender': 5,
-            'Midfielder': 5,
-            'Forward': 3,
+            'Goalkeeper': 2,  # Must have exactly 2 goalkeepers
+            'Defender': 5,    # Must have exactly 5 defenders
+            'Midfielder': 5,  # Must have exactly 5 midfielders
+            'Forward': 3,     # Must have exactly 3 forwards
         }
         max_players_per_team = 3
         budget_cap_millions = 100.0
@@ -66,137 +66,77 @@ class SquadService:
             reverse=True,
         )
 
-        # Compute cheapest price available to assure we can always fill remaining slots within budget
-        try:
-            min_price_overall = min(float(p.get('price') or 0.0) for p in players_data if p.get('price') is not None)
-        except ValueError:
-            min_price_overall = 3.5  # sensible fallback
-
-        # Build 15-player squad under constraints
+        # Build 15-player squad under strict FPL constraints
         squad: List[Dict[str, Any]] = []
         position_counts = {k: 0 for k in target_by_position.keys()}
         team_counts: Dict[str, int] = {}
         total_budget = 0.0
         used_ids = set()
 
-        for player in sorted_players:
-            if len(squad) >= 15:
-                break
-            pid = player.get('id')
-            if pid in used_ids:
-                continue
-            pos = player.get('position')
-            if pos not in target_by_position:
-                continue
-            # Enforce per-position target
-            if position_counts[pos] >= target_by_position[pos]:
-                continue
-            # Enforce team limit
-            team_name = player.get('team') or 'Unknown'
-            # Enforce team cap except for Unknown (don't block filling on unknown teams)
-            if team_name != 'Unknown' and team_counts.get(team_name, 0) >= max_players_per_team:
-                continue
-            # Enforce budget cap with feasibility: ensure enough budget remains to fill the rest with cheapest
-            price = float(player.get('price') or 0.0)
-            remaining_slots_if_added = (15 - (len(squad) + 1))
-            required_min_budget = remaining_slots_if_added * min_price_overall
-            if total_budget + price + required_min_budget > budget_cap_millions:
-                continue
+        # First pass: fill mandatory positions with best available players
+        for pos, required_count in target_by_position.items():
+            pos_players = [p for p in sorted_players if p.get('position') == pos]
+            pos_players.sort(key=lambda x: x.get('total_points', 0) or 0, reverse=True)
+            
+            for i in range(required_count):
+                if i < len(pos_players):
+                    player = pos_players[i]
+                    pid = player.get('id')
+                    if pid in used_ids:
+                        continue
+                    
+                    # Check team limit
+                    team_name = player.get('team') or 'Unknown'
+                    if team_name != 'Unknown' and team_counts.get(team_name, 0) >= max_players_per_team:
+                        continue
+                    
+                    # Check budget
+                    price = float(player.get('price') or 0.0)
+                    if total_budget + price > budget_cap_millions:
+                        continue
+                    
+                    # Add player
+                    squad.append(player)
+                    used_ids.add(pid)
+                    position_counts[pos] += 1
+                    team_counts[team_name] = team_counts.get(team_name, 0) + 1
+                    total_budget += price
 
-            # Add player
-            squad.append(player)
-            used_ids.add(pid)
-            position_counts[pos] += 1
-            team_counts[team_name] = team_counts.get(team_name, 0) + 1
-            total_budget += price
-
-        # If we couldn't reach 15, fill missing positions to meet exact position targets first
+        # Ensure we have exactly 15 players
         if len(squad) < 15:
-            for pos_needed, target in target_by_position.items():
-                while len(squad) < 15 and position_counts.get(pos_needed, 0) < target:
-                    candidate = None
-                    for player in sorted_players:
-                        pid = player.get('id')
-                        if pid in used_ids:
-                            continue
-                        if player.get('position') != pos_needed:
-                            continue
-                        team_name = player.get('team') or 'Unknown'
-                        if team_name != 'Unknown' and team_counts.get(team_name, 0) >= max_players_per_team:
-                            continue
-                        price = float(player.get('price') or 0.0)
-                        remaining_slots_if_added = (15 - (len(squad) + 1))
-                        required_min_budget = remaining_slots_if_added * min_price_overall
-                        if total_budget + price + required_min_budget > budget_cap_millions:
-                            continue
-                        candidate = player
-                        break
-                    if candidate is None:
-                        break
-                    squad.append(candidate)
-                    used_ids.add(candidate.get('id'))
-                    position_counts[pos_needed] = position_counts.get(pos_needed, 0) + 1
-                    tname = candidate.get('team') or 'Unknown'
-                    team_counts[tname] = team_counts.get(tname, 0) + 1
-                    total_budget += float(candidate.get('price') or 0.0)
-
-        # If still short, fill with cheapest candidates that do NOT exceed position targets
-        if len(squad) < 15:
-            remaining_budget = budget_cap_millions - total_budget
-            cheap_candidates = sorted(
-                [p for p in players_data if p.get('id') not in used_ids and position_counts.get(p.get('position'), 0) < target_by_position.get(p.get('position'), 0)],
-                key=lambda x: float(x.get('price') or 0.0)
-            )
-            for player in cheap_candidates:
+            # Fill remaining slots with best available players
+            remaining_players = [p for p in sorted_players if p.get('id') not in used_ids]
+            remaining_players.sort(key=lambda x: x.get('total_points', 0) or 0, reverse=True)
+            
+            for player in remaining_players:
                 if len(squad) >= 15:
                     break
-                price = float(player.get('price') or 0.0)
-                if price > remaining_budget:
+                    
+                pid = player.get('id')
+                if pid in used_ids:
                     continue
+                
+                # Check team limit
                 team_name = player.get('team') or 'Unknown'
                 if team_name != 'Unknown' and team_counts.get(team_name, 0) >= max_players_per_team:
                     continue
-                # enforce not exceeding the exact target for the position
-                pos = player.get('position')
-                if position_counts.get(pos, 0) >= target_by_position.get(pos, 0):
+                
+                # Check budget
+                price = float(player.get('price') or 0.0)
+                if total_budget + price > budget_cap_millions:
                     continue
+                
+                # Add player
                 squad.append(player)
-                used_ids.add(player.get('id'))
-                position_counts[pos] = position_counts.get(pos, 0) + 1
+                used_ids.add(pid)
                 team_counts[team_name] = team_counts.get(team_name, 0) + 1
                 total_budget += price
-                remaining_budget = budget_cap_millions - total_budget
 
-        # Final fallback: if still not 15, relax constraints to guarantee full squad size
-        # Prefer absolute cheapest remaining players regardless of team caps/position targets/budget
-        if len(squad) < 15:
-            absolute_cheapest = sorted(
-                [p for p in players_data if p.get('id') not in used_ids],
-                key=lambda x: float(x.get('price') or 0.0)
-            )
-            for player in absolute_cheapest:
-                if len(squad) >= 15:
-                    break
-                squad.append(player)
-                used_ids.add(player.get('id'))
-                pos = player.get('position')
-                position_counts[pos] = position_counts.get(pos, 0) + 1
-                tname = player.get('team') or 'Unknown'
-                team_counts[tname] = team_counts.get(tname, 0) + 1
-                total_budget += float(player.get('price') or 0.0)
+        # Select starting XI (best 11 players)
+        starting_xi = self._select_starting_xi(squad)
+        bench = [p for p in squad if p not in starting_xi]
 
-        # Derive XI and bench (exactly 11 + 4) using GW1 points for ranking
-        starting_xi = self._select_starting_xi(squad, scoring_field='gw1_points')
-        # Keep bench limited to 4, pick best remaining by GW1 points then total
-        remaining = [p for p in squad if p not in starting_xi]
-        remaining_sorted = sorted(
-            remaining,
-            key=lambda x: ((x.get('gw1_points', 0) or 0), (x.get('total_points', 0) or 0)),
-            reverse=True
-        )
-        bench = remaining_sorted[:4]
-
-        # Captain and vice-captain for GW1 (best and next-best by GW1 points)
+        # Captain and vice-captain selection
         xi_sorted_for_captain = sorted(
             starting_xi,
             key=lambda x: (float(x.get('gw1_points', 0) or 0), float(x.get('total_points', 0) or 0)),
@@ -213,49 +153,42 @@ class SquadService:
             "formation": self.get_formation(starting_xi),
             "captain": captain_name,
             "vice_captain": vice_captain_name,
+            "hits_points": 0,
+            "free_transfers_remaining": 1,
         }
     
     def _create_optimized_gw_squad(self, prev_gw_data: Dict[str, Any], 
                                   all_players: List[Dict[str, Any]], 
-                                  gw: int) -> Dict[str, Any]:
-        """Create optimized squad for subsequent gameweeks"""
+                                  gw: int,
+                                  max_transfers_per_gw: int) -> Dict[str, Any]:
+        """Create optimized squad for subsequent gameweeks with strict FPL rule compliance"""
         # Get current 15-player squad (carry over)
         current_squad = list(prev_gw_data["starting_xi"]) + list(prev_gw_data["bench"])
 
-        # Determine available free transfers with rollover (cap 5) and AFCON special GW16=5
+        # Determine available free transfers with rollover (cap 2)
         prev_free = int(prev_gw_data.get("free_transfers_remaining", 1))
-        available_free = 5 if gw == 16 else min(5, prev_free + 1)
+        available_free = min(2, prev_free + 1)  # FPL rule: max 2 free transfers
+        
+        # Limit transfers to user preference
+        max_transfers = min(max_transfers_per_gw, available_free)
         
         # Re-optimize starting XI based on current gameweek performance
         gw_points_field = f'gw{gw}_points'
-        sorted_squad = sorted(
-            current_squad,
-            key=lambda x: ((x.get(gw_points_field, 0) or 0), (x.get('total_points', 0) or 0)),
-            reverse=True
-        )
-
-        # Plan transfers greedily to improve GW points with hits when beneficial
-        updated_squad, transfers_in_names, transfers_out_names, hits_points, free_left, new_total_budget = (
+        
+        # Plan transfers with strict FPL compliance
+        updated_squad, transfers_in_players, transfers_out_players, hits_points, free_left, new_total_budget = (
             self._plan_transfers_for_gameweek(
                 current_squad=current_squad,
                 all_players=all_players,
                 gw_points_field=gw_points_field,
                 available_free_transfers=available_free,
+                max_transfers=max_transfers,
                 budget_cap=100.0,
             )
         )
 
-        # Ensure we maintain a full 15-player squad before selection
-        if len(updated_squad) < 15:
-            # Pad with cheapest available players not already in squad (relaxing constraints if necessary)
-            pad_pool = sorted(
-                [p for p in all_players if p.get('id') not in {x.get('id') for x in updated_squad}],
-                key=lambda x: float(x.get('price') or 0.0)
-            )
-            for p in pad_pool:
-                if len(updated_squad) >= 15:
-                    break
-                updated_squad.append(p)
+        # Ensure we maintain a full 15-player squad with proper position distribution
+        updated_squad = self._ensure_valid_fpl_squad(updated_squad, all_players)
 
         # Sort for XI selection
         sorted_squad = sorted(
@@ -265,7 +198,7 @@ class SquadService:
         )
 
         starting_xi = self._select_starting_xi(sorted_squad, scoring_field=gw_points_field)
-        # Limit bench to 4
+        # Ensure bench has exactly 4 players
         bench_candidates = [p for p in sorted_squad if p not in starting_xi]
         bench = bench_candidates[:4]
         
@@ -281,7 +214,7 @@ class SquadService:
         return {
             "starting_xi": starting_xi,
             "bench": bench,
-            "transfers": {"in": transfers_in_names, "out": transfers_out_names},
+            "transfers": {"in": transfers_in_players, "out": transfers_out_players},
             "hits_points": hits_points,
             "free_transfers_remaining": free_left,
             "points": sum(p.get(gw_points_field, 0) or 0 for p in starting_xi),
@@ -290,15 +223,62 @@ class SquadService:
             "vice_captain": vice_captain_name,
         }
 
+    def _ensure_valid_fpl_squad(self, squad: List[Dict[str, Any]], all_players: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+        """Ensure the squad meets FPL requirements: exactly 15 players with proper position distribution"""
+        target_by_position = {
+            'Goalkeeper': 2,
+            'Defender': 5,
+            'Midfielder': 5,
+            'Forward': 3,
+        }
+        
+        # Count current positions
+        position_counts = {'Goalkeeper': 0, 'Defender': 0, 'Midfielder': 0, 'Forward': 0}
+        for player in squad:
+            pos = player.get('position')
+            if pos in position_counts:
+                position_counts[pos] += 1
+        
+        # If we have exactly 15 players with correct distribution, return as-is
+        if len(squad) == 15 and all(position_counts[pos] == target_by_position[pos] for pos in target_by_position):
+            return squad
+        
+        # If we have fewer than 15 players, add missing players
+        if len(squad) < 15:
+            needed = 15 - len(squad)
+            available_players = [p for p in all_players if p.get('id') not in {x.get('id') for x in squad}]
+            
+            # Sort by total points
+            available_players.sort(key=lambda x: x.get('total_points', 0) or 0, reverse=True)
+            
+            for player in available_players:
+                if len(squad) >= 15:
+                    break
+                    
+                pos = player.get('position')
+                if pos in target_by_position and position_counts[pos] < target_by_position[pos]:
+                    squad.append(player)
+                    position_counts[pos] += 1
+        
+        # If we have more than 15 players, remove excess
+        if len(squad) > 15:
+            # Sort by total points and remove worst players
+            squad.sort(key=lambda x: x.get('total_points', 0) or 0)
+            while len(squad) > 15:
+                squad.pop(0)
+        
+        return squad
+
     def _plan_transfers_for_gameweek(
         self,
         current_squad: List[Dict[str, Any]],
         all_players: List[Dict[str, Any]],
         gw_points_field: str,
         available_free_transfers: int,
+        max_transfers: int,
         budget_cap: float,
-    ) -> tuple[List[Dict[str, Any]], List[str], List[str], int, int, float]:
-        """Greedy transfer planner. Returns (new_squad, in_names, out_names, hits_points, free_left, new_budget)."""
+    ) -> tuple[List[Dict[str, Any]], List[Dict[str, Any]], List[Dict[str, Any]], int, int, float]:
+        """Plan transfers with strict FPL rule compliance and detailed analysis"""
         # Compute current budget and team counts
         total_budget = sum(float(p.get('price') or 0.0) for p in current_squad)
         team_counts: Dict[str, int] = {}
@@ -309,86 +289,175 @@ class SquadService:
         # Build quick lookup of squad ids
         squad_ids = {p.get('id') for p in current_squad}
 
-        # Precompute best replacement for each squad player by delta points
-        candidates = []  # list of (delta, out_player, in_player)
+        # Find best transfer opportunities with detailed analysis
+        candidates = []  # list of (delta, out_player, in_player, analysis_data)
         for out_p in current_squad:
             out_pts = float(out_p.get(gw_points_field, 0) or 0)
             pos = out_p.get('position')
-            # Consider top N available by GW points in same position and globally (to allow formation flexibility)
+            
+            # Consider available players in same position
             for in_p in all_players:
                 if in_p.get('id') in squad_ids:
                     continue
-                # Respect team limit of 3 (don't count Unknown for cap)
+                    
+                # Must be same position for FPL compliance
+                if in_p.get('position') != pos:
+                    continue
+                    
+                # Respect team limit of 3
                 in_team = in_p.get('team') or 'Unknown'
                 if in_team != 'Unknown' and team_counts.get(in_team, 0) >= 3:
                     continue
+                    
+                # Calculate point improvement
                 delta = float(in_p.get(gw_points_field, 0) or 0) - out_pts
                 if delta <= 0:
                     continue
-                candidates.append((delta, out_p, in_p))
+                
+                # Calculate 8-week projected points for detailed analysis
+                analysis_data = self._calculate_transfer_analysis(out_p, in_p, gw_points_field)
+                
+                candidates.append((delta, out_p, in_p, analysis_data))
 
         # Sort descending by gain
         candidates.sort(key=lambda x: x[0], reverse=True)
 
         transfers_made = 0
         hits = 0
-        in_names: List[str] = []
-        out_names: List[str] = []
+        in_players: List[Dict[str, Any]] = []
+        out_players: List[Dict[str, Any]] = []
+        updated_squad = list(current_squad)
 
-        # Greedy apply while net positive considering hit cost
-        for delta, out_p, in_p in candidates:
-            # Skip if already transferred out or in
-            if out_p.get('id') not in {p.get('id') for p in current_squad}:
+        # Apply transfers up to the limit
+        for delta, out_p, in_p, analysis_data in candidates:
+            if transfers_made >= max_transfers:
+                break
+                
+            # Skip if already processed
+            if out_p.get('id') not in {p.get('id') for p in updated_squad}:
                 continue
-            if in_p.get('id') in {p.get('id') for p in current_squad}:
+            if in_p.get('id') in {p.get('id') for p in updated_squad}:
                 continue
+                
             # Budget check
             out_price = float(out_p.get('price') or 0.0)
             in_price = float(in_p.get('price') or 0.0)
             new_budget = total_budget - out_price + in_price
             if new_budget > budget_cap:
                 continue
-            # Team cap check if we remove and add
+                
+            # Team cap check
             out_team = out_p.get('team') or 'Unknown'
             in_team = in_p.get('team') or 'Unknown'
-            # Tentative team counts after swap
             new_team_counts = dict(team_counts)
             new_team_counts[out_team] = max(0, new_team_counts.get(out_team, 0) - 1)
             new_team_counts[in_team] = new_team_counts.get(in_team, 0) + 1
             if in_team != 'Unknown' and new_team_counts.get(in_team, 0) > 3:
                 continue
 
-            # Determine marginal hit cost for this transfer
-            marginal_hit = 0
-            if transfers_made + 1 > available_free_transfers:
-                marginal_hit = 4
-            # Apply only if net gain > marginal hit
-            if delta <= marginal_hit:
-                continue
-
             # Apply transfer
-            current_squad = [p for p in current_squad if p.get('id') != out_p.get('id')]
-            current_squad.append(in_p)
+            updated_squad = [p for p in updated_squad if p.get('id') != out_p.get('id')]
+            updated_squad.append(in_p)
             total_budget = new_budget
             team_counts = new_team_counts
-            squad_ids = {p.get('id') for p in current_squad}
             transfers_made += 1
-            in_names.append(in_p.get('name'))
-            out_names.append(out_p.get('name'))
+            
+            # Store full player objects with analysis data
+            out_player_with_analysis = dict(out_p)
+            out_player_with_analysis['transfer_analysis'] = analysis_data
+            
+            in_player_with_analysis = dict(in_p)
+            in_player_with_analysis['transfer_analysis'] = analysis_data
+            
+            in_players.append(in_player_with_analysis)
+            out_players.append(out_player_with_analysis)
 
-            # Limit to a reasonable number per week (avoid excessive swaps)
-            if transfers_made >= available_free_transfers + 4:
-                break
-
+        # Calculate hits
         free_used = min(transfers_made, available_free_transfers)
         extra = max(0, transfers_made - available_free_transfers)
         hits_points = -4 * extra
-        free_left = min(5, available_free_transfers - free_used)
+        free_left = max(0, available_free_transfers - free_used)
 
-        return current_squad, in_names, out_names, hits_points, free_left, total_budget
+        return updated_squad, in_players, out_players, hits_points, free_left, total_budget
+    
+    def _calculate_transfer_analysis(self, out_player: Dict[str, Any], in_player: Dict[str, Any], current_gw_field: str) -> Dict[str, Any]:
+        """Calculate detailed 8-week transfer analysis for two players"""
+        # Extract current GW number from field name (e.g., 'gw2_points' -> 2)
+        current_gw = int(current_gw_field.replace('gw', '').replace('_points', ''))
+        
+        # Calculate 8-week projected points for both players
+        out_8week_total = 0
+        in_8week_total = 0
+        out_weekly_points = []
+        in_weekly_points = []
+        
+        for gw in range(current_gw, min(current_gw + 8, 11)):  # FPL season goes to GW38, but we'll limit to GW10 for now
+            gw_field = f'gw{gw}_points'
+            
+            # Get points for out player
+            out_gw_points = float(out_player.get(gw_field, 0) or 0)
+            out_8week_total += out_gw_points
+            out_weekly_points.append({
+                'gw': gw,
+                'points': out_gw_points,
+                'field': gw_field
+            })
+            
+            # Get points for in player
+            in_gw_points = float(in_player.get(gw_field, 0) or 0)
+            in_8week_total += in_gw_points
+            in_weekly_points.append({
+                'gw': gw,
+                'points': in_gw_points,
+                'field': gw_field
+            })
+        
+        # Calculate transfer impact
+        point_difference = in_8week_total - out_8week_total
+        transfer_cost = 4  # Standard -4 hit cost
+        net_gain = point_difference - transfer_cost
+        
+        # Calculate ROI (Return on Investment)
+        out_price = float(out_player.get('price', 0) or 0)
+        in_price = float(in_player.get('price', 0) or 0)
+        price_difference = in_price - out_price
+        
+        # Points per million analysis
+        out_ppm = out_8week_total / out_price if out_price > 0 else 0
+        in_ppm = in_8week_total / in_price if in_price > 0 else 0
+        ppm_improvement = in_ppm - out_ppm
+        
+        return {
+            'out_player_8week_total': out_8week_total,
+            'in_player_8week_total': in_8week_total,
+            'point_difference': point_difference,
+            'transfer_cost': transfer_cost,
+            'net_gain': net_gain,
+            'price_difference': price_difference,
+            'out_ppm': out_ppm,
+            'in_ppm': in_ppm,
+            'ppm_improvement': ppm_improvement,
+            'out_weekly_points': out_weekly_points,
+            'in_weekly_points': in_weekly_points,
+            'analysis_period': f"GW{current_gw}-{min(current_gw + 7, 10)}",
+            'recommendation': self._generate_transfer_recommendation(net_gain, point_difference, ppm_improvement)
+        }
+    
+    def _generate_transfer_recommendation(self, net_gain: float, point_difference: float, ppm_improvement: float) -> str:
+        """Generate human-readable transfer recommendation"""
+        if net_gain > 5:
+            return "Strong Buy - High expected return even with transfer cost"
+        elif net_gain > 0:
+            return "Buy - Positive return expected over 8 weeks"
+        elif point_difference > 0:
+            return "Consider - Points improvement but transfer cost may outweigh benefits"
+        elif ppm_improvement > 0.5:
+            return "Value Buy - Better points per million ratio"
+        else:
+            return "Hold - Transfer may not provide sufficient improvement"
     
     def _select_starting_xi(self, players: List[Dict[str, Any]], scoring_field: str | None = None) -> List[Dict[str, Any]]:
-        """Select a valid starting XI with FPL-like constraints. Always returns up to 11 players."""
+        """Select a valid starting XI with strict FPL constraints"""
         def score(p: Dict[str, Any]) -> float:
             if scoring_field is not None:
                 v = p.get(scoring_field, 0)
@@ -398,6 +467,7 @@ class SquadService:
 
         sorted_all = sorted(players, key=score, reverse=True)
 
+        # Group by position
         gk = [p for p in sorted_all if p.get('position') == 'Goalkeeper']
         defs = [p for p in sorted_all if p.get('position') == 'Defender']
         mids = [p for p in sorted_all if p.get('position') == 'Midfielder']
@@ -406,6 +476,8 @@ class SquadService:
         starting_xi: List[Dict[str, Any]] = []
         used_ids = set()
         counts = {'Goalkeeper': 0, 'Defender': 0, 'Midfielder': 0, 'Forward': 0}
+        
+        # FPL minimum requirements
         min_req = {'Goalkeeper': 1, 'Defender': 3, 'Midfielder': 2, 'Forward': 1}
         max_allowed = {'Goalkeeper': 1, 'Defender': 5, 'Midfielder': 5, 'Forward': 3}
 
@@ -421,43 +493,38 @@ class SquadService:
             counts[pos] = counts.get(pos, 0) + 1
             return True
 
-        # Minimums (enforce exactly one GK in XI)
+        # Fill minimum requirements first
         if gk:
-            try_add(gk[0])
+            try_add(gk[0])  # Must have exactly 1 GK in starting XI
+        
+        # Fill minimum defenders
         for p in defs:
             if counts['Defender'] >= min_req['Defender']:
                 break
             try_add(p)
+            
+        # Fill minimum midfielders
         for p in mids:
             if counts['Midfielder'] >= min_req['Midfielder']:
                 break
             try_add(p)
+            
+        # Fill minimum forwards
         for p in fwds:
             if counts['Forward'] >= min_req['Forward']:
                 break
             try_add(p)
 
-        # Fill remaining up to 11
+        # Fill remaining slots up to 11
         for p in sorted_all:
             if len(starting_xi) >= 11:
                 break
-            # Do not allow more than 1 GK
+            if p.get('id') in used_ids:
+                continue
+            # Never add more than 1 GK to starting XI
             if p.get('position') == 'Goalkeeper' and counts['Goalkeeper'] >= 1:
                 continue
             try_add(p)
-
-        # Relax caps if still short
-        if len(starting_xi) < 11:
-            for p in sorted_all:
-                if len(starting_xi) >= 11:
-                    break
-                pid = p.get('id')
-                if pid in used_ids:
-                    continue
-                if p.get('position') == 'Goalkeeper' and counts['Goalkeeper'] >= 1:
-                    continue
-                starting_xi.append(p)
-                used_ids.add(pid)
 
         return starting_xi[:11]
     
@@ -466,14 +533,11 @@ class SquadService:
         if not starting_xi:
             return "Unknown"
         
-        # Count players by position, handling duplicates
+        # Count players by position
         gk_count = sum(1 for p in starting_xi if p.get('position') == 'Goalkeeper')
         def_count = sum(1 for p in starting_xi if p.get('position') == 'Defender')
         mid_count = sum(1 for p in starting_xi if p.get('position') == 'Midfielder')
         fwd_count = sum(1 for p in starting_xi if p.get('position') == 'Forward')
         
-        # Return the actual formation based on real positions
-        if gk_count > 0:
-            return f"{gk_count}-{def_count}-{mid_count}-{fwd_count}"
-        else:
-            return f"{def_count}-{mid_count}-{fwd_count}"
+        # Return the actual formation
+        return f"{gk_count}-{def_count}-{mid_count}-{fwd_count}"

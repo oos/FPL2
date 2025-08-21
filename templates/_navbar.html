@@ -8,23 +8,31 @@
              onerror="this.onerror=null; this.src='{{ url_for('static', filename='assets/FPLove_logo_2.png') }}?v=5';"/>
         <span class="visually-hidden">FPLove</span>
       </a>
-      <div class="navbar-nav ms-3">
-      <a class="nav-link {{ 'active' if request.path == '/' else '' }}" href="/">Dashboard</a>
-      <a class="nav-link {{ 'active' if request.path.startswith('/fdr') else '' }}" href="/fdr">FDR</a>
-      <div class="nav-item dropdown">
-        <a class="nav-link dropdown-toggle {{ 'active' if request.path.startswith('/players2') or request.path.startswith('/players') or request.path.startswith('/watchlist') else '' }}" href="/players2" id="players2Dropdown" role="button" aria-expanded="false">Players</a>
-        <ul class="dropdown-menu" aria-labelledby="players2Dropdown">
-          <li><a class="dropdown-item {{ 'active' if request.path == '/players' else '' }}" href="/players">All Players</a></li>
-          
-          <li><a class="dropdown-item {{ 'active' if request.path == '/players/individual' else '' }}" href="/players/individual">Individual</a></li>
-          <li><hr class="dropdown-divider"></li>
-          <li><a class="dropdown-item {{ 'active' if request.path == '/watchlist' else '' }}" href="/watchlist">Watchlist</a></li>
-        </ul>
+      <div class="navbar-nav me-auto">
+        <a class="nav-link {{ 'active' if request.path == '/' else '' }}" href="/">Dashboard</a>
+        <a class="nav-link {{ 'active' if request.path.startswith('/fdr') else '' }}" href="/fdr">FDR</a>
+        <a class="nav-link {{ 'active' if request.path.startswith('/historical') else '' }}" href="/historical">Historical</a>
+        <div class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            Players
+          </a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="/players">All</a></li>
+            <li><a class="dropdown-item" href="/player">Individual</a></li>
+            <li><a class="dropdown-item" href="/watchlist">Watchlist</a></li>
+          </ul>
+        </div>
+        <a class="nav-link {{ 'active' if request.path.startswith('/teams') else '' }}" href="/teams">Teams</a>
+        <a class="nav-link {{ 'active' if request.path.startswith('/squad') and not request.path.startswith('/squad-live') else '' }}" href="/squad">Squad-Initiation</a>
+        <a class="nav-link {{ 'active' if request.path.startswith('/squad-live') else '' }}" href="/squad-live">Squad Live</a>
       </div>
-      
-      <a class="nav-link {{ 'active' if request.path == '/teams' or request.path.startswith('/team/') else '' }}" href="/teams">Teams</a>
-      <a class="nav-link {{ 'active' if request.path.startswith('/squad') else '' }}" href="/squad">Squad</a>
-      </div>
+    </div>
+    
+    <!-- Right side profile icon -->
+    <div class="navbar-nav ms-auto">
+      <a class="nav-link" href="/account" title="Account Settings">
+        <i class="fas fa-user-circle" style="font-size: 1.2rem;"></i>
+      </a>
     </div>
   </div>
   <style>

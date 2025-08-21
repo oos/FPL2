@@ -15,6 +15,7 @@ class Player:
     form: float = 0.0  # Default to 0.0 since it's not in database
     ownership: float = 0.0  # Default to 0.0 since it's not in database
     team_id: Optional[int] = None
+    fpl_element_id: Optional[int] = None
     
     # Gameweek points
     gw1_points: float = 0.0
@@ -41,6 +42,7 @@ class Player:
             'form': self.form,
             'ownership': self.ownership,
             'team_id': self.team_id,
+            'fpl_element_id': self.fpl_element_id,
             'gw1_points': self.gw1_points,
             'gw2_points': self.gw2_points,
             'gw3_points': self.gw3_points,
@@ -75,5 +77,6 @@ class Player:
             gw8_points=row[16] if len(row) > 16 else 0.0,
             gw9_points=row[17] if len(row) > 17 else 0.0,
             chance_of_playing_next_round=row[18] if len(row) > 18 else 100.0,
-            points_per_million=row[19] if len(row) > 19 else 0.0
+            points_per_million=row[19] if len(row) > 19 else 0.0,
+            fpl_element_id=row[20] if len(row) > 20 else None
         )

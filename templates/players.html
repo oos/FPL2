@@ -561,7 +561,6 @@
                     <input class="form-check-input" type="checkbox" value="" id="filter-watchlist">
                     <label class="form-check-label" for="filter-watchlist">Watchlist only</label>
                 </div>
-                <input type="search" class="form-control" id="globalSearch" placeholder="Search players..." style="max-width: 260px;">
                 <button id="toggleViewsPanel" class="btn btn-outline-secondary">Views</button>
                 <button id="toggleAdvancedFilters" class="btn btn-outline-secondary">Advanced Filters</button>
             </div>
@@ -617,6 +616,11 @@
                     <small class="text-muted">Hints: use operators like >=, >, <=, <</small>
                 </div>
             </div>
+        </div>
+
+        <!-- Search field positioned above table, right-aligned to align with GW tabs -->
+        <div class="d-flex justify-content-end mb-2">
+            <input type="search" class="form-control" id="globalSearch" placeholder="Search players..." style="max-width: 260px;">
         </div>
 
         <!-- Players Table -->
