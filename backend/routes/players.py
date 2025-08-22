@@ -1,20 +1,13 @@
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify, request, current_app
 from ..services.player_service import PlayerService
-from ..database.manager import DatabaseManager
 
 # Create blueprint for players routes
 players_bp = Blueprint('players', __name__)
 
-# Initialize services (will be created when needed)
-db_manager = None
-player_service = None
-
 def get_services():
-    """Get or create service instances"""
-    global db_manager, player_service
-    if db_manager is None:
-        db_manager = DatabaseManager()
-        player_service = PlayerService(db_manager)
+    """Get service instances using the app's database manager"""
+    db_manager = current_app.db_manager
+    player_service = PlayerService(db_manager)
     return db_manager, player_service
 
 @players_bp.route('/api/players', methods=['GET'])
@@ -98,8 +91,16 @@ def add_player():
     try:
         _, player_service = get_services()
         player_data = request.get_json()
-        if not player_data:
-            return jsonify({'error': 'No data provided'}), 400
+        
+        # Check if data is provided and is a dictionary
+        if not player_data or not isinstance(player_data, dict):
+            return jsonify({'error': 'No data provided or invalid format'}), 400
+        
+        # Check if required fields are present
+        required_fields = ['id', 'name', 'position', 'team', 'price']
+        missing_fields = [field for field in required_fields if field not in player_data]
+        if missing_fields:
+            return jsonify({'error': f'Missing required fields: {missing_fields}'}), 400
         
         success = player_service.add_player(player_data)
         if success:

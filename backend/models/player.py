@@ -9,9 +9,9 @@ class Player:
     position: str
     team: str
     price: float
-    chance_of_playing_next_round: float
-    points_per_million: float
     total_points: float
+    chance_of_playing_next_round: float = 100.0
+    points_per_million: float = 0.0
     form: float = 0.0  # Default to 0.0 since it's not in database
     ownership: float = 0.0  # Default to 0.0 since it's not in database
     team_id: Optional[int] = None

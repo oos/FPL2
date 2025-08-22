@@ -2,13 +2,13 @@ from flask import Flask, render_template, jsonify, current_app
 from flask import request
 import os
 import requests
-from .config import config as app_config
-from .database.manager import DatabaseManager
-from .services.player_service import PlayerService
-from .services.squad_service import SquadService
-from .services.historical_service import HistoricalService
-from .services.live_fpl_service import LiveFPLService
-from .routes.players import players_bp
+from backend.config import config as app_config
+from backend.database.manager import DatabaseManager
+from backend.services.player_service import PlayerService
+from backend.services.squad_service import SquadService
+from backend.services.historical_service import HistoricalService
+from backend.services.live_fpl_service import LiveFPLService
+from backend.routes.players import players_bp
 
 def _get_position_name(position_code):
     """Convert numeric position code to readable position name"""
@@ -30,15 +30,11 @@ def create_app(config_name: str | None = None):
     cfg_cls = app_config.get(selected_profile, app_config['default'])
     app.config.from_object(cfg_cls)
 
-    # Initialize database manager
-    app.db_manager = DatabaseManager()
+    # Initialize database manager with the configured database path
+    app.db_manager = DatabaseManager(app.config['DATABASE_PATH'])
 
     # Register blueprints
     app.register_blueprint(players_bp)
-
-    # Store database manager in app context for access in routes
-    with app.app_context():
-        app.db_manager = DatabaseManager()
 
     # Dashboard (Home)
     @app.route('/')
@@ -430,7 +426,14 @@ def create_app(config_name: str | None = None):
             strategy_data = squad_service.get_optimal_squad_for_gw1_9()
 
             if not strategy_data:
-                return "Error: Could not generate squad data. Please try again later."
+                # Return a simple error page instead of crashing
+                return render_template('squad.html',
+                                    weekly_data=[],
+                                    total_points=0,
+                                    total_transfers=0,
+                                    total_value=0,
+                                    remaining_budget=100.0,
+                                    error_message="Could not generate squad data. Please try again later.")
 
             # Process strategy data for template
             weekly_data = []
@@ -544,7 +547,15 @@ def create_app(config_name: str | None = None):
                                 remaining_budget=remaining_budget)
 
         except Exception as e:
-            return f"Error generating squad page: {str(e)}"
+            print(f"Squad page error: {str(e)}")
+            # Return a simple error page instead of crashing
+            return render_template('squad.html',
+                                weekly_data=[],
+                                total_points=0,
+                                total_transfers=0,
+                                total_value=0,
+                                remaining_budget=100.0,
+                                error_message=f"Error generating squad page: {str(e)}")
 
     # Legacy API routes for backward compatibility
     @app.route('/api/players')
@@ -611,14 +622,14 @@ def create_app(config_name: str | None = None):
     @app.route('/account')
     def account_page():
         """Account page for managing FPL team ID"""
-        db_manager = DatabaseManager()
+        db_manager = current_app.db_manager
         profiles = db_manager.get_all_user_profiles()
         return render_template('account.html', profiles=profiles)
 
     @app.route('/squad-live')
     def squad_live_page():
         """Live squad page showing actual FPL squad with GW tabs"""
-        db_manager = DatabaseManager()
+        db_manager = current_app.db_manager
 
         # Get the first user profile (assuming single user for now)
         profiles = db_manager.get_all_user_profiles()
@@ -658,6 +669,7 @@ def create_app(config_name: str | None = None):
                     if player:
                         enriched_player = {
                             'id': squad_player['player_id'],
+                            'name': str(player.name) if player.name else 'Unknown',  # SquadService expects 'name'
                             'web_name': str(player.name) if player.name else 'Unknown',
                             'team': str(player.team) if player.team else 'Unknown',
                             'position': str(player.position) if player.position else 'Unknown',
@@ -668,7 +680,19 @@ def create_app(config_name: str | None = None):
                             'bench_position': squad_player['bench_position'],
                             'transfer_in': bool(squad_player['transfer_in']),
                             'transfer_out': bool(squad_player['transfer_out']),
-                            'gw1_xp': float(player.gw1_points) if player.gw1_points else 0.0,
+                            # Preserve all gameweek points for transfer analysis
+                            'gw1_points': float(squad_player.get('gw1_points', 0) or 0.0),
+                            'gw2_points': float(squad_player.get('gw2_points', 0) or 0.0),
+                            'gw3_points': float(squad_player.get('gw3_points', 0) or 0.0),
+                            'gw4_points': float(squad_player.get('gw4_points', 0) or 0.0),
+                            'gw5_points': float(squad_player.get('gw5_points', 0) or 0.0),
+                            'gw6_points': float(squad_player.get('gw6_points', 0) or 0.0),
+                            'gw7_points': float(squad_player.get('gw7_points', 0) or 0.0),
+                            'gw8_points': float(squad_player.get('gw8_points', 0) or 0.0),
+                            'gw9_points': float(squad_player.get('gw9_points', 0) or 0.0),
+                            'total_points': float(squad_player.get('total_points', 0) or 0.0),
+                            # Add GW1 specific fields for display
+                            'gw1_xp': float(squad_player.get('gw1_points', 0) or 0.0),
                             'gw1_actual': 0.0,  # Will be populated from historical data if available
                             'gw1_diff': 0.0  # Will be calculated as actual - xp
                         }
@@ -731,19 +755,6 @@ def create_app(config_name: str | None = None):
                             "free_transfers_remaining": 1
                         }
                         
-                        # Ensure all squad players have a 'name' field and gameweek points for SquadService
-                        for player in gw1_squad_data["starting_xi"] + gw1_squad_data["bench"]:
-                            if 'web_name' in player and 'name' not in player:
-                                player['name'] = player['web_name']
-                            elif 'name' not in player:
-                                player['name'] = f"Player {player.get('id', 'Unknown')}"
-                            
-                            # Ensure all gameweek points fields are available
-                            for gw in range(1, 10):
-                                gw_field = f'gw{gw}_points'
-                                if gw_field not in player:
-                                    player[gw_field] = 0.0
-
                         # Get all players for optimization
                         all_players = [player.to_dict() for player in db_manager.get_all_players()]
                         
@@ -866,7 +877,7 @@ def create_app(config_name: str | None = None):
             if not fpl_team_id:
                 return jsonify({'success': False, 'error': 'FPL Team ID is required'}), 400
 
-            db_manager = DatabaseManager()
+            db_manager = current_app.db_manager
             # First save the profile with just the team ID
             profile_id = db_manager.save_user_profile(fpl_team_id)
 
@@ -892,7 +903,7 @@ def create_app(config_name: str | None = None):
             if not fpl_team_id:
                 return jsonify({'success': False, 'error': 'FPL Team ID is required'}), 400
 
-            db_manager = DatabaseManager()
+            db_manager = current_app.db_manager
             live_service = LiveFPLService(db_manager)
 
             # Sync all data
@@ -916,7 +927,7 @@ def create_app(config_name: str | None = None):
             if not fpl_team_id:
                 return jsonify({'success': False, 'error': 'FPL Team ID is required'}), 400
 
-            db_manager = DatabaseManager()
+            db_manager = current_app.db_manager
             success = db_manager.delete_user_profile(fpl_team_id)
 
             if success:

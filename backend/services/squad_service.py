@@ -315,7 +315,7 @@ class SquadService:
                     continue
                 
                 # Calculate 8-week projected points for detailed analysis
-                analysis_data = self._calculate_transfer_analysis(out_p, in_p, gw_points_field)
+                analysis_data = self._calculate_transfer_analysis(out_p, in_p, gw_points_field, available_free_transfers)
                 
                 candidates.append((delta, out_p, in_p, analysis_data))
 
@@ -380,7 +380,7 @@ class SquadService:
 
         return updated_squad, in_players, out_players, hits_points, free_left, total_budget
     
-    def _calculate_transfer_analysis(self, out_player: Dict[str, Any], in_player: Dict[str, Any], current_gw_field: str) -> Dict[str, Any]:
+    def _calculate_transfer_analysis(self, out_player: Dict[str, Any], in_player: Dict[str, Any], current_gw_field: str, available_free_transfers: int = 1) -> Dict[str, Any]:
         """Calculate detailed 8-week transfer analysis for two players"""
         # Extract current GW number from field name (e.g., 'gw2_points' -> 2)
         current_gw = int(current_gw_field.replace('gw', '').replace('_points', ''))
@@ -412,9 +412,15 @@ class SquadService:
                 'field': gw_field
             })
         
-        # Calculate transfer impact
+        # Calculate transfer impact with proper cost calculation
         point_difference = in_8week_total - out_8week_total
-        transfer_cost = 4  # Standard -4 hit cost
+        
+        # Calculate actual transfer cost based on available free transfers
+        if available_free_transfers > 0:
+            transfer_cost = 0  # Free transfer available
+        else:
+            transfer_cost = 4  # -4 hit cost when no free transfers
+            
         net_gain = point_difference - transfer_cost
         
         # Calculate ROI (Return on Investment)
@@ -539,5 +545,5 @@ class SquadService:
         mid_count = sum(1 for p in starting_xi if p.get('position') == 'Midfielder')
         fwd_count = sum(1 for p in starting_xi if p.get('position') == 'Forward')
         
-        # Return the actual formation
-        return f"{gk_count}-{def_count}-{mid_count}-{fwd_count}"
+        # Return the standard formation format (excluding goalkeeper)
+        return f"{def_count}-{mid_count}-{fwd_count}"

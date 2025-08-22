@@ -467,7 +467,13 @@
                                                 </div>
                                                 <div class="col-4">
                                                     <small class="text-muted">Transfer Cost</small><br>
-                                                    <strong class="text-warning">{{ analysis.transfer_cost }} pts</strong>
+                                                    <strong class="{% if analysis.transfer_cost == 0 %}text-success{% else %}text-warning{% endif %}">
+                                                        {% if analysis.transfer_cost == 0 %}
+                                                            Free Transfer
+                                                        {% else %}
+                                                            {{ analysis.transfer_cost }} pts hit
+                                                        {% endif %}
+                                                    </strong>
                                                 </div>
                                                 <div class="col-4">
                                                     <small class="text-muted">Net Gain</small><br>
@@ -509,11 +515,21 @@
                                                 {{ "%.1f"|format(analysis.point_difference) }}-point improvement.
                                                 
                                                 {% if analysis.net_gain > 0 %}
-                                                    Even with a {{ analysis.transfer_cost }}-point transfer hit, this results in a net gain of 
-                                                    {{ "%.1f"|format(analysis.net_gain) }} points over the analysis period.
+                                                    {% if analysis.transfer_cost == 0 %}
+                                                        This free transfer results in a net gain of 
+                                                        {{ "%.1f"|format(analysis.net_gain) }} points over the analysis period.
+                                                    {% else %}
+                                                        Even with a {{ analysis.transfer_cost }}-point transfer hit, this results in a net gain of 
+                                                        {{ "%.1f"|format(analysis.net_gain) }} points over the analysis period.
+                                                    {% endif %}
                                                 {% elif analysis.point_difference > 0 %}
-                                                    However, the {{ analysis.transfer_cost }}-point transfer cost means this transfer shows a net loss of 
-                                                    {{ "%.1f"|format(-analysis.net_gain) }} points, though it may still be justified by other factors.
+                                                    {% if analysis.transfer_cost == 0 %}
+                                                        This free transfer shows a net gain of 
+                                                        {{ "%.1f"|format(analysis.point_difference) }} points over the analysis period.
+                                                    {% else %}
+                                                        However, the {{ analysis.transfer_cost }}-point transfer cost means this transfer shows a net loss of 
+                                                        {{ "%.1f"|format(-analysis.net_gain) }} points, though it may still be justified by other factors.
+                                                    {% endif %}
                                                 {% else %}
                                                     This transfer shows a net loss of {{ "%.1f"|format(-analysis.net_gain) }} points over 8 gameweeks.
                                                 {% endif %}

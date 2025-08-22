@@ -13,11 +13,18 @@ class DatabaseManager:
     def __init__(self, db_path: str = None):
         """Initialize database manager with database path"""
         self.db_path = db_path or Config.DATABASE_PATH
+        self._memory_connection = None  # For in-memory databases
         self._ensure_database_exists()
     
     def _ensure_database_exists(self):
         """Ensure the database file exists and has the correct schema"""
-        if not os.path.exists(self.db_path):
+        if self.db_path == ':memory:':
+            # For in-memory databases, create persistent connection and schema
+            self._memory_connection = sqlite3.connect(':memory:', timeout=Config.DATABASE_TIMEOUT)
+            self._memory_connection.row_factory = sqlite3.Row
+            self._create_tables(self._memory_connection)
+            print(f"Database created at {self.db_path}")
+        elif not os.path.exists(self.db_path):
             self._create_database()
         else:
             self._ensure_schema()
@@ -209,18 +216,25 @@ class DatabaseManager:
     @contextmanager
     def _get_connection(self):
         """Context manager for database connections"""
-        conn = sqlite3.connect(self.db_path, timeout=Config.DATABASE_TIMEOUT)
-        conn.row_factory = sqlite3.Row
-        try:
-            yield conn
-        finally:
-            conn.close()
+        if self.db_path == ':memory:' and self._memory_connection:
+            # Use persistent connection for in-memory database
+            yield self._memory_connection
+        else:
+            conn = sqlite3.connect(self.db_path, timeout=Config.DATABASE_TIMEOUT)
+            conn.row_factory = sqlite3.Row
+            try:
+                yield conn
+            finally:
+                conn.close()
     
     def get_connection(self):
         """Get a database connection (for direct operations)"""
-        conn = sqlite3.connect(self.db_path, timeout=Config.DATABASE_TIMEOUT)
-        conn.row_factory = sqlite3.Row
-        return conn
+        if self.db_path == ':memory:' and self._memory_connection:
+            return self._memory_connection
+        else:
+            conn = sqlite3.connect(self.db_path, timeout=Config.DATABASE_TIMEOUT)
+            conn.row_factory = sqlite3.Row
+            return conn
     
     def bulk_insert_players(self, players_data: List[Dict]) -> int:
         """Efficiently insert multiple players using batch operations"""
@@ -323,15 +337,15 @@ class DatabaseManager:
                         form, ownership, team_id, gw1_points, gw2_points, 
                         gw3_points, gw4_points, gw5_points, gw6_points,
                         gw7_points, gw8_points, gw9_points, chance_of_playing_next_round,
-                        points_per_million
-                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                        points_per_million, fpl_element_id
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """, (
                     player.id, player.name, player.position, player.team, player.price,
                     player.total_points, player.form, player.ownership, player.team_id,
                     player.gw1_points, player.gw2_points, player.gw3_points,
                     player.gw4_points, player.gw5_points, player.gw6_points,
                     player.gw7_points, player.gw8_points, player.gw9_points,
-                    player.chance_of_playing_next_round, player.points_per_million
+                    player.chance_of_playing_next_round, player.points_per_million, player.fpl_element_id
                 ))
                 conn.commit()
                 return True
