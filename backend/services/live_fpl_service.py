@@ -35,15 +35,17 @@ class LiveFPLService:
             logger.error(f"Failed to fetch team history for {fpl_team_id}: {e}")
             return None
     
-    def fetch_current_squad(self, fpl_team_id: int) -> Optional[Dict]:
+    def fetch_current_squad(self, fpl_team_id: int, gameweek: int = None) -> Optional[Dict]:
         """Fetch current squad from FPL API"""
         try:
-            url = f"{self.BASE_URL}/entry/{fpl_team_id}/event/1/picks/"
+            if gameweek is None:
+                gameweek = self.get_current_gameweek()
+            url = f"{self.BASE_URL}/entry/{fpl_team_id}/event/{gameweek}/picks/"
             response = requests.get(url, timeout=10)
             response.raise_for_status()
             return response.json()
         except requests.RequestException as e:
-            logger.error(f"Failed to fetch current squad for {fpl_team_id}: {e}")
+            logger.error(f"Failed to fetch current squad for {fpl_team_id} GW{gameweek}: {e}")
             return None
     
     def fetch_gameweek_picks(self, fpl_team_id: int, gameweek: int) -> Optional[Dict]:
@@ -161,11 +163,35 @@ class LiveFPLService:
             logger.error(f"Failed to sync user league standings for {fpl_team_id}: {e}")
             return False
     
+    def get_current_gameweek(self) -> int:
+        """Get the current gameweek from FPL API"""
+        try:
+            url = f"{self.BASE_URL}/bootstrap-static/"
+            response = requests.get(url, timeout=10)
+            response.raise_for_status()
+            data = response.json()
+            
+            # Find the current gameweek
+            for event in data.get('events', []):
+                if event.get('is_current'):
+                    return event.get('id', 1)
+            
+            # Fallback to the latest gameweek if no current one
+            events = data.get('events', [])
+            if events:
+                return max(event.get('id', 1) for event in events)
+            
+            return 1  # Default fallback
+        except Exception as e:
+            logger.error(f"Failed to get current gameweek: {e}")
+            return 1  # Default fallback
+
     def sync_all_user_data(self, fpl_team_id: int) -> Dict[str, bool]:
         """Sync all user data from FPL API"""
+        current_gw = self.get_current_gameweek()
         results = {
             'profile': self.sync_user_profile(fpl_team_id),
-            'squad': self.sync_user_squad(fpl_team_id, 1),  # Current GW
+            'squad': self.sync_user_squad(fpl_team_id, current_gw),  # Current GW
             'standings': self.sync_user_league_standings(fpl_team_id)
         }
         

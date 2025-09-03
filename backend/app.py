@@ -639,20 +639,21 @@ def create_app(config_name: str | None = None):
         profile = profiles[0]
         fpl_team_id = profile['fpl_team_id']
 
-        # Get current squad and standings
-        squad = db_manager.get_user_squad(fpl_team_id, 1)  # Try GW1 first
+        # Get current gameweek and squad data
+        live_service = LiveFPLService(db_manager)
+        current_gw = live_service.get_current_gameweek()
+        squad = db_manager.get_user_squad(fpl_team_id, current_gw)
 
         # If no squad data exists, try to sync from FPL API automatically
         if not squad:
             try:
-                live_service = LiveFPLService(db_manager)
                 # Sync profile and squad data
                 live_service.sync_user_profile(fpl_team_id)
-                live_service.sync_user_squad(fpl_team_id, 1)  # Sync GW1
+                live_service.sync_user_squad(fpl_team_id, current_gw)  # Sync current GW
                 live_service.sync_user_league_standings(fpl_team_id)
 
                 # Try to get squad data again
-                squad = db_manager.get_user_squad(fpl_team_id, 1)
+                squad = db_manager.get_user_squad(fpl_team_id, current_gw)
             except Exception as e:
                 print(f"Auto-sync failed: {e}")
                 # Continue without squad data - user will see the warning and can manually refresh
