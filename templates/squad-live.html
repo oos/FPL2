@@ -194,9 +194,9 @@
                                             <td>{{ player.team }}</td>
                                             <td>£{{ "%.1f"|format(player.price) }}M</td>
                                             <td>{{ "%.1f"|format(player.gw1_xp or 0) }}</td>
-                                            <td>{{ "%.1f"|format(player.gw1_actual or 0) }}</td>
-                                            <td class="{% if (player.gw1_diff or 0) > 0 %}text-success{% elif (player.gw1_diff or 0) < 0 %}text-danger{% endif %}">
-                                                {{ "%.1f"|format(player.gw1_diff or 0) }}
+                                            <td>{{ "%.1f"|format(player.actual_points or 0) }}</td>
+                                            <td class="{% if (player.actual_points or 0) > (player.gw1_points or 0) %}text-success{% elif (player.actual_points or 0) < (player.gw1_points or 0) %}text-danger{% endif %}">
+                                                {{ "%.1f"|format((player.actual_points or 0) - (player.gw1_points or 0)) }}
                                             </td>
                                             <td>
                                                 {% if player.is_bench %}
@@ -313,9 +313,9 @@
                                                 <td>{{ player.team }}</td>
                                                 <td>£{{ "%.1f"|format(player.price) }}M</td>
                                                 <td>{{ "%.1f"|format(player.get('gw' + gw_data.gw|string + '_points', 0) or 0) }}</td>
-                                                <td>{% if gw_data.gw <= 1 %}{{ "%.1f"|format(player.get('gw' + gw_data.gw|string + '_actual', 0) or 0) }}{% else %}-{% endif %}</td>
-                                                <td class="{% if gw_data.gw <= 1 and (player.get('gw' + gw_data.gw|string + '_diff', 0) or 0) > 0 %}text-success{% elif gw_data.gw <= 1 and (player.get('gw' + gw_data.gw|string + '_diff', 0) or 0) < 0 %}text-danger{% endif %}">
-                                                    {% if gw_data.gw <= 1 %}{{ "%.1f"|format(player.get('gw' + gw_data.gw|string + '_diff', 0) or 0) }}{% else %}-{% endif %}
+                                                <td>{{ "%.1f"|format(player.actual_points or 0) }}</td>
+                                                <td class="{% if (player.actual_points or 0) > (player.get('gw' + gw_data.gw|string + '_points', 0) or 0) %}text-success{% elif (player.actual_points or 0) < (player.get('gw' + gw_data.gw|string + '_points', 0) or 0) %}text-danger{% endif %}">
+                                                    {{ "%.1f"|format((player.actual_points or 0) - (player.get('gw' + gw_data.gw|string + '_points', 0) or 0)) }}
                                                 </td>
                                                 <td><span class="badge bg-success">Starting XI</span></td>
                                                 <td>
@@ -337,9 +337,9 @@
                                                 <td>{{ player.team }}</td>
                                                 <td>£{{ "%.1f"|format(player.price) }}M</td>
                                                 <td>{{ "%.1f"|format(player.get('gw' + gw_data.gw|string + '_points', 0) or 0) }}</td>
-                                                <td>{% if gw_data.gw <= 1 %}{{ "%.1f"|format(player.get('gw' + gw_data.gw|string + '_actual', 0) or 0) }}{% else %}-{% endif %}</td>
-                                                <td class="{% if gw_data.gw <= 1 and (player.get('gw' + gw_data.gw|string + '_diff', 0) or 0) > 0 %}text-success{% elif gw_data.gw <= 1 and (player.get('gw' + gw_data.gw|string + '_diff', 0) or 0) < 0 %}text-danger{% endif %}">
-                                                    {% if gw_data.gw <= 1 %}{{ "%.1f"|format(player.get('gw' + gw_data.gw|string + '_diff', 0) or 0) }}{% else %}-{% endif %}
+                                                <td>{{ "%.1f"|format(player.actual_points or 0) }}</td>
+                                                <td class="{% if (player.actual_points or 0) > (player.get('gw' + gw_data.gw|string + '_points', 0) or 0) %}text-success{% elif (player.actual_points or 0) < (player.get('gw' + gw_data.gw|string + '_points', 0) or 0) %}text-danger{% endif %}">
+                                                    {{ "%.1f"|format((player.actual_points or 0) - (player.get('gw' + gw_data.gw|string + '_points', 0) or 0)) }}
                                                 </td>
                                                 <td><span class="badge bg-secondary">Bench</span></td>
                                                 <td>

@@ -120,7 +120,9 @@ class LiveFPLService:
                         'is_bench': pick['position'] > 11,
                         'bench_position': pick['position'] - 11 if pick['position'] > 11 else None,
                         'transfer_in': pick.get('multiplier', 0) > 0,
-                        'transfer_out': pick.get('multiplier', 0) < 0
+                        'transfer_out': pick.get('multiplier', 0) < 0,
+                        'actual_points': pick.get('points', 0),  # Store actual points from FPL API
+                        'multiplier': pick.get('multiplier', 1)  # Store multiplier (captain = 2, etc.)
                     })
             
             # Save squad data

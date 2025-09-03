@@ -164,12 +164,24 @@ class DatabaseManager:
                 bench_position INTEGER,
                 transfer_in BOOLEAN DEFAULT FALSE,
                 transfer_out BOOLEAN DEFAULT FALSE,
+                actual_points INTEGER DEFAULT 0,
+                multiplier INTEGER DEFAULT 1,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 FOREIGN KEY (fpl_team_id) REFERENCES user_profiles (fpl_team_id),
                 FOREIGN KEY (player_id) REFERENCES players (id),
                 UNIQUE(fpl_team_id, gameweek, player_id)
             )
         ''')
+        
+        # Add columns to existing table if they don't exist (for database migration)
+        try:
+            cursor.execute('ALTER TABLE user_squads ADD COLUMN actual_points INTEGER DEFAULT 0')
+        except:
+            pass  # Column already exists
+        try:
+            cursor.execute('ALTER TABLE user_squads ADD COLUMN multiplier INTEGER DEFAULT 1')
+        except:
+            pass  # Column already exists
         
         # Add user_league_standings table
         cursor.execute('''
@@ -760,13 +772,14 @@ class DatabaseManager:
                     INSERT INTO user_squads (
                         fpl_team_id, gameweek, player_id, position, 
                         is_captain, is_vice_captain, is_bench, bench_position,
-                        transfer_in, transfer_out
-                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                        transfer_in, transfer_out, actual_points, multiplier
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 ''', (
                     fpl_team_id, gameweek, player['player_id'], player['position'],
                     player.get('is_captain', False), player.get('is_vice_captain', False),
                     player.get('is_bench', False), player.get('bench_position'),
-                    player.get('transfer_in', False), player.get('transfer_out', False)
+                    player.get('transfer_in', False), player.get('transfer_out', False),
+                    player.get('actual_points', 0), player.get('multiplier', 1)
                 ))
             
             conn.commit()
@@ -802,20 +815,22 @@ class DatabaseManager:
                     'bench_position': row[8],
                     'transfer_in': bool(row[9]),
                     'transfer_out': bool(row[10]),
-                    'web_name': row[11],  # This is actually p.name
-                    'team': row[12],
-                    'player_position': row[13],
-                    'price': row[14],
-                    'gw1_points': row[15] or 0.0,
-                    'gw2_points': row[16] or 0.0,
-                    'gw3_points': row[17] or 0.0,
-                    'gw4_points': row[18] or 0.0,
-                    'gw5_points': row[19] or 0.0,
-                    'gw6_points': row[20] or 0.0,
-                    'gw7_points': row[21] or 0.0,
-                    'gw8_points': row[22] or 0.0,
-                    'gw9_points': row[23] or 0.0,
-                    'total_points': row[24] or 0.0
+                    'actual_points': row[11] or 0,  # New column
+                    'multiplier': row[12] or 1,     # New column
+                    'web_name': row[13],  # This is actually p.name (shifted by 2)
+                    'team': row[14],
+                    'player_position': row[15],
+                    'price': row[16],
+                    'gw1_points': row[17] or 0.0,
+                    'gw2_points': row[18] or 0.0,
+                    'gw3_points': row[19] or 0.0,
+                    'gw4_points': row[20] or 0.0,
+                    'gw5_points': row[21] or 0.0,
+                    'gw6_points': row[22] or 0.0,
+                    'gw7_points': row[23] or 0.0,
+                    'gw8_points': row[24] or 0.0,
+                    'gw9_points': row[25] or 0.0,
+                    'total_points': row[26] or 0.0
                 })
             
             return squad
