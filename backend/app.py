@@ -837,7 +837,24 @@ def create_app(config_name: str | None = None):
                 for squad_player in gw_squad:
                     player = db_manager.get_player_by_id(squad_player['player_id'])
                     if player:
-                        enriched_player = {
+                        # Create a custom class to handle the get method for template compatibility
+                        class PlayerData:
+                            def __init__(self, data):
+                                self._data = data
+                            
+                            def get(self, key, default=None):
+                                return self._data.get(key, default)
+                            
+                            def __getitem__(self, key):
+                                return self._data[key]
+                            
+                            def __setitem__(self, key, value):
+                                self._data[key] = value
+                            
+                            def __getattr__(self, key):
+                                return self._data.get(key, None)
+                        
+                        enriched_player = PlayerData({
                             'id': squad_player['player_id'],
                             'name': str(player.name) if player.name else 'Unknown',
                             'web_name': str(player.name) if player.name else 'Unknown',
@@ -853,17 +870,17 @@ def create_app(config_name: str | None = None):
                             'actual_points': _safe_float_conversion(squad_player.get('actual_points', 0)),
                             'multiplier': _safe_int_conversion(squad_player.get('multiplier', 1)),
                             # Preserve all gameweek points for transfer analysis
-                            'gw1_points': _safe_float_conversion(squad_player.get('gw1_points', 0)),
-                            'gw2_points': _safe_float_conversion(squad_player.get('gw2_points', 0)),
-                            'gw3_points': _safe_float_conversion(squad_player.get('gw3_points', 0)),
-                            'gw4_points': _safe_float_conversion(squad_player.get('gw4_points', 0)),
-                            'gw5_points': _safe_float_conversion(squad_player.get('gw5_points', 0)),
-                            'gw6_points': _safe_float_conversion(squad_player.get('gw6_points', 0)),
-                            'gw7_points': _safe_float_conversion(squad_player.get('gw7_points', 0)),
-                            'gw8_points': _safe_float_conversion(squad_player.get('gw8_points', 0)),
-                            'gw9_points': _safe_float_conversion(squad_player.get('gw9_points', 0)),
-                            'total_points': _safe_float_conversion(squad_player.get('total_points', 0))
-                        }
+                            'gw1_points': _safe_float_conversion(player.gw1_points if hasattr(player, 'gw1_points') else 0),
+                            'gw2_points': _safe_float_conversion(player.gw2_points if hasattr(player, 'gw2_points') else 0),
+                            'gw3_points': _safe_float_conversion(player.gw3_points if hasattr(player, 'gw3_points') else 0),
+                            'gw4_points': _safe_float_conversion(player.gw4_points if hasattr(player, 'gw4_points') else 0),
+                            'gw5_points': _safe_float_conversion(player.gw5_points if hasattr(player, 'gw5_points') else 0),
+                            'gw6_points': _safe_float_conversion(player.gw6_points if hasattr(player, 'gw6_points') else 0),
+                            'gw7_points': _safe_float_conversion(player.gw7_points if hasattr(player, 'gw7_points') else 0),
+                            'gw8_points': _safe_float_conversion(player.gw8_points if hasattr(player, 'gw8_points') else 0),
+                            'gw9_points': _safe_float_conversion(player.gw9_points if hasattr(player, 'gw9_points') else 0),
+                            'total_points': _safe_float_conversion(player.total_points if hasattr(player, 'total_points') else 0)
+                        })
                         enriched_squad.append(enriched_player)
 
             # Create weekly data entry
