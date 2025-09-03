@@ -806,12 +806,24 @@ def create_app(config_name: str | None = None):
         
         # Ensure squad is properly formatted for template
         if squad:
+            # Map position number to position name
+            position_map = {
+                1: 'Goalkeeper', 2: 'Defender', 3: 'Defender', 4: 'Defender', 5: 'Defender',
+                6: 'Midfielder', 7: 'Midfielder', 8: 'Midfielder', 9: 'Midfielder', 10: 'Midfielder',
+                11: 'Forward', 12: 'Goalkeeper', 13: 'Defender', 14: 'Midfielder', 15: 'Forward'
+            }
+            
             for player in squad:
                 # Ensure price is always a float
                 if 'price' in player:
                     player['price'] = _safe_float_conversion(player['price'])
                 else:
                     player['price'] = 0.0
+                
+                # Map position number to position name
+                if 'position' in player:
+                    position_num = player.get('position', 0)
+                    player['position'] = position_map.get(position_num, str(position_num))
 
         # Generate weekly data for all gameweeks (1-9)
         weekly_data = []
