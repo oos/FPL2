@@ -184,8 +184,10 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {% if squad %}
-                                        {% for player in squad %}
+                                    {% if weekly_data %}
+                                        {% for gw_data in weekly_data %}
+                                            {% if gw_data.gw == 1 %}
+                                                {% for player in gw_data.starting_xi %}
                                         <tr class="{% if player.is_bench %}table-secondary{% endif %}">
                                             <td>
                                                 <span class="badge bg-primary">{{ player.position }}</span>
@@ -222,6 +224,8 @@
                                                 {% endif %}
                                             </td>
                                         </tr>
+                                                {% endfor %}
+                                            {% endif %}
                                         {% endfor %}
                                     {% else %}
                                         <tr>
@@ -235,9 +239,11 @@
                 </div>
 
                 <!-- Transfer Details Panel for GW1 -->
-                {% if squad %}
-                {% set transfers_in_count = squad|length %}
-                {% set transfers_out_count = 0 %}
+                {% if weekly_data %}
+                    {% for gw_data in weekly_data %}
+                        {% if gw_data.gw == 1 %}
+                            {% set transfers_in_count = gw_data.starting_xi|length %}
+                            {% set transfers_out_count = 0 %}
                 {% if transfers_in_count > 0 %}
                 <div class="card shadow-sm mt-3">
                     <div class="card-header">
@@ -249,7 +255,7 @@
                             <div class="col-12">
                                 <h6 class="text-danger mb-2"><i class="fas fa-arrow-down"></i> Transferred Out</h6>
                                 <div class="d-flex flex-wrap gap-2">
-                                    {% for player in squad %}
+                                    {% for player in gw_data.starting_xi %}
                                         {% if player.transfer_out %}
                                         <span class="badge bg-danger">{{ player.web_name }}</span>
                                         {% endif %}
@@ -263,7 +269,7 @@
                             <div class="col-12">
                                 <h6 class="text-success mb-2"><i class="fas fa-check-circle"></i> Selected Players</h6>
                                 <div class="d-flex flex-wrap gap-2">
-                                    {% for player in squad %}
+                                    {% for player in gw_data.starting_xi %}
                                     <span class="badge bg-success">{{ player.web_name }}</span>
                                     {% endfor %}
                                 </div>
@@ -272,6 +278,8 @@
                     </div>
                 </div>
                 {% endif %}
+                        {% endif %}
+                    {% endfor %}
                 {% endif %}
             </div>
             
