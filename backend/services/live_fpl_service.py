@@ -1,7 +1,7 @@
 import requests
 import logging
 from typing import Dict, List, Optional
-from ..database.manager import DatabaseManager
+from backend.database.manager import DatabaseManager
 
 logger = logging.getLogger(__name__)
 

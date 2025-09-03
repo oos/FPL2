@@ -1,5 +1,5 @@
 from typing import List, Dict, Any
-from ..database.manager import DatabaseManager
+from backend.database.manager import DatabaseManager
 import random
 
 class SquadService:

@@ -660,7 +660,7 @@ def create_app(config_name: str | None = None):
         # Enrich squad data with player details
         if squad:
             try:
-                from .services.squad_service import SquadService
+                from backend.services.squad_service import SquadService
                 squad_service = SquadService(db_manager)
 
                 enriched_squad = []

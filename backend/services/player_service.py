@@ -1,6 +1,6 @@
 from typing import List, Optional, Dict, Any
-from ..models.player import Player
-from ..database.manager import DatabaseManager
+from backend.models.player import Player
+from backend.database.manager import DatabaseManager
 
 class PlayerService:
     """Service layer for player-related business logic"""

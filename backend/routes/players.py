@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify, request, current_app
-from ..services.player_service import PlayerService
+from backend.services.player_service import PlayerService
 
 # Create blueprint for players routes
 players_bp = Blueprint('players', __name__)

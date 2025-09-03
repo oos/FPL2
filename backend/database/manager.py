@@ -2,10 +2,10 @@ import sqlite3
 import os
 from typing import List, Optional, Dict, Any
 from contextlib import contextmanager
-from ..models.player import Player
-from ..models.team import Team
-from ..models.fixture import Fixture
-from ..config import Config
+from backend.models.player import Player
+from backend.models.team import Team
+from backend.models.fixture import Fixture
+from backend.config import Config
 
 class DatabaseManager:
     """Manages all database operations for the FPL application"""
