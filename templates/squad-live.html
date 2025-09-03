@@ -39,11 +39,17 @@
                         <div class="row text-center">
                             <div class="col-md-3">
                                 <h6 class="text-primary">Formation</h6>
-                                <h5 class="mb-0" id="topSquadFormation">{{ squad|selectattr('is_bench', 'equalto', false)|selectattr('position', 'equalto', 'Goalkeeper')|list|length }}-{{ squad|selectattr('is_bench', 'equalto', false)|selectattr('position', 'equalto', 'Defender')|list|length }}-{{ squad|selectattr('is_bench', 'equalto', false)|selectattr('position', 'equalto', 'Midfielder')|list|length }}-{{ squad|selectattr('is_bench', 'equalto', false)|selectattr('position', 'equalto', 'Forward')|list|length }}</h5>
+                                <h5 class="mb-0" id="topSquadFormation">
+                                    {% if squad %}
+                                        {{ squad|selectattr('is_bench', 'equalto', false)|selectattr('position', 'equalto', 'Goalkeeper')|list|length }}-{{ squad|selectattr('is_bench', 'equalto', false)|selectattr('position', 'equalto', 'Defender')|list|length }}-{{ squad|selectattr('is_bench', 'equalto', false)|selectattr('position', 'equalto', 'Midfielder')|list|length }}-{{ squad|selectattr('is_bench', 'equalto', false)|selectattr('position', 'equalto', 'Forward')|list|length }}
+                                    {% else %}
+                                        0-0-0-0
+                                    {% endif %}
+                                </h5>
                             </div>
                             <div class="col-md-3">
                                 <h6 class="text-success">Squad Value</h6>
-                                <h5 class="mb-0" id="topSquadValue">£{{ "%.1f"|format(squad|sum(attribute='price')) }}M</h5>
+                                <h5 class="mb-0" id="topSquadValue">£{{ "%.1f"|format(squad|sum(attribute='price') if squad else 0) }}M</h5>
                             </div>
                             <div class="col-md-3">
                                 <h6 class="text-info">Transfers</h6>
@@ -66,8 +72,8 @@
                                 <p class="text-muted mb-0">Manager: {{ profile.manager_name or 'Unknown' }}</p>
                                 <p class="text-muted mb-0">FPL Team ID: {{ profile.fpl_team_id }}</p>
                                 <div class="mt-3">
-                                    <button class="btn btn-success w-100" id="refreshSquadBtn">
-                                        <i class="fas fa-sync"></i> Refresh Squad
+                                    <button class="btn btn-primary w-100" id="syncSquadDataBtn">
+                                        <i class="fas fa-sync-alt"></i> Sync Squad Data
                                     </button>
                                 </div>
                             </div>
@@ -154,7 +160,9 @@
             <div class="tab-pane fade show active" id="gw1" role="tabpanel">
                 <div class="card shadow-sm">
                     <div class="card-header d-flex justify-content-between align-items-center">
-                        <h5 class="mb-0"><i class="fas fa-users"></i> GW1 - Your Actual FPL Squad</h5>
+                        <h5 class="mb-0"><i class="fas fa-users"></i> GW1 - Your Actual FPL Squad 
+                            <span class="badge bg-info ms-2">Historical</span>
+                        </h5>
                         <div class="search-field">
                             <input type="search" class="form-control form-control-sm" id="gw1Search" placeholder="Search players..." style="width: 200px;">
                         </div>
@@ -194,9 +202,9 @@
                                             <td>{{ player.team }}</td>
                                             <td>£{{ "%.1f"|format(player.price) }}M</td>
                                             <td>{{ "%.1f"|format(player.gw1_xp or 0) }}</td>
-                                            <td>{{ "%.1f"|format(player.actual_points or 0) }}</td>
-                                            <td class="{% if (player.actual_points or 0) > (player.gw1_points or 0) %}text-success{% elif (player.actual_points or 0) < (player.gw1_points or 0) %}text-danger{% endif %}">
-                                                {{ "%.1f"|format((player.actual_points or 0) - (player.gw1_points or 0)) }}
+                                            <td>{{ "%.1f"|format((player.actual_points|float) if player.actual_points else 0) }}</td>
+                                            <td class="{% if (player.actual_points|float) > (player.gw1_points|float) %}text-success{% elif (player.actual_points|float) < (player.gw1_points|float) %}text-danger{% endif %}">
+                                                {{ "%.1f"|format((player.actual_points|float) - (player.gw1_points|float)) }}
                                             </td>
                                             <td>
                                                 {% if player.is_bench %}
@@ -274,7 +282,15 @@
                     <div class="tab-pane fade" id="gw{{ gw_data.gw }}" role="tabpanel">
                         <div class="card shadow-sm">
                             <div class="card-header d-flex justify-content-between align-items-center">
-                                <h5 class="mb-0"><i class="fas fa-chart-line"></i> GW{{ gw_data.gw }} - Optimized Squad</h5>
+                                <h5 class="mb-0"><i class="fas fa-chart-line"></i> GW{{ gw_data.gw }} - Optimized Squad 
+                                    {% if gw_data.status == 'Historical' %}
+                                        <span class="badge bg-info ms-2">Historical</span>
+                                    {% elif gw_data.status == 'Current' %}
+                                        <span class="badge bg-success ms-2">Current</span>
+                                    {% elif gw_data.status == 'Predicted' %}
+                                        <span class="badge bg-warning ms-2">Predicted</span>
+                                    {% endif %}
+                                </h5>
                                 <div class="search-field">
                                     <input type="search" class="form-control form-control-sm" id="gw{{ gw_data.gw }}Search" placeholder="Search players..." style="width: 200px;">
                                 </div>
@@ -313,9 +329,9 @@
                                                 <td>{{ player.team }}</td>
                                                 <td>£{{ "%.1f"|format(player.price) }}M</td>
                                                 <td>{{ "%.1f"|format(player.get('gw' + gw_data.gw|string + '_points', 0) or 0) }}</td>
-                                                <td>{{ "%.1f"|format(player.actual_points or 0) }}</td>
-                                                <td class="{% if (player.actual_points or 0) > (player.get('gw' + gw_data.gw|string + '_points', 0) or 0) %}text-success{% elif (player.actual_points or 0) < (player.get('gw' + gw_data.gw|string + '_points', 0) or 0) %}text-danger{% endif %}">
-                                                    {{ "%.1f"|format((player.actual_points or 0) - (player.get('gw' + gw_data.gw|string + '_points', 0) or 0)) }}
+                                                <td>{{ "%.1f"|format((player.actual_points|float) if player.actual_points else 0) }}</td>
+                                                <td class="{% if (player.actual_points|float) > (player.get('gw' + gw_data.gw|string + '_points', 0)|float) %}text-success{% elif (player.actual_points|float) < (player.get('gw' + gw_data.gw|string + '_points', 0)|float) %}text-danger{% endif %}">
+                                                    {{ "%.1f"|format((player.actual_points|float) - (player.get('gw' + gw_data.gw|string + '_points', 0)|float)) }}
                                                 </td>
                                                 <td><span class="badge bg-success">Starting XI</span></td>
                                                 <td>
@@ -337,9 +353,9 @@
                                                 <td>{{ player.team }}</td>
                                                 <td>£{{ "%.1f"|format(player.price) }}M</td>
                                                 <td>{{ "%.1f"|format(player.get('gw' + gw_data.gw|string + '_points', 0) or 0) }}</td>
-                                                <td>{{ "%.1f"|format(player.actual_points or 0) }}</td>
-                                                <td class="{% if (player.actual_points or 0) > (player.get('gw' + gw_data.gw|string + '_points', 0) or 0) %}text-success{% elif (player.actual_points or 0) < (player.get('gw' + gw_data.gw|string + '_points', 0) or 0) %}text-danger{% endif %}">
-                                                    {{ "%.1f"|format((player.actual_points or 0) - (player.get('gw' + gw_data.gw|string + '_points', 0) or 0)) }}
+                                                <td>{{ "%.1f"|format((player.actual_points|float) if player.actual_points else 0) }}</td>
+                                                <td class="{% if (player.actual_points|float) > (player.get('gw' + gw_data.gw|string + '_points', 0)|float) %}text-success{% elif (player.actual_points|float) < (player.get('gw' + gw_data.gw|string + '_points', 0)|float) %}text-danger{% endif %}">
+                                                    {{ "%.1f"|format((player.actual_points|float) - (player.get('gw' + gw_data.gw|string + '_points', 0)|float)) }}
                                                 </td>
                                                 <td><span class="badge bg-secondary">Bench</span></td>
                                                 <td>
@@ -630,7 +646,7 @@
         {% else %}
         <div class="alert alert-warning">
             <h5><i class="fas fa-exclamation-triangle"></i> No Squad Data</h5>
-            <p>Your squad data hasn't been synced yet. Click the "Refresh Squad" button above to fetch your current squad from FPL.</p>
+            <p>Your squad data hasn't been synced yet. Click the "Sync Squad Data" button above to fetch your current and historical squads from FPL.</p>
         </div>
         {% endif %}
     {% endif %}
@@ -669,46 +685,16 @@
       }, 500); // Small delay to ensure page is fully loaded
       {% endif %}
       
-      $('#refreshSquadBtn').on('click', function() {
-          refreshSquad();
+      $('#syncSquadDataBtn').on('click', function() {
+          syncSquadData();
       });
       
-      function refreshSquad() {
+      function syncSquadData() {
           $('#refreshModal').modal('show');
-          $('#refreshMessage').text('Fetching latest squad data from FPL...');
+          $('#refreshMessage').text('Syncing all squad data from FPL (current + historical)...');
           
-          var fplTeamId = {{ profile.fpl_team_id if profile else 0 }};
-          
-          $.ajax({
-              url: '/api/account/sync-data',
-              method: 'POST',
-              contentType: 'application/json',
-              data: JSON.stringify({ 
-                  fpl_team_id: fplTeamId
-              }),
-              success: function(response) {
-                  if (response.success) {
-                      $('#refreshMessage').text('Squad refreshed successfully!');
-                      setTimeout(function() {
-                          $('#refreshModal').modal('hide');
-                          location.reload();
-                      }, 1000);
-                  } else {
-                      $('#refreshMessage').text('Error: ' + response.error);
-                      setTimeout(function() { 
-                          $('#refreshModal').modal('hide'); 
-                      }, 2000);
-                      alert('Error refreshing squad: ' + response.error);
-                  }
-              },
-              error: function() {
-                  $('#refreshMessage').text('Error connecting to FPL API');
-                  setTimeout(function() { 
-                      $('#refreshModal').modal('hide'); 
-                  }, 2000);
-                  alert('Error connecting to FPL API. Please try again.');
-              }
-          });
+          // Redirect to the same page with sync_squad_data parameter
+          window.location.href = '/squad-live?sync_squad_data=true';
       }
       
       // GW Tab Navigation

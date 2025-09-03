@@ -629,6 +629,139 @@ def create_app(config_name: str | None = None):
     @app.route('/squad-live')
     def squad_live_page():
         """Live squad page showing actual FPL squad with GW tabs"""
+        
+        def _safe_float_conversion(value):
+            """Safely convert value to float, handling timestamps and other non-numeric values"""
+            if value is None:
+                return 0.0
+            try:
+                # If it's already a number, convert it
+                if isinstance(value, (int, float)):
+                    return float(value)
+                # If it's a string, try to convert it
+                if isinstance(value, str):
+                    # Check if it looks like a timestamp (contains dashes and colons)
+                    if '-' in value and ':' in value:
+                        return 0.0  # Return 0 for timestamps
+                    return float(value)
+                return 0.0
+            except (ValueError, TypeError):
+                return 0.0
+        
+        def _safe_int_conversion(value):
+            """Safely convert value to int, handling timestamps and other non-numeric values"""
+            if value is None:
+                return 1
+            try:
+                # If it's already a number, convert it
+                if isinstance(value, (int, float)):
+                    return int(value)
+                # If it's a string, try to convert it
+                if isinstance(value, str):
+                    # Check if it looks like a timestamp (contains dashes and colons)
+                    if '-' in value and ':' in value:
+                        return 1  # Return 1 for timestamps
+                    return int(float(value))  # Convert via float first to handle decimals
+                return 1
+            except (ValueError, TypeError):
+                return 1
+        
+        def _generate_predicted_squad(current_squad, target_gw, db_manager):
+            """Generate a predicted squad for future gameweeks based on current squad"""
+            if not current_squad:
+                return None
+            
+            try:
+                from backend.services.squad_service import SquadService
+                squad_service = SquadService(db_manager)
+                
+                # Convert current squad to format expected by SquadService
+                current_squad_data = {
+                    "starting_xi": [p for p in current_squad if not p.get('is_bench', False)],
+                    "bench": [p for p in current_squad if p.get('is_bench', False)],
+                    "free_transfers_remaining": 1
+                }
+                
+                # Get all players for optimization
+                all_players = [player.to_dict() for player in db_manager.get_all_players()]
+                
+                # Generate optimized squad for the target gameweek
+                max_transfers = 1  # Default to 1 transfer per week
+                optimized_squad = squad_service._create_optimized_gw_squad(
+                    current_squad_data, all_players, target_gw, max_transfers
+                )
+                
+                # Convert back to the format expected by the template
+                predicted_squad = []
+                
+                # Process starting XI
+                for i, player in enumerate(optimized_squad.get("starting_xi", [])):
+                    predicted_squad.append({
+                        'player_id': player.get('id'),
+                        'position': i + 1,
+                        'is_captain': player.get('name') == optimized_squad.get('captain'),
+                        'is_vice_captain': player.get('name') == optimized_squad.get('vice_captain'),
+                        'is_bench': False,
+                        'bench_position': None,
+                        'transfer_in': False,
+                        'transfer_out': False,
+                        'actual_points': 0,  # No actual points for predictions
+                        'multiplier': 1,
+                        # Copy player data
+                        'name': player.get('name', 'Unknown'),
+                        'web_name': player.get('name', 'Unknown'),
+                        'team': player.get('team', 'Unknown'),
+                        'position_name': player.get('position', 'Unknown'),
+                        'price': _safe_float_conversion(player.get('price', 0)),
+                        'gw1_points': _safe_float_conversion(player.get('gw1_points', 0)),
+                        'gw2_points': _safe_float_conversion(player.get('gw2_points', 0)),
+                        'gw3_points': _safe_float_conversion(player.get('gw3_points', 0)),
+                        'gw4_points': _safe_float_conversion(player.get('gw4_points', 0)),
+                        'gw5_points': _safe_float_conversion(player.get('gw5_points', 0)),
+                        'gw6_points': _safe_float_conversion(player.get('gw6_points', 0)),
+                        'gw7_points': _safe_float_conversion(player.get('gw7_points', 0)),
+                        'gw8_points': _safe_float_conversion(player.get('gw8_points', 0)),
+                        'gw9_points': _safe_float_conversion(player.get('gw9_points', 0)),
+                        'total_points': _safe_float_conversion(player.get('total_points', 0))
+                    })
+                
+                # Process bench
+                for i, player in enumerate(optimized_squad.get("bench", [])):
+                    predicted_squad.append({
+                        'player_id': player.get('id'),
+                        'position': 12 + i,  # Bench positions start at 12
+                        'is_captain': False,
+                        'is_vice_captain': False,
+                        'is_bench': True,
+                        'bench_position': i + 1,
+                        'transfer_in': False,
+                        'transfer_out': False,
+                        'actual_points': 0,  # No actual points for predictions
+                        'multiplier': 1,
+                        # Copy player data
+                        'name': player.get('name', 'Unknown'),
+                        'web_name': player.get('name', 'Unknown'),
+                        'team': player.get('team', 'Unknown'),
+                        'position_name': player.get('position', 'Unknown'),
+                        'price': _safe_float_conversion(player.get('price', 0)),
+                        'gw1_points': _safe_float_conversion(player.get('gw1_points', 0)),
+                        'gw2_points': _safe_float_conversion(player.get('gw2_points', 0)),
+                        'gw3_points': _safe_float_conversion(player.get('gw3_points', 0)),
+                        'gw4_points': _safe_float_conversion(player.get('gw4_points', 0)),
+                        'gw5_points': _safe_float_conversion(player.get('gw5_points', 0)),
+                        'gw6_points': _safe_float_conversion(player.get('gw6_points', 0)),
+                        'gw7_points': _safe_float_conversion(player.get('gw7_points', 0)),
+                        'gw8_points': _safe_float_conversion(player.get('gw8_points', 0)),
+                        'gw9_points': _safe_float_conversion(player.get('gw9_points', 0)),
+                        'total_points': _safe_float_conversion(player.get('total_points', 0))
+                    })
+                
+                return predicted_squad
+                
+            except Exception as e:
+                print(f"Error generating predicted squad for GW{target_gw}: {e}")
+                return None
+        
         db_manager = current_app.db_manager
 
         # Get the first user profile (assuming single user for now)
@@ -639,38 +772,74 @@ def create_app(config_name: str | None = None):
         profile = profiles[0]
         fpl_team_id = profile['fpl_team_id']
 
-        # Get current gameweek and squad data
+        # Get current gameweek
         live_service = LiveFPLService(db_manager)
         current_gw = live_service.get_current_gameweek()
-        squad = db_manager.get_user_squad(fpl_team_id, current_gw)
-
-        # If no squad data exists, try to sync from FPL API automatically
-        if not squad:
+        
+        # Sync squad data if requested (both current and historical)
+        if request.args.get('sync_squad_data') == 'true':
             try:
-                # Sync profile and squad data
-                live_service.sync_user_profile(fpl_team_id)
-                live_service.sync_user_squad(fpl_team_id, current_gw)  # Sync current GW
-                live_service.sync_user_league_standings(fpl_team_id)
-
-                # Try to get squad data again
-                squad = db_manager.get_user_squad(fpl_team_id, current_gw)
+                # First sync current gameweek squad
+                print(f"Syncing current squad for GW{current_gw}")
+                live_service.sync_user_squad(fpl_team_id, current_gw)
+                
+                # Then sync all historical squads
+                print("Syncing historical squads...")
+                live_service.sync_all_historical_squads(fpl_team_id)
+                
+                print("Squad data sync completed successfully")
             except Exception as e:
-                print(f"Auto-sync failed: {e}")
-                # Continue without squad data - user will see the warning and can manually refresh
+                print(f"Squad data sync failed: {e}")
+        
+        # Always try to sync historical data for past gameweeks if not available
+        try:
+            for gw in range(1, current_gw):
+                existing_squad = db_manager.get_user_squad(fpl_team_id, gw)
+                if not existing_squad:
+                    print(f"Auto-syncing missing historical data for GW{gw}")
+                    live_service.sync_user_squad(fpl_team_id, gw)
+        except Exception as e:
+            print(f"Auto-sync historical data failed: {e}")
 
-        # Enrich squad data with player details
+        # Get squad data for current gameweek
+        squad = live_service.get_squad_for_gameweek(fpl_team_id, current_gw)
+        
+        # Ensure squad is properly formatted for template
         if squad:
-            try:
-                from backend.services.squad_service import SquadService
-                squad_service = SquadService(db_manager)
+            for player in squad:
+                # Ensure price is always a float
+                if 'price' in player:
+                    player['price'] = _safe_float_conversion(player['price'])
+                else:
+                    player['price'] = 0.0
 
+        # Generate weekly data for all gameweeks (1-9)
+        weekly_data = []
+        
+        for gw in range(1, 10):
+            # Determine status based on gameweek
+            if gw < current_gw:
+                status = "Historical"
+                # Get historical squad data
+                gw_squad = live_service.get_squad_for_gameweek(fpl_team_id, gw)
+            elif gw == current_gw:
+                status = "Current"
+                # Use current squad data
+                gw_squad = squad
+            else:
+                status = "Predicted"
+                # For future gameweeks, generate predictions based on current squad
+                gw_squad = _generate_predicted_squad(squad, gw, db_manager) if squad else None
+            
+            # Enrich squad data if available
                 enriched_squad = []
-                for squad_player in squad:
+            if gw_squad:
+                for squad_player in gw_squad:
                     player = db_manager.get_player_by_id(squad_player['player_id'])
                     if player:
                         enriched_player = {
                             'id': squad_player['player_id'],
-                            'name': str(player.name) if player.name else 'Unknown',  # SquadService expects 'name'
+                            'name': str(player.name) if player.name else 'Unknown',
                             'web_name': str(player.name) if player.name else 'Unknown',
                             'team': str(player.team) if player.team else 'Unknown',
                             'position': str(player.position) if player.position else 'Unknown',
@@ -681,193 +850,53 @@ def create_app(config_name: str | None = None):
                             'bench_position': squad_player['bench_position'],
                             'transfer_in': bool(squad_player['transfer_in']),
                             'transfer_out': bool(squad_player['transfer_out']),
+                            'actual_points': _safe_float_conversion(squad_player.get('actual_points', 0)),
+                            'multiplier': _safe_int_conversion(squad_player.get('multiplier', 1)),
                             # Preserve all gameweek points for transfer analysis
-                            'gw1_points': float(squad_player.get('gw1_points', 0) or 0.0),
-                            'gw2_points': float(squad_player.get('gw2_points', 0) or 0.0),
-                            'gw3_points': float(squad_player.get('gw3_points', 0) or 0.0),
-                            'gw4_points': float(squad_player.get('gw4_points', 0) or 0.0),
-                            'gw5_points': float(squad_player.get('gw5_points', 0) or 0.0),
-                            'gw6_points': float(squad_player.get('gw6_points', 0) or 0.0),
-                            'gw7_points': float(squad_player.get('gw7_points', 0) or 0.0),
-                            'gw8_points': float(squad_player.get('gw8_points', 0) or 0.0),
-                            'gw9_points': float(squad_player.get('gw9_points', 0) or 0.0),
-                            'total_points': float(squad_player.get('total_points', 0) or 0.0),
-                            # Add GW1 specific fields for display
-                            'gw1_xp': float(squad_player.get('gw1_points', 0) or 0.0),
-                            'gw1_actual': 0.0,  # Will be populated from historical data if available
-                            'gw1_diff': 0.0  # Will be calculated as actual - xp
+                            'gw1_points': _safe_float_conversion(squad_player.get('gw1_points', 0)),
+                            'gw2_points': _safe_float_conversion(squad_player.get('gw2_points', 0)),
+                            'gw3_points': _safe_float_conversion(squad_player.get('gw3_points', 0)),
+                            'gw4_points': _safe_float_conversion(squad_player.get('gw4_points', 0)),
+                            'gw5_points': _safe_float_conversion(squad_player.get('gw5_points', 0)),
+                            'gw6_points': _safe_float_conversion(squad_player.get('gw6_points', 0)),
+                            'gw7_points': _safe_float_conversion(squad_player.get('gw7_points', 0)),
+                            'gw8_points': _safe_float_conversion(squad_player.get('gw8_points', 0)),
+                            'gw9_points': _safe_float_conversion(squad_player.get('gw9_points', 0)),
+                            'total_points': _safe_float_conversion(squad_player.get('total_points', 0))
                         }
                         enriched_squad.append(enriched_player)
 
-                # Try to populate actual GW1 points from historical data
-                try:
-                    HIST_SEASON = '2025/26'  # Default season
-                    hist_totals = db_manager.get_historical_totals_for_season(HIST_SEASON)
-                    if hist_totals:
-                        for player in enriched_squad:
-                            if player.get('id') in hist_totals:
-                                player['gw1_actual'] = float(hist_totals[player['id']].get('gw1_points', 0))
-                            else:
-                                # Try to match by FPL element ID if available
-                                db_player = db_manager.get_player_by_id(player['id'])
-                                if db_player and db_player.fpl_element_id and db_player.fpl_element_id in hist_totals:
-                                    player['gw1_actual'] = float(hist_totals[db_player.fpl_element_id].get('gw1_points', 0))
-
-                            # Calculate the difference (Actual - xP)
-                            player['gw1_diff'] = player['gw1_actual'] - player['gw1_xp']
-                except Exception as e:
-                    print(f"Error fetching historical data: {e}")
-
-                squad = enriched_squad
-
-                # Generate weekly data for GW1-9
-                weekly_data = []
-
-                # GW1: Use actual FPL squad
-                gw1_data = {
-                    "gw": 1,
-                    "starting_xi": [p for p in squad if not p['is_bench']],
-                    "bench": [p for p in squad if p['is_bench']],
+            # Create weekly data entry
+            gw_data = {
+                "gw": gw,
+                "status": status,
+                "starting_xi": [p for p in enriched_squad if not p['is_bench']] if enriched_squad else [],
+                "bench": [p for p in enriched_squad if p['is_bench']] if enriched_squad else [],
                     "transfers_in": [],
                     "transfers_out": [],
-                    "points": 0,  # Will be updated with actual points
-                    "captain_name": next((p['web_name'] for p in squad if p['is_captain']), None),
-                    "vice_captain_name": next((p['web_name'] for p in squad if p['is_vice_captain']), None),
+                "points": 0,
+                "captain_name": next((p['web_name'] for p in enriched_squad if p['is_captain']), None) if enriched_squad else None,
+                "vice_captain_name": next((p['web_name'] for p in enriched_squad if p['is_vice_captain']), None) if enriched_squad else None,
                     "hits_points": 0,
                     "total_with_captain_and_hits": 0,
-                    "squad_value": sum(p['price'] for p in squad),
-                    "formation": squad_service.get_formation([p for p in squad if not p['is_bench']]) if squad else "Unknown"
+                "squad_value": sum(p['price'] for p in enriched_squad) if enriched_squad else 0,
+                "formation": "Unknown"
                 }
-                weekly_data.append(gw1_data)
 
-                # GW2-9: Generate optimized squads based on GW1
-                if squad:
-                    try:
-                        squad_service = SquadService(db_manager)
-                        
-                        # Get user preference for maximum transfers per GW (default: 1)
-                        max_transfers_per_gw = request.args.get('max_transfers', 1, type=int)
-                        max_transfers_per_gw = max(1, min(5, max_transfers_per_gw))  # Clamp between 1-5
-
-                        # Convert enriched squad to format expected by SquadService
-                        gw1_squad_data = {
-                            "starting_xi": [p for p in squad if not p['is_bench']],
-                            "bench": [p for p in squad if p['is_bench']],
-                            "free_transfers_remaining": 1
-                        }
-                        
-                        # Get all players for optimization
-                        all_players = [player.to_dict() for player in db_manager.get_all_players()]
-                        
-                        # Note: all_players already have readable position values from database
-                        # No need to convert positions for SquadService
-
-                        # Generate optimized squads for GW2-9 using the new service
-                        for gw in range(2, 10):
-                            if gw == 2:
-                                # GW2: Apply transfers to GW1 squad
-                                gw_data = squad_service._create_optimized_gw_squad(
-                                    gw1_squad_data, all_players, gw, max_transfers_per_gw
-                                )
-                            else:
-                                # GW3-9: Use previous GW as base
-                                prev_gw_data = weekly_data[gw-2]  # -2 because weekly_data is 0-indexed
-                                prev_squad = {
-                                    "starting_xi": prev_gw_data["starting_xi"],
-                                    "bench": prev_gw_data["bench"],
-                                    "free_transfers_remaining": prev_gw_data.get("free_transfers_remaining", 1)
-                                }
-                                
-                                # Ensure all previous squad players have a 'name' field for SquadService
-                                for player in prev_squad["starting_xi"] + prev_squad["bench"]:
-                                    if 'name' not in player:
-                                        player['name'] = f"Player {player.get('id', 'Unknown')}"
-                                
-                                gw_data = squad_service._create_optimized_gw_squad(
-                                    prev_squad, all_players, gw, max_transfers_per_gw
-                                )
-
-                            # Add to weekly data
-                            starting_xi = gw_data.get("starting_xi", [])
-                            bench = gw_data.get("bench", [])
-
-                            # Ensure all players have required fields
-                            for player in starting_xi + bench:
-                                # Always enrich player data from database to ensure consistency
-                                if 'id' in player:
-                                    db_player = db_manager.get_player_by_id(player['id'])
-                                    if db_player:
-                                        player['name'] = db_player.name
-                                        player['position'] = str(db_player.position)  # Use readable position directly
-                                        player['team'] = db_player.team
-                                        player['price'] = db_player.price
-                                    else:
-                                        player['name'] = f"Player {player['id']}"
-                                        player['position'] = 'Unknown'
-                                        player['team'] = 'Unknown'
-                                        player['price'] = 0.0
-                                else:
-                                    player['name'] = "Unknown Player"
-                                    player['position'] = 'Unknown'
-                                    player['team'] = 'Unknown'
-                                    player['price'] = 0.0
-
-                            # Get transfer data with analysis
-                            transfers_in = gw_data.get("transfers", {}).get("in", [])
-                            transfers_out = gw_data.get("transfers", {}).get("out", [])
-                            
-                            # Extract transfer names for backward compatibility
-                            transfers_in_names = [p.get('name', 'Unknown') for p in transfers_in]
-                            transfers_out_names = [p.get('name', 'Unknown') for p in transfers_out]
-
-                            weekly_data.append({
-                                "gw": gw,
-                                "starting_xi": starting_xi,
-                                "bench": bench,
-                                "transfers_in": transfers_in_names,  # Backward compatibility
-                                "transfers_out": transfers_out_names,  # Backward compatibility
-                                "transfers_in_players": transfers_in,  # Full player objects with analysis
-                                "transfers_out_players": transfers_out,  # Full player objects with analysis
-                                "points": 0,  # Will be calculated
-                                "captain_name": gw_data.get("captain"),
-                                "vice_captain_name": gw_data.get("vice_captain"),
-                                "hits_points": gw_data.get("hits_points", 0),
-                                "total_with_captain_and_hits": 0,
-                                "squad_value": sum(p.get('price', 0) for p in starting_xi + bench),
-                                "formation": squad_service.get_formation(starting_xi)
-                            })
-
-                            # Update previous squad for next iteration
-                            if gw < 9:
-                                weekly_data[gw-1]["free_transfers_remaining"] = gw_data.get("free_transfers_remaining", 1)
-
-                    except Exception as e:
-                        print(f"Error generating optimized squads: {e}")
-                        # Fallback: create empty GW2-9 data
-                        for gw in range(2, 10):
-                            weekly_data.append({
-                                "gw": gw,
-                                "starting_xi": [],
-                                "bench": [],
-                                "transfers_in": [],
-                                "transfers_out": [],
-                                "points": 0,
-                                "captain_name": None,
-                                "vice_captain_name": None,
-                                "hits_points": 0,
-                                "total_with_captain_and_hits": 0,
-                                "squad_value": 0,
-                                "formation": "4-4-2"
-                            })
-            except Exception as e:
-                print(f"Error in squad enrichment: {e}")
-                # Continue without enriched data
-                pass
+                        # Calculate formation if we have starting XI
+            # if gw_data["starting_xi"]:
+            #     try:
+            #         from backend.services.squad_service import SquadService
+            #         squad_service = SquadService(db_manager)
+            #         gw_data["formation"] = squad_service.get_formation(gw_data["starting_xi"])
+            #     except:
+            #         pass
+            
+            weekly_data.append(gw_data)
 
         standings = db_manager.get_user_league_standings(fpl_team_id)
 
         return render_template('squad-live.html', profile=profile, squad=squad, standings=standings, weekly_data=weekly_data)
-
     @app.route('/api/account/save-team-id', methods=['POST'])
     def save_team_id():
         """Save FPL team ID to user profile"""

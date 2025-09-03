@@ -198,3 +198,36 @@ class LiveFPLService:
         }
         
         return results
+    
+    def sync_all_historical_squads(self, fpl_team_id: int) -> Dict[int, bool]:
+        """Sync historical squad data for all past gameweeks"""
+        current_gw = self.get_current_gameweek()
+        results = {}
+        
+        # Sync squads for all past gameweeks (1 to current_gw-1)
+        for gw in range(1, current_gw):
+            try:
+                success = self.sync_user_squad(fpl_team_id, gw)
+                results[gw] = success
+                logger.info(f"Synced historical squad for GW{gw}: {'Success' if success else 'Failed'}")
+            except Exception as e:
+                logger.error(f"Failed to sync historical squad for GW{gw}: {e}")
+                results[gw] = False
+        
+        return results
+    
+    def get_squad_for_gameweek(self, fpl_team_id: int, gameweek: int) -> Optional[List[Dict]]:
+        """Get squad data for a specific gameweek, syncing if not available"""
+        # First try to get existing squad data
+        squad = self.db_manager.get_user_squad(fpl_team_id, gameweek)
+        
+        # If no squad data exists, try to sync from FPL API
+        if not squad:
+            try:
+                success = self.sync_user_squad(fpl_team_id, gameweek)
+                if success:
+                    squad = self.db_manager.get_user_squad(fpl_team_id, gameweek)
+            except Exception as e:
+                logger.error(f"Failed to sync squad for GW{gameweek}: {e}")
+        
+        return squad
