@@ -1,0 +1,106 @@
+<nav class="navbar navbar-expand-lg navbar-light bg-light mb-4">
+  <div class="container-fluid">
+    <div class="d-flex align-items-center">
+      <a class="navbar-brand fw-bold text-decoration-none d-flex align-items-center" href="/">
+        <img src="{{ url_for('static', filename='assets/FPLove_logo_4.png') }}?v=2"
+             alt="FPLove" loading="eager"
+             style="height:28px; width:auto; margin-right:8px; display:inline-block; vertical-align:middle;"
+             onerror="this.onerror=null; this.src='{{ url_for('static', filename='assets/FPLove_logo_2.png') }}?v=5';"/>
+        <span class="visually-hidden">FPLove</span>
+      </a>
+      <div class="navbar-nav me-auto">
+        <a class="nav-link {{ 'active' if request.path == '/' else '' }}" href="/">Dashboard</a>
+        <a class="nav-link {{ 'active' if request.path.startswith('/fdr') else '' }}" href="/fdr">FDR</a>
+        <a class="nav-link {{ 'active' if request.path.startswith('/historical') else '' }}" href="/historical">Historical</a>
+        <div class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            Players
+          </a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="/players">All</a></li>
+            <li><a class="dropdown-item" href="/player">Individual</a></li>
+            <li><a class="dropdown-item" href="/watchlist">Watchlist</a></li>
+          </ul>
+        </div>
+        <a class="nav-link {{ 'active' if request.path.startswith('/teams') else '' }}" href="/teams">Teams</a>
+        <a class="nav-link {{ 'active' if request.path.startswith('/squad') and not request.path.startswith('/squad-live') else '' }}" href="/squad">Squad-Initiation</a>
+        <a class="nav-link {{ 'active' if request.path.startswith('/squad-live') else '' }}" href="/squad-live">Squad Live</a>
+      </div>
+    </div>
+    
+    <!-- Right side profile icon -->
+    <div class="navbar-nav ms-auto">
+      <a class="nav-link" href="/account" title="Account Settings">
+        <i class="fas fa-user-circle" style="font-size: 1.2rem;"></i>
+      </a>
+    </div>
+  </div>
+  <style>
+    /* Ensure active state is clearly visible */
+    .navbar .nav-link.active { background-color: #3498db !important; color: #fff !important; border-radius: 5px; }
+    .dropdown-menu .dropdown-item.active { background-color: #3498db; color: #fff; }
+
+    /* Global: keep entity links (players/teams) in content using default text color */
+    .table a,
+    .table a:visited,
+    .table a:hover,
+    .table a:active,
+    .table a:focus,
+    .card a.text-decoration-none,
+    .card a.text-decoration-none:visited,
+    .card a.text-decoration-none:hover,
+    .card a.text-decoration-none:active,
+    .card a.text-decoration-none:focus {
+      color: inherit !important;
+      text-decoration: none !important;
+    }
+
+    /* Unified table header styling across the app (match FDR page) + very light blue tint */
+    table.dataTable thead th,
+    table thead th {
+      white-space: normal;
+      background-color: #eef7ff; /* light blue tint */
+      border-color: #dee2e6;
+      font-weight: 600;
+      color: #2c3e50;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+    table.dataTable thead th:hover,
+    table thead th:hover {
+      background-color: #e3f0ff !important; /* slightly deeper on hover */
+      transform: scale(1.02);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+  </style>
+  <script>
+    document.addEventListener('DOMContentLoaded', function(){
+      try {
+        const toggle = document.getElementById('players2Dropdown');
+        if (!toggle) return;
+        const parent = toggle.closest('.nav-item.dropdown');
+        const menu = parent && parent.querySelector('.dropdown-menu');
+        if (!parent || !menu) return;
+        const mq = window.matchMedia('(hover:hover) and (pointer:fine)');
+        function openMenu(){ toggle.classList.add('show'); menu.classList.add('show'); toggle.setAttribute('aria-expanded','true'); }
+        function closeMenu(){ toggle.classList.remove('show'); menu.classList.remove('show'); toggle.setAttribute('aria-expanded','false'); }
+        // Hover opens menu on desktops
+        parent.addEventListener('mouseenter', function(){ if (mq.matches) openMenu(); });
+        parent.addEventListener('mouseleave', function(){ if (mq.matches) closeMenu(); });
+        // Click top-level navigates to first submenu (Players) and also opens menu so user can pick others quickly
+        toggle.addEventListener('click', function(e){
+          e.preventDefault();
+          openMenu();
+          const firstLink = menu.querySelector('a.dropdown-item');
+          if (firstLink && firstLink.getAttribute('href')) {
+            window.location.href = firstLink.getAttribute('href');
+          }
+        });
+        // Allow clicking submenu items as normal
+        menu.addEventListener('click', function(){ closeMenu(); });
+      } catch(_e) {}
+    });
+  </script>
+</nav>
+
+

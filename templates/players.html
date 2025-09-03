@@ -1,0 +1,1727 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>FPL Players - Expected Points (GW1-9)</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.3/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.datatables.net/fixedheader/3.4.0/css/fixedHeader.dataTables.min.css">
+    <script src="https://cdn.datatables.net/fixedheader/3.4.0/js/dataTables.fixedHeader.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <style>
+        body { 
+            background-color: #f8f9fa; 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .navbar-brand { 
+            font-weight: bold; 
+            color: #2c3e50 !important; 
+        }
+        .nav-link { 
+            color: #34495e !important; 
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        .nav-link.active { 
+            background-color: #3498db !important; 
+            color: white !important; 
+            border-radius: 5px;
+            transform: scale(1.05);
+        }
+        .nav-link:hover { 
+            color: #3498db !important; 
+            transform: translateY(-2px);
+        }
+        h1 { 
+            color: #2c3e50; 
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+        }
+        .position-badge { 
+            font-size: 0.8em; 
+            padding: 4px 8px; 
+            border-radius: 12px; 
+            color: white; 
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        .gk { background-color: #dc3545; }
+        .def { background-color: #007bff; }
+        .mid { background-color: #28a745; }
+        .fwd { background-color: #ffc107; color: #212529; }
+        
+        .position-badge:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        
+        .table th { 
+            white-space: normal !important; 
+            word-wrap: break-word !important;
+            max-width: none !important;
+            font-size: 0.85em;
+            padding: 8px 4px;
+            text-align: center;
+            vertical-align: middle;
+            transition: background-color 0.3s ease;
+        }
+        .table th:hover {
+            background-color: #e9ecef !important;
+        }
+        
+        .table td { 
+            vertical-align: middle; 
+            font-size: 0.9em;
+            padding: 6px 4px;
+            text-align: center;
+            transition: all 0.2s ease;
+        }
+        
+        .table tbody tr:hover {
+            background-color: #f8f9fa !important;
+            transform: scale(1.01);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        /* Enhanced UI Animations and Effects */
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        .slide-up {
+            animation: slideUp 0.3s ease-out;
+        }
+        
+        .bounce-in {
+            animation: bounceIn 0.6s ease-out;
+        }
+        
+        .scale-in {
+            animation: scaleIn 0.4s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        @keyframes bounceIn {
+            0% { transform: scale(0.3); opacity: 0; }
+            50% { transform: scale(1.05); }
+            70% { transform: scale(0.9); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        
+        @keyframes scaleIn {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+        
+        /* Enhanced Button Styles */
+        .btn {
+            transition: all 0.3s ease;
+            border-radius: 8px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+            border: none;
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%);
+            border: none;
+        }
+        
+        .btn-warning {
+            background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%);
+            border: none;
+            color: #212529;
+        }
+        
+        .btn-info {
+            background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+            border: none;
+        }
+        
+        /* Enhanced dropdown styling for optgroups */
+        .form-select optgroup {
+            font-weight: bold;
+            color: #495057;
+            background-color: #f8f9fa;
+        }
+        
+        .form-select option {
+            padding: 8px 12px;
+        }
+        
+        /* Keyboard shortcut tooltip for dropdown */
+        .form-select:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 0 0.2rem rgba(0,123,255,0.25);
+        }
+        
+        /* Filter Summary Styling */
+        .filter-summary .alert {
+            border-radius: 8px;
+            border: none;
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+            color: #1565c0;
+            font-weight: 500;
+        }
+        
+        .filter-summary .alert i {
+            color: #1976d2;
+        }
+        
+        .filter-summary .text-muted {
+            color: #546e7a !important;
+        }
+        
+        .filter-summary .alert:hover {
+            background: linear-gradient(135deg, #bbdefb 0%, #90caf9 100%);
+            transform: translateY(-1px);
+            transition: all 0.3s ease;
+        }
+        
+        /* Enhanced DataTables Styling */
+        .dataTables_wrapper .dataTables_length,
+        .dataTables_wrapper .dataTables_filter,
+        .dataTables_wrapper .dataTables_info,
+        .dataTables_wrapper .dataTables_paginate {
+            margin: 10px 0;
+        }
+        
+        /* Ensure DataTables controls use full width */
+        .dataTables_wrapper .dataTables_length,
+        .dataTables_wrapper .dataTables_filter {
+            display: inline-block;
+            width: 50%;
+        }
+        
+        .dataTables_wrapper .dataTables_length {
+            text-align: left;
+        }
+        
+        .dataTables_wrapper .dataTables_filter {
+            text-align: right;
+        }
+        
+        .dataTables_wrapper .dataTables_info,
+        .dataTables_wrapper .dataTables_paginate {
+            width: 100%;
+            text-align: center;
+        }
+        
+        /* Ensure DataTables cells maintain center alignment */
+        .dataTables_wrapper .dataTable td,
+        .dataTables_wrapper .dataTable th {
+            text-align: center !important;
+        }
+        
+        /* Force center alignment for all table elements */
+        #playersTable td,
+        #playersTable th,
+        .table td,
+        .table th {
+            text-align: center !important;
+        }
+        
+        /* Override any DataTables inline styles */
+        .dataTables_wrapper table.dataTable td,
+        .dataTables_wrapper table.dataTable th {
+            text-align: center !important;
+        }
+        
+        /* Make table full width */
+        .table-responsive {
+            width: 100% !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+        
+        #playersTable {
+            width: 100% !important;
+            margin: 0 !important;
+            table-layout: auto !important;
+        }
+        
+        .dataTables_wrapper {
+            width: 100% !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+        
+        .dataTables_wrapper .dataTable {
+            width: 100% !important;
+            margin: 0 !important;
+            table-layout: auto !important;
+        }
+        
+        /* Ensure column widths are respected */
+        #playersTable th,
+        #playersTable td {
+            white-space: nowrap !important;
+            overflow: hidden !important;
+            text-overflow: ellipsis !important;
+        }
+        
+        /* Allow name column to wrap if needed */
+        #playersTable th:first-child,
+        #playersTable td:first-child {
+            white-space: normal !important;
+            word-wrap: break-word !important;
+        }
+        
+        /* Ensure table stretches to full container width */
+        .container-fluid {
+            padding-left: 15px !important;
+            padding-right: 15px !important;
+        }
+        
+        .row {
+            margin-left: 0 !important;
+            margin-right: 0 !important;
+        }
+        
+        .col-md-12 {
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+        }
+        
+        /* Ensure main container uses full width */
+        .main-content {
+            width: 100% !important;
+            max-width: none !important;
+            margin: 0 !important;
+            padding: 0 15px !important;
+        }
+        
+        /* Remove any max-width constraints */
+        .container, .container-fluid {
+            max-width: none !important;
+        }
+        
+        /* Ensure table wrapper takes full width */
+        .table-wrapper {
+            width: 100% !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+        
+        .dataTables_wrapper .dataTables_paginate .paginate_button {
+            border-radius: 5px;
+            margin: 0 2px;
+            transition: all 0.3s ease;
+        }
+        
+        .dataTables_wrapper .dataTables_paginate .paginate_button.current {
+            background: #007bff !important;
+            border-color: #007bff !important;
+            color: white !important;
+            transform: scale(1.1);
+        }
+        
+        .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+            background: #0056b3 !important;
+            border-color: #0056b3 !important;
+            color: white !important;
+            transform: translateY(-2px);
+        }
+        /* Ensure links in the Players table use default text color (no blue) */
+        #playersTable a,
+        #playersTable a:visited,
+        #playersTable a:hover,
+        #playersTable a:active,
+        #playersTable a:focus {
+            color: inherit !important;
+            text-decoration: none !important;
+        }
+        /* Using DataTables FixedHeader plugin instead of CSS sticky headers to avoid misalignment */
+        
+        /* Save & Load Views Section */
+        .views-section {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+            transition: all 0.3s ease;
+        }
+        
+        .views-section:hover {
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            transform: translateY(-2px);
+        }
+        
+        .views-section h5 {
+            color: #2c3e50;
+            margin-bottom: 1rem;
+        }
+        
+        .views-section .form-control,
+        .views-section .form-select {
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 8px 12px;
+            transition: all 0.3s ease;
+        }
+        
+        .views-section .form-control:focus,
+        .views-section .form-select:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 0 0.2rem rgba(0,123,255,0.25);
+            transform: scale(1.02);
+        }
+        
+        /* Advanced Filters Panel */
+        .advanced-filters-panel {
+            display: block;
+            background: white;
+            padding: 16px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            margin-bottom: 1rem;
+        }
+        /* Hide legacy filter panel to avoid duplication with header filters */
+        .filters-section { display: none !important; }
+        
+        .filters-section:hover {
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            transform: translateY(-2px);
+        }
+        
+        .filters-section h5 {
+            color: #2c3e50;
+            margin-bottom: 1rem;
+        }
+        
+        .filters-section .form-control,
+        .filters-section .form-select {
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 8px 12px;
+            transition: all 0.3s ease;
+        }
+        
+        .filters-section .form-control:focus,
+        .filters-section .form-select:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 0 0.2rem rgba(0,123,255,0.25);
+            transform: scale(1.02);
+        }
+        
+        /* Notification Styles */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 500;
+            z-index: 1000;
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+        }
+        
+        .notification.success {
+            background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%);
+        }
+        
+        .notification.info {
+            background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+        }
+    </style>
+</head>
+<body class="p-4">
+    {% include '_navbar.html' %}
+    
+    <div class="container-fluid main-content">
+        <h1 class="text-center fade-in"><i class="fas fa-users"></i> FPL Players - Expected Points (GW1-9)</h1>
+        
+        <!-- Save & Load Views Section -->
+        <div id="viewsPanel" class="views-section slide-up">
+            <h5><i class="fas fa-bookmark"></i> Save & Load Views</h5>
+            <div class="row">
+                <div class="col-md-4">
+                    <label for="viewName" class="form-label">View Name:</label>
+                    <input type="text" id="viewName" class="form-control" placeholder="Enter view name">
+                </div>
+                <div class="col-md-4">
+                    <label for="loadView" class="form-label">Load View or Quick Sort:</label>
+                    <select id="loadView" class="form-select">
+                        <option value="">Select a view or sorting option...</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">&nbsp;</label>
+                    <div>
+                        <button id="saveView" class="btn btn-success me-2">
+                            <i class="fas fa-save"></i> Save View
+                        </button>
+                        <button id="loadViewBtn" class="btn btn-primary">
+                            <i class="fas fa-folder-open"></i> Load View
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Enhanced Filters Section -->
+        <div class="filters-section slide-up">
+            <h5><i class="fas fa-filter"></i> Enhanced Filters</h5>
+            <div class="row mb-3">
+                <div class="col-md-2">
+                    <label for="positionFilter" class="form-label">Position:</label>
+                    <select id="positionFilter" class="form-select">
+                        <option value="">All Positions</option>
+                        <option value="Goalkeeper">Goalkeeper</option>
+                        <option value="Defender">Defender</option>
+                        <option value="Midfielder">Midfielder</option>
+                        <option value="Forward">Forward</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label for="teamFilter" class="form-label">Team:</label>
+                    <select id="teamFilter" class="form-select">
+                        <option value="">All Teams</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label for="maxPriceFilter" class="form-label">Max Price:</label>
+                    <input type="number" id="maxPriceFilter" class="form-control" placeholder="e.g., 12.5" step="0.1">
+                </div>
+                <div class="col-md-2">
+                    <label for="minChanceFilter" class="form-label">Min Chance %:</label>
+                    <input type="number" id="minChanceFilter" class="form-control" placeholder="e.g., 75" min="0" max="100">
+                </div>
+                <div class="col-md-2">
+                    <label for="minPointsPerMillionFilter" class="form-label">Min Points/£:</label>
+                    <input type="number" id="minPointsPerMillionFilter" class="form-control" placeholder="e.g., 50" step="0.1">
+                </div>
+                <div class="col-md-2">
+                    <label for="minTotalPointsFilter" class="form-label">Min Total Points:</label>
+                    <input type="number" id="minTotalPointsFilter" class="form-control" placeholder="e.g., 100">
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-2">
+                    <label for="minFormFilter" class="form-label">Min Form:</label>
+                    <input type="number" id="minFormFilter" class="form-control" placeholder="e.g., 5.0" step="0.1">
+                </div>
+                <div class="col-md-2">
+                    <label for="minOwnershipFilter" class="form-label">Min Ownership %:</label>
+                    <input type="number" id="minOwnershipFilter" class="form-control" placeholder="e.g., 10" min="0" max="100">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">&nbsp;</label>
+                    <div>
+                        <button id="applyFilters" class="btn btn-primary me-2">
+                            <i class="fas fa-filter"></i> Apply Filters
+                        </button>
+                        <button id="clearFilters" class="btn btn-warning">
+                            <i class="fas fa-times"></i> Clear Filters
+                        </button>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">&nbsp;</label>
+                    <div>
+                        <!-- Sort buttons removed - now available in dropdown -->
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Filter Summary removed; info will be inline with search via DataTables DOM -->
+        
+        <!-- Inline top controls: info/search + Views/Advanced Filters buttons -->
+        <div class="d-flex justify-content-between align-items-center mb-2">
+            <div class="text-muted" id="playersInfoInline"></div>
+            <div class="d-flex align-items-center gap-3">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="" id="filter-watchlist">
+                    <label class="form-check-label" for="filter-watchlist">Watchlist only</label>
+                </div>
+                <button id="toggleViewsPanel" class="btn btn-outline-secondary">Views</button>
+                <button id="toggleAdvancedFilters" class="btn btn-outline-secondary">Advanced Filters</button>
+            </div>
+        </div>
+
+        <!-- Advanced Filters Panel (visible by default). All filters live here -->
+        <div id="advancedFiltersPanel" class="advanced-filters-panel">
+            <div class="row g-2 mb-2">
+                <div class="col-md-2">
+                    <label class="form-label">Position</label>
+                    <select id="af-position" class="form-select form-select-sm">
+                        <option value="">All</option>
+                        <option value="Goalkeeper">Goalkeeper</option>
+                        <option value="Defender">Defender</option>
+                        <option value="Midfielder">Midfielder</option>
+                        <option value="Forward">Forward</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Team</label>
+                    <select id="af-team" class="form-select form-select-sm">
+                        <option value="">All</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">Max Price</label>
+                    <input id="af-price" type="text" class="form-control form-control-sm" placeholder="<=7.5">
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">Min Chance %</label>
+                    <input id="af-chance" type="text" class="form-control form-control-sm" placeholder=">=75">
+                </div>
+            </div>
+            <div class="row g-2">
+                <div class="col-md-2">
+                    <label class="form-label">Min Points/£</label>
+                    <input id="af-ppm" type="text" class="form-control form-control-sm" placeholder=">=50">
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">Min Total Points</label>
+                    <input id="af-total" type="text" class="form-control form-control-sm" placeholder=">=100">
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">Min Form</label>
+                    <input id="af-form" type="text" class="form-control form-control-sm" placeholder=">=5">
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">Min Ownership %</label>
+                    <input id="af-own" type="text" class="form-control form-control-sm" placeholder=">=10%">
+                </div>
+                <div class="col-md-4 d-flex align-items-end">
+                    <button id="clearAdvancedFilters" class="btn btn-sm btn-outline-secondary me-2">Clear</button>
+                    <small class="text-muted">Hints: use operators like >=, >, <=, <</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Search field positioned above table, right-aligned to align with GW tabs -->
+        <div class="d-flex justify-content-end mb-2">
+            <input type="search" class="form-control" id="globalSearch" placeholder="Search players..." style="max-width: 260px;">
+        </div>
+
+        <!-- Players Table -->
+        <div class="table-responsive scale-in table-wrapper">
+            <table id="playersTable" class="table table-striped table-hover">
+                <thead>
+                    <tr>
+                        <th>★</th>
+                        <th>Name</th>
+                        <th>Position</th>
+                        <th>Team</th>
+                        <th>Price</th>
+                        <th>Chance %</th>
+                        <th>Points/£</th>
+                        <th>Total Points</th>
+                        <th>Form</th>
+                        <th>Ownership %</th>
+                        <th>Avg xP</th>
+                        <th>GW1</th>
+                        <th>GW2</th>
+                        <th>GW3</th>
+                        <th>GW4</th>
+                        <th>GW5</th>
+                        <th>GW6</th>
+                        <th>GW7</th>
+                        <th>GW8</th>
+                        <th>GW9</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Data will be populated by JavaScript -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <style>
+      .watch-star { cursor: pointer; color: #b0b0b0; background: transparent; border: none; padding: 2px 6px; font-size: 1.35rem; line-height: 1; border-radius: 6px; }
+      .watch-star:hover { background: rgba(0,0,0,0.05); }
+      .watch-star.watched { color: #f1c40f; text-shadow: 0 0 2px rgba(0,0,0,0.2); }
+    </style>
+    <!-- Notification Container -->
+    <div id="notificationContainer"></div>
+    
+    <script>
+        $(document).ready(function() {
+            let currentTable = null;
+            window.WATCH_IDS = {{ watch_ids|tojson if watch_ids is defined else '[]' }};
+            
+            // Utility function for consistent number formatting
+            function formatNumber(value, decimals = 1) {
+                if (value === null || value === undefined || value === '') {
+                    return '0.0';
+                }
+                const num = parseFloat(value);
+                if (isNaN(num)) {
+                    return '0.0';
+                }
+                return num.toFixed(decimals);
+            }
+            
+            // Use players data from template (like the original implementation)
+            const playersData = {{ players|tojson }};
+            console.log('Players data loaded from template:', playersData.length, 'players');
+            console.log('Sample player:', playersData[0]);
+            
+            // Populate team dropdown in Advanced Filters from canonical team list
+            const canonicalTeams = {{ team_names|tojson }};
+            $('#af-team').empty().append('<option value="">All</option>');
+            canonicalTeams.forEach(team => {
+                $('#af-team').append(`<option value="${team}">${team}</option>`);
+            });
+            
+            // Create default "Value + Points" view if it doesn't exist
+            createDefaultValuePointsView();
+            
+            // Test dropdown population immediately
+            console.log('Testing immediate dropdown population...');
+            console.log('Dropdown element exists:', $('#loadView').length);
+            console.log('Dropdown element:', $('#loadView')[0]);
+            
+            updateViewsDropdown();
+            console.log('Immediate dropdown population complete. Options count:', $('#loadView option').length);
+            console.log('Dropdown HTML:', $('#loadView').html());
+            
+            // Test manual option addition
+            $('#loadView').append('<option value="test">TEST OPTION</option>');
+            console.log('After manual addition. Options count:', $('#loadView option').length);
+            
+            // Remove test option to keep dropdown clean
+            $('#loadView option[value="test"]').remove();
+            
+            // Initialize DataTable
+            initializeDataTable();
+            
+            // Set up event handlers
+            setupEventHandlers();
+            
+            // Dropdown will be updated after DataTable initialization
+            
+            // Handle window resize to maintain full width
+            $(window).on('resize', function() {
+                if (currentTable && currentTable.columns) {
+                    currentTable.columns.adjust();
+                    $('#playersTable').css('width', '100%');
+                    $('.dataTables_wrapper').css('width', '100%');
+                }
+            });
+            
+            function forceCenterAlignment() {
+                // Force center alignment for all table cells
+                $('#playersTable td, #playersTable th').css('text-align', 'center');
+                // Recompute sticky offset in case fonts/layout changed on redraw
+                try {
+                    const filtersHeight = $('#playersTable thead tr.filters-row').outerHeight() || 40;
+                    document.documentElement.style.setProperty('--filters-height', filtersHeight + 'px');
+                } catch(_e) {}
+            }
+            
+            function createDefaultValuePointsView() {
+                console.log('Creating default value points view...');
+                
+                // Check if default view already exists
+                const savedViews = JSON.parse(localStorage.getItem('fplPlayerViews') || '{}');
+                console.log('Current saved views:', savedViews);
+                
+                if (!savedViews['Best Value Players']) {
+                    // Create default view with Points/£ + Total Points sorting
+                    const defaultView = {
+                        name: 'Best Value Players',
+                        description: 'Points/£ + Total Points',
+                        filters: {
+                            position: '',
+                            team: '',
+                            maxPrice: '',
+                            minChance: '',
+                            minPointsPerMillion: '',
+                            minTotalPoints: '',
+                            minForm: '',
+                            minOwnership: ''
+                        },
+                        sorting: [[6, 'desc'], [7, 'desc']], // Points/£ then Total Points (adjusted for star column)
+                        pageLength: 100,
+                        search: '',
+                        timestamp: new Date().toISOString()
+                    };
+                    
+                    savedViews['Best Value Players'] = defaultView;
+                    localStorage.setItem('fplPlayerViews', JSON.stringify(savedViews));
+                    console.log('Created default "Best Value Players" view:', defaultView);
+                } else {
+                    console.log('Default view already exists');
+                }
+            }
+            
+            function initializeDataTable() {
+                console.log('Initializing DataTable with', playersData.length, 'players');
+                console.log('First player data:', playersData[0]);
+                
+                // Destroy existing table if it exists
+                if (currentTable) {
+                    currentTable.destroy();
+                }
+                
+                currentTable = $('#playersTable').DataTable({
+                    // custom top controls handled outside
+                    dom: 'rt<"row mt-2"<"col-md-6"l><"col-md-6"p>>',
+                    data: playersData,
+                    rowId: 'id',
+                    orderCellsTop: false,
+                    searching: true,
+                    searchDelay: 0,
+                    columns: [
+                        { 
+                            data: null,
+                            className: 'text-center',
+                            width: '6%',
+                            orderable: false,
+                            searchable: false,
+                            render: function(row){
+                                const watched = (window.WATCH_IDS || []).includes(row.id);
+                                const glyph = watched ? '★' : '☆';
+                                return `<button type=\"button\" class=\"watch-star ${watched ? 'watched' : ''}\" data-player-id=\"${row.id}\" aria-label=\"Toggle watch\">${glyph}</button>`;
+                            }
+                        },
+                        { 
+                            data: 'name', 
+                            className: 'text-center',
+                            width: '12%',
+                            render: function(data, type, row) {
+                                if (type === 'display') {
+                                    return `<a href=\"/player/${row.id}\" class=\"text-decoration-none\">${data}</a>`;
+                                }
+                                return data;
+                            }
+                        },
+                        { 
+                            data: 'position',
+                            className: 'text-center',
+                            width: '8%',
+                            render: function(data) {
+                                const classes = {
+                                    'Goalkeeper': 'gk',
+                                    'Defender': 'def',
+                                    'Midfielder': 'mid',
+                                    'Forward': 'fwd'
+                                };
+                                return `<span class="position-badge ${classes[data] || ''}">${data}</span>`;
+                            }
+                        },
+                        { 
+                            data: 'team_short', 
+                            className: 'text-center',
+                            width: '8%',
+                            render: function(data, type, row) {
+                                if (type === 'display' && row.team_id) {
+                                    return `<a href="/team/${row.team_id}" class="text-decoration-none">${data || row.team}</a>`;
+                                }
+                                return data || row.team;
+                            }
+                        },
+                        { 
+                            data: 'price', 
+                            className: 'text-center',
+                            width: '6%',
+                            render: function(data) {
+                                return '£' + formatNumber(data, 1) + 'M';
+                            }
+                        },
+                        { 
+                            data: 'chance_of_playing_next_round', 
+                            className: 'text-center',
+                            width: '6%',
+                            render: function(data) {
+                                return formatNumber(data, 1) + '%';
+                            }
+                        },
+                        { 
+                            data: 'points_per_million', 
+                            className: 'text-center',
+                            width: '8%',
+                            render: function(data) {
+                                return formatNumber(data, 1);
+                            }
+                        },
+                        { 
+                            data: 'total_points', 
+                            className: 'text-center',
+                            width: '8%',
+                            render: function(data) {
+                                return formatNumber(data, 1);
+                            }
+                        },
+                        { 
+                            data: 'form', 
+                            className: 'text-center',
+                            width: '6%',
+                            render: function(data) {
+                                return formatNumber(data, 1);
+                            }
+                        },
+                        { 
+                            data: 'ownership', 
+                            className: 'text-center',
+                            width: '6%',
+                            render: function(data) {
+                                return formatNumber(data, 1) + '%';
+                            }
+                        },
+                        { 
+                            data: null,
+                            className: 'text-center',
+                            width: '6%',
+                            render: function(row){
+                                const vals = [
+                                    row.gw1_points, row.gw2_points, row.gw3_points,
+                                    row.gw4_points, row.gw5_points, row.gw6_points,
+                                    row.gw7_points, row.gw8_points, row.gw9_points
+                                ].map(v => parseFloat(v || 0));
+                                const sum = vals.reduce((a,b)=>a+(isNaN(b)?0:b),0);
+                                const avg = sum / 9.0;
+                                return '<strong>' + formatNumber(avg, 1) + '</strong>';
+                            }
+                        },
+                        { 
+                            data: null,
+                            className: 'text-center',
+                            width: '4%',
+                            render: function(row, type, _full, meta) {
+                                const pts = formatNumber(row.gw1_points, 1);
+                                const opp = row.gw1_opp ? row.gw1_opp : '';
+                                const fdr = row.gw1_fdr;
+                                const color = fdr <= 2 ? 'success' : (fdr === 3 ? 'warning' : 'danger');
+                                const fdrBadge = fdr ? `<span class="badge bg-${color}">${fdr}</span>` : '';
+                                // Max xP for same position in GW1
+                                const pos = row.position;
+                                const maxForPos = Math.max.apply(null, playersData
+                                    .filter(p => p.position === pos)
+                                    .map(p => parseFloat(p.gw1_points || 0))
+                                    .map(v => (isNaN(v) ? 0 : v))
+                                );
+                                const maxHtml = `<br><small class=\"text-muted\">max ${formatNumber(maxForPos,1)}</small>`;
+                                return `<strong style=\"font-size:1.05em\">${pts}</strong><br><small>${opp} ${fdrBadge}</small>${maxHtml}`;
+                            }
+                        },
+                        { 
+                            data: null,
+                            className: 'text-center',
+                            width: '4%',
+                            render: function(row, type, _full, meta) {
+                                const pts = formatNumber(row.gw2_points, 1);
+                                const opp = row.gw2_opp ? row.gw2_opp : '';
+                                const fdr = row.gw2_fdr;
+                                const color = fdr <= 2 ? 'success' : (fdr === 3 ? 'warning' : 'danger');
+                                const fdrBadge = fdr ? `<span class=\"badge bg-${color}\">${fdr}</span>` : '';
+                                const pos = row.position;
+                                const maxForPos = Math.max.apply(null, playersData
+                                    .filter(p => p.position === pos)
+                                    .map(p => parseFloat(p.gw2_points || 0))
+                                    .map(v => (isNaN(v) ? 0 : v))
+                                );
+                                const maxHtml = `<br><small class=\"text-muted\">max ${formatNumber(maxForPos,1)}</small>`;
+                                return `<strong style=\"font-size:1.05em\">${pts}</strong><br><small>${opp} ${fdrBadge}</small>${maxHtml}`;
+                            }
+                        },
+                        { 
+                            data: null,
+                            className: 'text-center',
+                            width: '4%',
+                            render: function(row, type, _full, meta) {
+                                const pts = formatNumber(row.gw3_points, 1);
+                                const opp = row.gw3_opp ? row.gw3_opp : '';
+                                const fdr = row.gw3_fdr;
+                                const color = fdr <= 2 ? 'success' : (fdr === 3 ? 'warning' : 'danger');
+                                const fdrBadge = fdr ? `<span class=\"badge bg-${color}\">${fdr}</span>` : '';
+                                const pos = row.position;
+                                const maxForPos = Math.max.apply(null, playersData
+                                    .filter(p => p.position === pos)
+                                    .map(p => parseFloat(p.gw3_points || 0))
+                                    .map(v => (isNaN(v) ? 0 : v))
+                                );
+                                const maxHtml = `<br><small class=\"text-muted\">max ${formatNumber(maxForPos,1)}</small>`;
+                                return `<strong style=\"font-size:1.05em\">${pts}</strong><br><small>${opp} ${fdrBadge}</small>${maxHtml}`;
+                            }
+                        },
+                        { 
+                            data: null,
+                            className: 'text-center',
+                            width: '4%',
+                            render: function(row, type, _full, meta) {
+                                const pts = formatNumber(row.gw4_points, 1);
+                                const opp = row.gw4_opp ? row.gw4_opp : '';
+                                const fdr = row.gw4_fdr;
+                                const color = fdr <= 2 ? 'success' : (fdr === 3 ? 'warning' : 'danger');
+                                const fdrBadge = fdr ? `<span class=\"badge bg-${color}\">${fdr}</span>` : '';
+                                const pos = row.position;
+                                const maxForPos = Math.max.apply(null, playersData
+                                    .filter(p => p.position === pos)
+                                    .map(p => parseFloat(p.gw4_points || 0))
+                                    .map(v => (isNaN(v) ? 0 : v))
+                                );
+                                const maxHtml = `<br><small class=\"text-muted\">max ${formatNumber(maxForPos,1)}</small>`;
+                                return `<strong style=\"font-size:1.05em\">${pts}</strong><br><small>${opp} ${fdrBadge}</small>${maxHtml}`;
+                            }
+                        },
+                        { 
+                            data: null,
+                            className: 'text-center',
+                            width: '4%',
+                            render: function(row, type, _full, meta) {
+                                const pts = formatNumber(row.gw5_points, 1);
+                                const opp = row.gw5_opp ? row.gw5_opp : '';
+                                const fdr = row.gw5_fdr;
+                                const color = fdr <= 2 ? 'success' : (fdr === 3 ? 'warning' : 'danger');
+                                const fdrBadge = fdr ? `<span class=\"badge bg-${color}\">${fdr}</span>` : '';
+                                const pos = row.position;
+                                const maxForPos = Math.max.apply(null, playersData
+                                    .filter(p => p.position === pos)
+                                    .map(p => parseFloat(p.gw5_points || 0))
+                                    .map(v => (isNaN(v) ? 0 : v))
+                                );
+                                const maxHtml = `<br><small class=\"text-muted\">max ${formatNumber(maxForPos,1)}</small>`;
+                                return `<strong style=\"font-size:1.05em\">${pts}</strong><br><small>${opp} ${fdrBadge}</small>${maxHtml}`;
+                            }
+                        },
+                        { 
+                            data: null,
+                            className: 'text-center',
+                            width: '4%',
+                            render: function(row, type, _full, meta) {
+                                const pts = formatNumber(row.gw6_points, 1);
+                                const opp = row.gw6_opp ? row.gw6_opp : '';
+                                const fdr = row.gw6_fdr;
+                                const color = fdr <= 2 ? 'success' : (fdr === 3 ? 'warning' : 'danger');
+                                const fdrBadge = fdr ? `<span class=\"badge bg-${color}\">${fdr}</span>` : '';
+                                const pos = row.position;
+                                const maxForPos = Math.max.apply(null, playersData
+                                    .filter(p => p.position === pos)
+                                    .map(p => parseFloat(p.gw6_points || 0))
+                                    .map(v => (isNaN(v) ? 0 : v))
+                                );
+                                const maxHtml = `<br><small class=\"text-muted\">max ${formatNumber(maxForPos,1)}</small>`;
+                                return `<strong style=\"font-size:1.05em\">${pts}</strong><br><small>${opp} ${fdrBadge}</small>${maxHtml}`;
+                            }
+                        },
+                        { 
+                            data: null,
+                            className: 'text-center',
+                            width: '4%',
+                            render: function(row, type, _full, meta) {
+                                const pts = formatNumber(row.gw7_points, 1);
+                                const opp = row.gw7_opp ? row.gw7_opp : '';
+                                const fdr = row.gw7_fdr;
+                                const color = fdr <= 2 ? 'success' : (fdr === 3 ? 'warning' : 'danger');
+                                const fdrBadge = fdr ? `<span class=\"badge bg-${color}\">${fdr}</span>` : '';
+                                const pos = row.position;
+                                const maxForPos = Math.max.apply(null, playersData
+                                    .filter(p => p.position === pos)
+                                    .map(p => parseFloat(p.gw7_points || 0))
+                                    .map(v => (isNaN(v) ? 0 : v))
+                                );
+                                const maxHtml = `<br><small class=\"text-muted\">max ${formatNumber(maxForPos,1)}</small>`;
+                                return `<strong style=\"font-size:1.05em\">${pts}</strong><br><small>${opp} ${fdrBadge}</small>${maxHtml}`;
+                            }
+                        },
+                        { 
+                            data: null,
+                            className: 'text-center',
+                            width: '4%',
+                            render: function(row, type, _full, meta) {
+                                const pts = formatNumber(row.gw8_points, 1);
+                                const opp = row.gw8_opp ? row.gw8_opp : '';
+                                const fdr = row.gw8_fdr;
+                                const color = fdr <= 2 ? 'success' : (fdr === 3 ? 'warning' : 'danger');
+                                const fdrBadge = fdr ? `<span class=\"badge bg-${color}\">${fdr}</span>` : '';
+                                const pos = row.position;
+                                const maxForPos = Math.max.apply(null, playersData
+                                    .filter(p => p.position === pos)
+                                    .map(p => parseFloat(p.gw8_points || 0))
+                                    .map(v => (isNaN(v) ? 0 : v))
+                                );
+                                const maxHtml = `<br><small class=\"text-muted\">max ${formatNumber(maxForPos,1)}</small>`;
+                                return `<strong style=\"font-size:1.05em\">${pts}</strong><br><small>${opp} ${fdrBadge}</small>${maxHtml}`;
+                            }
+                        },
+                        { 
+                            data: null,
+                            className: 'text-center',
+                            width: '4%',
+                            render: function(row, type, _full, meta) {
+                                const pts = formatNumber(row.gw9_points, 1);
+                                const opp = row.gw9_opp ? row.gw9_opp : '';
+                                const fdr = row.gw9_fdr;
+                                const color = fdr <= 2 ? 'success' : (fdr === 3 ? 'warning' : 'danger');
+                                const fdrBadge = fdr ? `<span class=\"badge bg-${color}\">${fdr}</span>` : '';
+                                const pos = row.position;
+                                const maxForPos = Math.max.apply(null, playersData
+                                    .filter(p => p.position === pos)
+                                    .map(p => parseFloat(p.gw9_points || 0))
+                                    .map(v => (isNaN(v) ? 0 : v))
+                                );
+                                const maxHtml = `<br><small class=\"text-muted\">max ${formatNumber(maxForPos,1)}</small>`;
+                                return `<strong style=\"font-size:1.05em\">${pts}</strong><br><small>${opp} ${fdrBadge}</small>${maxHtml}`;
+                            }
+                        }
+                    ],
+                    order: [[6, 'desc'], [7, 'desc']], // Default: Points/£ then Total Points
+                    pageLength: 100,
+                    responsive: true,
+                    scrollX: false,
+                    initComplete: function(settings){
+                        try {
+                            const api = this.api();
+                            const val = $('#globalSearch').val() || '';
+                            if (val) { api.search(val).draw(); }
+                        } catch(_e) {}
+                    },
+                    initComplete: function() {
+                        console.log('DataTable initialization complete');
+                        
+                        // Force center alignment after DataTables initializes
+                        forceCenterAlignment();
+                        // Activate FixedHeader to keep headers aligned with the table body
+                        try { new $.fn.dataTable.FixedHeader(currentTable, { header: true, headerOffset: $('.navbar').outerHeight() || 0 }); } catch(_e) {}
+                        
+                        // Ensure table uses full width
+                        $('#playersTable').css('width', '100%');
+                        $('.dataTables_wrapper').css('width', '100%');
+                        $('.dataTables_wrapper .dataTable').css('width', '100%');
+                        
+                        // Column widths are now fixed, no need to adjust
+                        console.log('Fixed column widths applied successfully');
+                        
+                        // Hook up global search and simple info text
+                        const debounced = (fn, wait=120) => { let t; return function(){ const ctx=this,args=arguments; clearTimeout(t); t=setTimeout(()=>fn.apply(ctx,args), wait);} };
+                        const setAllSearchInputs = (val) => {
+                            try { $('#globalSearch').val(val); } catch(_e){}
+                            try { $('#playersTable_filter input').val(val); } catch(_e){}
+                        };
+                        const handleGlobalSearch = debounced(function(){
+                            const val = $(this).val();
+                            setAllSearchInputs(val);
+                            try { currentTable.search(val).draw(); } catch(_e) {}
+                        });
+                        // Bind via delegation to be robust across rerenders
+                        $(document).off('keyup.gs input.gs change.gs search.gs', '#globalSearch')
+                                   .on('keyup.gs input.gs change.gs search.gs', '#globalSearch', handleGlobalSearch);
+                        // Also mirror any internal DT filter (if present)
+                        $(document).off('keyup.gs3 input.gs3 change.gs3', '#playersTable_filter input')
+                                   .on('keyup.gs3 input.gs3 change.gs3', '#playersTable_filter input', handleGlobalSearch);
+                        // Ensure no stale custom predicates
+                        $.fn.dataTable.ext.search = $.fn.dataTable.ext.search.filter(f => f._id !== 'global-search');
+                        // Apply any pre-filled value immediately via native search
+                        const initial = $('#globalSearch').val() || '';
+                        if (initial) { try { currentTable.search(initial).draw(); } catch(_e) {} }
+                        $('#playersInfoInline').text(`Showing ${currentTable.page.info().recordsDisplay} of ${currentTable.page.info().recordsTotal} entries`);
+                        currentTable.on('draw', function(){
+                            const info = currentTable.page.info();
+                            $('#playersInfoInline').text(`Showing ${info.start + 1} to ${info.end} of ${info.recordsDisplay} entries`);
+                        });
+
+                        // Ensure team dropdowns stay populated with canonical teams
+                        $('#filter-team').empty().append('<option value="">All</option>');
+                        ({{ team_names|tojson }}).forEach(team => {
+                            $('#filter-team').append(`<option value="${team}">${team}</option>`);
+                        });
+
+                        // Now that DataTable is ready, update the dropdown
+                        updateViewsDropdown();
+                        
+                        // Initialize filter summary
+                        updateFilterSummary();
+
+                        // Bind watchlist star toggle
+                        $('#playersTable tbody').on('click', '.watch-star', async function(e){
+                            e.stopPropagation(); // prevent row clicks
+                            const el = $(this);
+                            const id = parseInt(el.data('player-id'));
+                            try {
+                                const resp = await fetch('/api/watchlist/toggle', {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({ player_id: id })
+                                });
+                                const data = await resp.json();
+                                if (data && data.ok) {
+                                    el.toggleClass('watched', !!data.watched);
+                                    el.text(data.watched ? '★' : '☆');
+                                    if (data.watched) {
+                                        if (!window.WATCH_IDS.includes(id)) window.WATCH_IDS.push(id);
+                                    } else {
+                                        window.WATCH_IDS = window.WATCH_IDS.filter(x => x !== id);
+                                    }
+                                    // Keep row in sync
+                                    try { currentTable.row(el.closest('tr')).invalidate().draw(false); } catch (_e) {}
+                                    // If watchlist-only filter is active, redraw to reflect state
+                                    if ($('#filter-watchlist').is(':checked')) { try { currentTable.draw(false); } catch(_e) {} }
+                                }
+                            } catch (e) { console.error('watch toggle failed', e); }
+                        });
+
+                        // Robust header filter bindings that work with FixedHeader clone
+                        const bindHeader = (selector, events, handler) => {
+                            const scopes = ['#playersTable thead', 'div.fixedHeader-floating'];
+                            scopes.forEach(scope => {
+                                $(document).off(events + '.hf', `${scope} ${selector}`);
+                                $(document).on(events + '.hf', `${scope} ${selector}`, handler);
+                            });
+                        };
+                        // Text/Select filters
+                        bindHeader('#filter-name', 'input change', function(){ currentTable.column(1).search(this.value).draw(); });
+                        bindHeader('#filter-position', 'input change', function(){ currentTable.column(2).search(this.value).draw(); });
+                        bindHeader('#filter-team', 'input change', function(){ currentTable.column(3).search(this.value).draw(); });
+                        // Numeric comparators
+                        const attachNumeric = (selector, idx) => bindHeader(selector, 'keyup change', function(){
+                            const val = this.value.trim();
+                            $.fn.dataTable.ext.search = $.fn.dataTable.ext.search.filter(fn => !(fn._scope === 'header' && fn._col === idx));
+                            if (!val) { currentTable.draw(); return; }
+                            let op = '>='; let num = parseFloat(val.replace(/[^0-9.]/g, ''));
+                            if (val.startsWith('<=') ) op = '<='; else if (val.startsWith('<')) op = '<';
+                            else if (val.startsWith('>=')) op = '>='; else if (val.startsWith('>')) op = '>';
+                            const predicate = function(settings, data){
+                                const cell = parseFloat((data[idx]||'').toString().replace(/[^0-9.]/g,'')) || 0;
+                                if (op === '>=') return cell >= num; if (op === '>') return cell > num;
+                                if (op === '<=') return cell <= num; if (op === '<') return cell < num;
+                                return true;
+                            };
+                            predicate._col = idx; predicate._scope = 'header';
+                            $.fn.dataTable.ext.search.push(predicate);
+                            currentTable.draw();
+                        });
+                        attachNumeric('#filter-price', 4);
+                        attachNumeric('#filter-chance', 5);
+                        attachNumeric('#filter-ppm', 6);
+                        attachNumeric('#filter-total', 7);
+                        attachNumeric('#filter-form', 8);
+                        attachNumeric('#filter-own', 9);
+
+                        // Watchlist-only toggle filter (scoped to this table)
+                        $('#filter-watchlist').off('.dt').on('change', function(){
+                            const checked = $(this).is(':checked');
+                            $.fn.dataTable.ext.search = $.fn.dataTable.ext.search.filter(f => f._id !== 'watchlist-only');
+                            if (checked) {
+                                const wlPredicate = function(settings, data, dataIndex){
+                                    // Only apply to this table
+                                    if (!settings || !settings.nTable || settings.nTable.id !== 'playersTable') return true;
+                                    // Access row by DOM rowId for reliability
+                                    let idNum = NaN;
+                                    try {
+                                        const rowNode = settings.aoData[dataIndex] && settings.aoData[dataIndex].nTr;
+                                        if (rowNode && rowNode.id) idNum = Number(rowNode.id);
+                                    } catch(_e) {}
+                                    if (isNaN(idNum)) {
+                                        let aData = null;
+                                        try { aData = settings.aoData[dataIndex] && settings.aoData[dataIndex]._aData; } catch(_e) {}
+                                        if (aData && aData.id !== undefined) idNum = Number(aData.id);
+                                    }
+                                    const wlSet = new Set((window.WATCH_IDS || []).map(Number));
+                                    return wlSet.has(idNum);
+                                };
+                                wlPredicate._id = 'watchlist-only';
+                                $.fn.dataTable.ext.search.push(wlPredicate);
+                            }
+                            currentTable.draw();
+                        });
+                    }
+                });
+            }
+
+            // Column filter bindings (simple contains/thresholds)
+            // Note: columns shifted by +1 due to leading watch-star column
+            // Bind Advanced Filters panel inputs
+            // Removed Advanced Panel text search; rely on the global search input above the table
+            $('#af-position').off('.af').on('input change.af', function(){ currentTable.column(2).search(this.value).draw(); });
+            $('#af-team').off('.af').on('input change.af', function(){ currentTable.column(3).search(this.value).draw(); });
+            const panelNumeric = (selector, idx) => {
+                $(selector).off('.af').on('keyup change.af', function(){
+                    const val = this.value.trim();
+                    $.fn.dataTable.ext.search = $.fn.dataTable.ext.search.filter(fn => !(fn._scope === 'panel' && fn._col === idx));
+                    if (!val) { currentTable.draw(); return; }
+                    let op = '>='; let num = parseFloat(val.replace(/[^0-9.]/g, ''));
+                    if (val.startsWith('<=')) op = '<='; else if (val.startsWith('<')) op = '<';
+                    else if (val.startsWith('>=')) op = '>='; else if (val.startsWith('>')) op = '>';
+                    const predicate = function(settings, data){
+                        const cell = parseFloat((data[idx]||'').toString().replace(/[^0-9.]/g,'')) || 0;
+                        if (op === '>=') return cell >= num; if (op === '>') return cell > num;
+                        if (op === '<=') return cell <= num; if (op === '<') return cell < num;
+                        return true;
+                    };
+                    predicate._col = idx; predicate._scope = 'panel';
+                    $.fn.dataTable.ext.search.push(predicate);
+                    currentTable.draw();
+                });
+            };
+            panelNumeric('#af-price', 4);
+            panelNumeric('#af-chance', 5);
+            panelNumeric('#af-ppm', 6);
+            panelNumeric('#af-total', 7);
+            panelNumeric('#af-form', 8);
+            panelNumeric('#af-own', 9);
+
+            function applyNumericFilter(inputId, columnIndex, comparator) {
+                $(inputId).on('keyup change', function(){
+                    const val = this.value.trim();
+                    // Remove prior header-scope numeric filter for this column
+                    $.fn.dataTable.ext.search = $.fn.dataTable.ext.search.filter(fn => !(fn._scope === 'header' && fn._col === columnIndex));
+                    if (!val) { currentTable.draw(); return; }
+                    let op = '>='; let num = parseFloat(val.replace(/[^0-9.]/g, ''));
+                    if (val.startsWith('<=')) op = '<='; else if (val.startsWith('<')) op = '<';
+                    else if (val.startsWith('>=')) op = '>='; else if (val.startsWith('>')) op = '>';
+                    const predicate = function(settings, data){
+                        const cell = parseFloat((data[columnIndex]||'').toString().replace(/[^0-9.]/g,'')) || 0;
+                        if (op === '>=') return cell >= num; if (op === '>') return cell > num;
+                        if (op === '<=') return cell <= num; if (op === '<') return cell < num;
+                        return true;
+                    };
+                    predicate._col = columnIndex; predicate._scope = 'header';
+                    $.fn.dataTable.ext.search.push(predicate);
+                    currentTable.draw();
+                });
+            }
+
+            applyNumericFilter('#filter-price', 4);
+            applyNumericFilter('#filter-chance', 5);
+            applyNumericFilter('#filter-ppm', 6);
+            applyNumericFilter('#filter-total', 7);
+            applyNumericFilter('#filter-form', 8);
+            applyNumericFilter('#filter-own', 9);
+
+            // Advanced filters toggle and handlers (delegated for Chrome/overlays)
+            $(document).off('click.adv','\#toggleAdvancedFilters').on('click.adv','\#toggleAdvancedFilters', function(){
+                const panel = $('#advancedFiltersPanel');
+                panel.slideToggle(150, function(){
+                    try { panel[0].scrollIntoView({ behavior: 'smooth', block: 'nearest' }); } catch(_e) {}
+                });
+            });
+
+            // Views panel toggle
+            $(document).off('click.views','\#toggleViewsPanel').on('click.views','\#toggleViewsPanel', function(){
+                const vpanel = $('#viewsPanel');
+                vpanel.slideToggle(150, function(){
+                    try { vpanel[0].scrollIntoView({ behavior: 'smooth', block: 'nearest' }); } catch(_e) {}
+                });
+            });
+
+            function addAdvancedNumericFilter(selector, fn) {
+                $(selector).on('input change', function(){
+                    const val = this.value.trim();
+                    // Remove any prior advanced filter with the same id
+                    $.fn.dataTable.ext.search = $.fn.dataTable.ext.search.filter(f => !(f._adv && f._id === selector));
+                    if (!val) { currentTable.draw(); return; }
+                    let op = '>='; let num = parseFloat(val.replace(/[^0-9.]/g, ''));
+                    if (val.startsWith('<=')) op = '<='; else if (val.startsWith('<')) op = '<';
+                    else if (val.startsWith('>=')) op = '>='; else if (val.startsWith('>')) op = '>';
+                    const predicate = function(settings, data, dataIndex){
+                        const row = currentTable.row(dataIndex).data();
+                        const metric = fn(row);
+                        if (op === '>=') return metric >= num; if (op === '>') return metric > num;
+                        if (op === '<=') return metric <= num; if (op === '<') return metric < num;
+                        return true;
+                    };
+                    predicate._adv = true; predicate._id = selector;
+                    $.fn.dataTable.ext.search.push(predicate);
+                    currentTable.draw();
+                });
+            }
+
+            // GW1-3 average points
+            addAdvancedNumericFilter('#filter-avg13', (r) => {
+                const a = parseFloat(r.gw1_points || 0); const b = parseFloat(r.gw2_points || 0); const c = parseFloat(r.gw3_points || 0);
+                return (a + b + c) / 3.0;
+            });
+            addAdvancedNumericFilter('#filter-adv-price', (r) => parseFloat(r.price || 0));
+            addAdvancedNumericFilter('#filter-adv-own', (r) => parseFloat((r.ownership || '0').toString().replace('%','')));
+            addAdvancedNumericFilter('#filter-adv-form', (r) => parseFloat(r.form || 0));
+            addAdvancedNumericFilter('#filter-adv-ppm', (r) => parseFloat(r.points_per_million || 0));
+
+            $('#clearAdvancedFilters').on('click', function(){
+                $('#advancedFiltersPanel input').val('');
+                $.fn.dataTable.ext.search = $.fn.dataTable.ext.search.filter(f => !f._adv);
+                currentTable.draw();
+            });
+            
+            function setupEventHandlers() {
+                // Save view button
+                $('#saveView').on('click', function() {
+                    saveView();
+                });
+                
+                // Load view button
+                $('#loadViewBtn').on('click', function() {
+                    loadView();
+                });
+                
+                // Clear filters button
+                $('#clearFilters').on('click', function() {
+                    clearFilters();
+                });
+                
+                // Dynamic filtering - apply filters automatically as user types/changes values
+                $('#positionFilter, #teamFilter').on('change', function() {
+                    applyFilters();
+                });
+                
+                // Real-time filtering for numeric inputs with debouncing
+                let filterTimeout;
+                $('#maxPriceFilter, #minChanceFilter, #minPointsPerMillionFilter, #minTotalPointsFilter, #minFormFilter, #minOwnershipFilter').on('input', function() {
+                    clearTimeout(filterTimeout);
+                    filterTimeout = setTimeout(() => {
+                        applyFilters();
+                    }, 300); // 300ms delay to avoid excessive filtering while typing
+                });
+                
+                // Keyboard shortcut for Value + Points sorting (Ctrl+V)
+                $(document).on('keydown', function(e) {
+                    if (e.ctrlKey && e.key === 'v') {
+                        e.preventDefault();
+                        $('#loadView').val('sort_value_points');
+                        handleQuickSort('sort_value_points');
+                        showNotification('Keyboard shortcut: Ctrl+V for Value + Points sorting', 'info');
+                    }
+                });
+            }
+            
+            function saveView() {
+                const viewName = $('#viewName').val().trim();
+                if (!viewName) {
+                    showNotification('Please enter a view name', 'info');
+                    return;
+                }
+                
+                // Check if DataTable is ready
+                if (!currentTable) {
+                    showNotification('DataTable not ready yet. Please wait a moment and try again.', 'error');
+                    return;
+                }
+                
+                // Get current sorting state
+                const currentSorting = currentTable.order();
+                let sortDescription = 'Default';
+                
+                // Determine sort description for better view identification
+                if (currentSorting.length === 1) {
+                    if (currentSorting[0][0] === 5) sortDescription = 'Points/£';
+                    else if (currentSorting[0][0] === 6) sortDescription = 'Total Points';
+                } else if (currentSorting.length === 2) {
+                    if (currentSorting[0][0] === 5 && currentSorting[1][0] === 6) {
+                        sortDescription = 'Points/£ + Total Points';
+                    }
+                }
+                
+                const view = {
+                    name: viewName,
+                    description: sortDescription,
+                    filters: {
+                        position: $('#positionFilter').val(),
+                        team: $('#teamFilter').val(),
+                        maxPrice: $('#maxPriceFilter').val(),
+                        minChance: $('#minChanceFilter').val(),
+                        minPointsPerMillion: $('#minPointsPerMillionFilter').val(),
+                        minTotalPoints: $('#minTotalPointsFilter').val(),
+                        minForm: $('#minFormFilter').val(),
+                        minOwnership: $('#minOwnershipFilter').val()
+                    },
+                    sorting: currentSorting,
+                    pageLength: currentTable.page.len(),
+                    search: currentTable.search(),
+                    timestamp: new Date().toISOString()
+                };
+                
+                // Save to localStorage
+                const savedViews = JSON.parse(localStorage.getItem('fplPlayerViews') || '{}');
+                savedViews[viewName] = view;
+                localStorage.setItem('fplPlayerViews', JSON.stringify(savedViews));
+                
+                showNotification(`View "${viewName}" (${sortDescription}) saved successfully!`, 'success');
+                $('#viewName').val('');
+                updateViewsDropdown();
+            }
+            
+            function loadView() {
+                const viewName = $('#loadView').val();
+                if (!viewName) {
+                    showNotification('Please select a view or sorting option', 'info');
+                    return;
+                }
+                
+                // Handle quick sorting options
+                if (viewName.startsWith('sort_')) {
+                    handleQuickSort(viewName);
+                    return;
+                }
+                
+                // Handle saved views
+                const savedViews = JSON.parse(localStorage.getItem('fplPlayerViews') || '{}');
+                const view = savedViews[viewName];
+                
+                if (!view) {
+                    showNotification('View not found', 'info');
+                    return;
+                }
+                
+                // Apply filters
+                $('#positionFilter').val(view.filters.position || '');
+                $('#teamFilter').val(view.filters.team || '');
+                $('#maxPriceFilter').val(view.filters.maxPrice || '');
+                $('#minChanceFilter').val(view.filters.minChance || '');
+                $('#minPointsPerMillionFilter').val(view.filters.minPointsPerMillion || '');
+                $('#minTotalPointsFilter').val(view.filters.minTotalPoints || '');
+                $('#minFormFilter').val(view.filters.minForm || '');
+                $('#minOwnershipFilter').val(view.filters.minOwnership || '');
+                
+                // Apply filters to table
+                applyFilters();
+                
+                // Apply sorting and other settings
+                if (view.sorting) {
+                    currentTable.order(view.sorting).draw();
+                    forceCenterAlignment();
+                }
+                
+                if (view.pageLength) {
+                    currentTable.page.len(view.pageLength).draw();
+                    forceCenterAlignment();
+                }
+                
+                if (view.search) {
+                    currentTable.search(view.search).draw();
+                    forceCenterAlignment();
+                }
+                
+                showNotification(`View "${viewName}" loaded successfully!`, 'success');
+            }
+            
+            function handleQuickSort(sortType) {
+                // Check if DataTable is ready
+                if (!currentTable) {
+                    showNotification('DataTable not ready yet. Please wait a moment and try again.', 'error');
+                    return;
+                }
+                
+                switch(sortType) {
+                    case 'sort_points':
+                        currentTable.order([6, 'desc']).draw();
+                        forceCenterAlignment();
+                        showNotification('Sorted by Total Points (High to Low)', 'success');
+                        break;
+                    case 'sort_value':
+                        currentTable.order([5, 'desc']).draw();
+                        forceCenterAlignment();
+                        showNotification('Sorted by Points/£ (High to Low)', 'success');
+                        break;
+                    case 'sort_value_points':
+                        currentTable.order([
+                            [5, 'desc'],  // Points/£ column (index 5)
+                            [6, 'desc']   // Total Points column (index 6)
+                        ]).draw();
+                        forceCenterAlignment();
+                        showNotification('Sorted by Value + Points (Best Value First)', 'success');
+                        break;
+                    default:
+                        showNotification('Unknown sorting option', 'error');
+                }
+                
+                // Reset dropdown to default
+                $('#loadView').val('');
+            }
+            
+            function updateViewsDropdown() {
+                console.log('updateViewsDropdown function called');
+                console.log('Dropdown element at start:', $('#loadView').length);
+                
+                const savedViews = JSON.parse(localStorage.getItem('fplPlayerViews') || '{}');
+                const viewNames = Object.keys(savedViews);
+                
+                console.log('Updating dropdown with saved views:', savedViews);
+                console.log('View names found:', viewNames);
+                
+                $('#loadView').empty().append('<option value="">Select a view or sorting option...</option>');
+                console.log('Added default option. Options count:', $('#loadView option').length);
+                
+                // Add quick sorting options at the top
+                $('#loadView').append('<optgroup label="Quick Sorting Options">');
+                $('#loadView').append('<option value="sort_points">📊 Sort by Total Points (High to Low)</option>');
+                $('#loadView').append('<option value="sort_value">💰 Sort by Points/£ (High to Low)</option>');
+                $('#loadView').append('<option value="sort_value_points">🎯 Sort by Value + Points (Best Value First)</option>');
+                $('#loadView').append('</optgroup>');
+                console.log('Added quick sorting options. Options count:', $('#loadView option').length);
+                
+                // Add saved views if any exist
+                if (viewNames.length > 0) {
+                    $('#loadView').append('<optgroup label="Saved Views">');
+                    viewNames.forEach(name => {
+                        const view = savedViews[name];
+                        const description = view.description || 'Default';
+                        const timestamp = view.timestamp ? new Date(view.timestamp).toLocaleDateString() : '';
+                        const displayText = `${name} (${description})${timestamp ? ' - ' + timestamp : ''}`;
+                        $('#loadView').append(`<option value="${name}" title="${displayText}">${displayText}</option>`);
+                    });
+                    $('#loadView').append('</optgroup>');
+                    console.log('Added saved views. Options count:', $('#loadView option').length);
+                }
+                
+                console.log('Dropdown updated. Total options:', $('#loadView option').length);
+                console.log('Final dropdown HTML:', $('#loadView').html());
+            }
+            
+            function updateFilterSummary() {
+                const position = $('#positionFilter').val();
+                const team = $('#teamFilter').val();
+                const maxPrice = parseFloat($('#maxPriceFilter').val()) || 0;
+                const minChance = parseFloat($('#minChanceFilter').val()) || 0;
+                const minPointsPerMillion = parseFloat($('#minPointsPerMillionFilter').val()) || 0;
+                const minTotalPoints = parseFloat($('#minTotalPointsFilter').val()) || 0;
+                const minForm = parseFloat($('#minFormFilter').val()) || 0;
+                const minOwnership = parseFloat($('#minOwnershipFilter').val()) || 0;
+                
+                // Count filtered players
+                let filteredCount = 0;
+                const activeFilters = [];
+                
+                playersData.forEach(player => {
+                    if (position && player.position !== position) return;
+                    if (team && player.team !== team) return;
+                    if (maxPrice && player.price > maxPrice) return;
+                    if (minChance && player.chance_of_playing_next_round < minChance) return;
+                    if (minPointsPerMillion && player.points_per_million < minPointsPerMillion) return;
+                    if (minTotalPoints && player.total_points < minTotalPoints) return;
+                    if (minForm && player.form < minForm) return;
+                    if (minOwnership && player.ownership < minOwnership) return;
+                    
+                    filteredCount++;
+                });
+                
+                // Update summary text
+                if (filteredCount === playersData.length) {
+                    $('#filterSummaryText').text(`Showing all ${playersData.length} players`);
+                    $('#filterSummaryDetails').text('');
+                } else {
+                    $('#filterSummaryText').text(`Showing ${filteredCount} of ${playersData.length} players`);
+                    
+                    // Build filter details
+                    if (position) activeFilters.push(`Position: ${position}`);
+                    if (team) activeFilters.push(`Team: ${team}`);
+                    if (maxPrice) activeFilters.push(`Max Price: £${maxPrice}M`);
+                    if (minChance) activeFilters.push(`Min Chance: ${minChance}%`);
+                    if (minPointsPerMillion) activeFilters.push(`Min Points/£: ${minPointsPerMillion}`);
+                    if (minTotalPoints) activeFilters.push(`Min Total Points: ${minTotalPoints}`);
+                    if (minForm) activeFilters.push(`Min Form: ${minForm}`);
+                    if (minOwnership) activeFilters.push(`Min Ownership: ${minOwnership}%`);
+                    
+                    if (activeFilters.length > 0) {
+                        $('#filterSummaryDetails').text(`Active filters: ${activeFilters.join(', ')}`);
+                    } else {
+                        $('#filterSummaryDetails').text('');
+                    }
+                }
+            }
+            
+            function applyFilters() {
+                const position = $('#positionFilter').val();
+                const team = $('#teamFilter').val();
+                const maxPrice = parseFloat($('#maxPriceFilter').val()) || 0;
+                const minChance = parseFloat($('#minChanceFilter').val()) || 0;
+                const minPointsPerMillion = parseFloat($('#minPointsPerMillionFilter').val()) || 0;
+                const minTotalPoints = parseFloat($('#minTotalPointsFilter').val()) || 0;
+                const minForm = parseFloat($('#minFormFilter').val()) || 0;
+                const minOwnership = parseFloat($('#minOwnershipFilter').val()) || 0;
+                
+                // Clear any existing panel/advanced filters but keep header filters
+                $.fn.dataTable.ext.search = $.fn.dataTable.ext.search.filter(fn => !(fn._scope === 'panel' || fn._adv));
+                
+                // Apply filters to DataTable
+                currentTable.draw();
+                forceCenterAlignment();
+                
+                // Custom filtering function
+                const panelFilter = function(settings, data, dataIndex) {
+                    const player = playersData[dataIndex];
+                    
+                    if (position && player.position !== position) return false;
+                    if (team && player.team !== team) return false;
+                    if (maxPrice && player.price > maxPrice) return false;
+                    if (minChance && player.chance_of_playing_next_round < minChance) return false;
+                    if (minPointsPerMillion && player.points_per_million < minPointsPerMillion) return false;
+                    if (minTotalPoints && player.total_points < minTotalPoints) return false;
+                    if (minForm && player.form < minForm) return false;
+                    if (minOwnership && player.ownership < minOwnership) return false;
+                    
+                    return true;
+                };
+                panelFilter._scope = 'panel';
+                $.fn.dataTable.ext.search.push(panelFilter);
+                
+                currentTable.draw();
+                forceCenterAlignment();
+                
+                // Update filter summary
+                updateFilterSummary();
+            }
+            
+            function clearFilters() {
+                $('#positionFilter').val('');
+                $('#teamFilter').val('');
+                $('#maxPriceFilter').val('');
+                $('#minChanceFilter').val('');
+                $('#minPointsPerMillionFilter').val('');
+                $('#minTotalPointsFilter').val('');
+                $('#minFormFilter').val('');
+                $('#minOwnershipFilter').val('');
+                
+                // Clear panel/advanced filters and keep header filters
+                $.fn.dataTable.ext.search = $.fn.dataTable.ext.search.filter(f => f._scope !== 'panel' && !f._adv);
+                currentTable.draw();
+                forceCenterAlignment();
+                
+                // Update filter summary
+                updateFilterSummary();
+                
+                showNotification('All filters cleared!', 'info');
+            }
+            
+            function showNotification(message, type) {
+                const notification = $(`
+                    <div class="notification ${type}">
+                        <i class="fas fa-${type === 'success' ? 'check-circle' : 'info-circle'}"></i>
+                        ${message}
+                    </div>
+                `);
+                
+                $('#notificationContainer').append(notification);
+                
+                // Show notification
+                setTimeout(() => notification.addClass('show'), 100);
+                
+                // Hide and remove notification
+                setTimeout(() => {
+                    notification.removeClass('show');
+                    setTimeout(() => notification.remove(), 300);
+                }, 3000);
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,949 @@
+from flask import Flask, render_template, jsonify, current_app
+from flask import request
+import os
+import requests
+from backend.config import config as app_config
+from backend.database.manager import DatabaseManager
+from backend.services.player_service import PlayerService
+from backend.services.squad_service import SquadService
+from backend.services.historical_service import HistoricalService
+from backend.services.live_fpl_service import LiveFPLService
+from backend.routes.players import players_bp
+
+def _get_position_name(position_code):
+    """Convert numeric position code to readable position name"""
+    position_map = {
+        '1': 'Goalkeeper',
+        '2': 'Defender',
+        '3': 'Midfielder',
+        '4': 'Forward'
+    }
+    return position_map.get(str(position_code), 'Unknown')
+
+def create_app(config_name: str | None = None):
+    app = Flask(__name__, template_folder='../templates')
+
+    # Apply configuration profile
+    selected_profile = (
+        config_name or os.environ.get('FLASK_CONFIG') or 'default'
+    )
+    cfg_cls = app_config.get(selected_profile, app_config['default'])
+    app.config.from_object(cfg_cls)
+
+    # Initialize database manager with the configured database path
+    app.db_manager = DatabaseManager(app.config['DATABASE_PATH'])
+
+    # Register blueprints
+    app.register_blueprint(players_bp)
+
+    # Dashboard (Home)
+    @app.route('/')
+    def dashboard():
+        """Serve the dashboard page with key summaries for upcoming weeks"""
+        db_manager = current_app.db_manager
+        # Fixtures and upcoming GW
+        fixtures = db_manager.get_all_fixtures()
+        gws = sorted({f.gameweek for f in fixtures})
+        # Pick the first gameweek that appears to be complete (>=10 fixtures).
+        # If none meet that threshold, fall back to the earliest GW available.
+        fixtures_by_gw = {}
+        for f in fixtures:
+            fixtures_by_gw.setdefault(f.gameweek, []).append(f)
+        # Choose the GW with the most fixtures overall to maximize the list.
+        # This avoids showing only a few games when data is partially populated.
+        upcoming_gw = (
+            sorted(gws, key=lambda gw: (-len(fixtures_by_gw.get(gw, [])), gw))[0]
+            if gws else 1
+        )
+
+        # All fixtures for upcoming GW (sorted by combined difficulty)
+        gw_fixtures = fixtures_by_gw.get(upcoming_gw, [])
+        for_gw_sorted = sorted(
+            gw_fixtures,
+            key=lambda f: (f.home_difficulty + f.away_difficulty, f.home_team)
+        )
+        easiest = for_gw_sorted[:6]
+        # Provide full, sorted list for dashboard "All Fixtures" panel
+        all_fixtures = for_gw_sorted
+
+        # Suggested XI for upcoming GW using SquadService
+        squad_service = SquadService(db_manager)
+        strategy = squad_service.get_optimal_squad_for_gw1_9()
+        starting_xi = []
+        bench = []
+        formation = 'Unknown'
+        gw_points = 0.0
+        if strategy and upcoming_gw in strategy:
+            entry = strategy[upcoming_gw]
+            starting_xi = entry.get('starting_xi', [])
+            bench = entry.get('bench', [])
+            formation = squad_service.get_formation(starting_xi)
+            gw_points = sum(p.get(f"gw{upcoming_gw}_points", 0) or 0 for p in starting_xi)
+        else:
+            # Try to find the nearest GW in strategy data to avoid empty XI
+            if strategy:
+                available_gws = sorted(strategy.keys())
+                nearest = min(available_gws, key=lambda g: abs(g - upcoming_gw))
+                entry = strategy.get(nearest, {})
+                starting_xi = entry.get('starting_xi', [])
+                bench = entry.get('bench', [])
+                formation = squad_service.get_formation(starting_xi) if starting_xi else 'Unknown'
+                gw_points = sum(p.get(f"gw{nearest}_points", 0) or 0 for p in starting_xi)
+
+        # Build mapping for team name -> id for linking in templates
+        teams_all = db_manager.get_all_teams()
+        team_id_by_name = {t.name: t.id for t in teams_all}
+
+        return render_template(
+            'dashboard.html',
+            upcoming_gw=upcoming_gw,
+            easiest=easiest,
+            toughest=[],
+            xi=starting_xi,
+            bench=bench,
+            formation=formation,
+            gw_points=gw_points,
+            all_fixtures=all_fixtures,
+            team_id_by_name=team_id_by_name,
+        )
+
+    # FDR page
+    @app.route('/fdr')
+    def fdr_page():
+        """Serve the FDR page"""
+        return render_template('fdr.html')
+
+    # Historical page
+    @app.route('/historical', methods=['GET'])
+    def historical_page():
+        season = request.args.get('season', '2025/26')
+        summary = current_app.db_manager.get_historical_summary(season)
+        return render_template('historical.html', summary=summary)
+
+    # Historical fetch endpoint
+    @app.route('/api/historical/fetch', methods=['POST'])
+    def historical_fetch():
+        season = request.form.get('season', '2025/26')
+        reset = request.form.get('reset') == 'true'
+        gw_param = request.form.get('gw')
+        if reset:
+            current_app.db_manager.clear_historical_data()
+        svc = HistoricalService(current_app.db_manager)
+        # If a specific GW is requested, fetch just that GW using the fast endpoint for responsiveness
+        if gw_param:
+            try:
+                gw_int = int(gw_param)
+            except ValueError:
+                gw_int = None
+        else:
+            gw_int = None
+        if gw_int:
+            svc.fetch_and_store_since_last_run(season, start_gw=gw_int, end_gw=gw_int, prefer_fast=True)
+        else:
+            # On reset, repopulate from GW1 through current available; prefer official source (slower)
+            svc.fetch_and_store_since_last_run(season, start_gw=1 if reset else None, end_gw=None, prefer_fast=False)
+        # Return up-to-date summary for the UI
+        summary = current_app.db_manager.get_historical_summary(season)
+        return jsonify(summary)
+
+    # Historical delete-only endpoint (no fetch). Also resets last fetched.
+    @app.route('/api/historical/delete', methods=['POST'])
+    def historical_delete():
+        season = request.form.get('season', '2025/26')
+        current_app.db_manager.clear_historical_data()
+        summary = current_app.db_manager.get_historical_summary(season)
+        return jsonify(summary)
+
+    # Historical GW details (enriched)
+    @app.route('/api/historical/gw')
+    def historical_gw():
+        season = request.args.get('season', '2025/26')
+        gw = int(request.args.get('gw', '1'))
+        rows = current_app.db_manager.get_historical_gw_stats(season, gw)
+        # Enrich with names/teams using bootstrap-static
+        try:
+            data = requests.get('https://fantasy.premierleague.com/api/bootstrap-static/').json()
+            elements = {int(e['id']): e for e in data.get('elements', [])}
+            teams = {int(t['id']): t for t in data.get('teams', [])}
+            types = {int(t['id']): t.get('singular_name_short', '') for t in data.get('element_types', [])}
+        except Exception:
+            elements, teams, types = {}, {}, {}
+        enriched = []
+        for r in rows:
+            e = elements.get(int(r['fpl_element_id']), {})
+            team = teams.get(e.get('team') or 0, {})
+            # Try to attach local player record for richer details (price, position text, etc.)
+            local_player = current_app.db_manager.get_player_by_fpl_element_id(int(r['fpl_element_id']))
+            local = local_player.to_dict() if local_player else {}
+            enriched.append({
+                **r,
+                'name': (e.get('web_name') or f"{e.get('first_name','')} {e.get('second_name','')}").strip(),
+                'team_short': team.get('short_name', ''),
+                'position': types.get(int(e.get('element_type', 0) or 0), ''),
+                'local': {
+                    'id': local.get('id'),
+                    'team': local.get('team'),
+                    'price': local.get('price'),
+                    'position': local.get('position'),
+                    'ownership': local.get('ownership'),
+                    'form': local.get('form'),
+                }
+            })
+        return jsonify({'season': season, 'gameweek': gw, 'rows': enriched})
+
+    # Historical summary (no fetch)
+    @app.route('/api/historical/summary')
+    def historical_summary():
+        season = request.args.get('season', '2025/26')
+        summary = current_app.db_manager.get_historical_summary(season)
+        return jsonify(summary)
+
+    # Health check (used by docs/tests)
+    @app.route('/health')
+    def health():
+        try:
+            db_stats = current_app.db_manager.get_database_stats()
+            return jsonify({
+                'status': 'ok',
+                'config': {
+                    'DEBUG': app.config.get('DEBUG'),
+                    'PORT': app.config.get('PORT')
+                },
+                'database': db_stats,
+            })
+        except Exception:
+            return jsonify({'status': 'ok'}), 200
+
+    @app.route('/teams')
+    def teams_page():
+        """List all teams with links to their pages"""
+        db_manager = current_app.db_manager
+        teams = db_manager.get_all_teams()
+        return render_template('teams.html', teams=[t.to_dict() for t in teams])
+
+    @app.route('/players')
+    def players_page():
+        """Serve the All Players page (formerly players2)."""
+        db = current_app.db_manager
+        players = [p.to_dict() for p in db.get_all_players()]
+        # Best-effort: backfill fpl_element_id by matching bootstrap-static web_name + team short
+        try:
+            bs = requests.get('https://fantasy.premierleague.com/api/bootstrap-static/').json()
+            elements = bs.get('elements', [])
+            teams_api = {int(t['id']): t for t in bs.get('teams', [])}
+            # Build map of (web_name_lower, team_short) -> element id
+            key_to_id = {}
+            for e in elements:
+                team_short = teams_api.get(int(e.get('team') or 0), {}).get('short_name', '')
+                key = (str(e.get('web_name','')).strip().lower(), team_short)
+                key_to_id[key] = int(e.get('id'))
+            updated = 0
+            for pdata in players:
+                if pdata.get('fpl_element_id'):
+                    continue
+                key = (str(pdata.get('name','')).split(' ')[-1].lower(), str(pdata.get('team_short') or pdata.get('team') or '')[:3].upper())
+                # Try exact match by web_name if name equals web_name
+                # Also try using full name last token + team short
+                # Normalize team short in mapping
+                for k, elem_id in key_to_id.items():
+                    if k[0] == key[0] and k[1] == (pdata.get('team_short') or ''):
+                        db.set_player_fpl_element_id(int(pdata['id']), elem_id)
+                        pdata['fpl_element_id'] = elem_id
+                        updated += 1
+                        break
+        except Exception:
+            pass
+        teams = db.get_all_teams()
+        fixtures = db.get_all_fixtures()
+        # Overlay historical totals (season default 2025/26) for Total Points and GW1 points if present
+        HIST_SEASON = request.args.get('hist_season', '2025/26')
+        hist_totals = db.get_historical_totals_for_season(HIST_SEASON)
+        if hist_totals:
+            # Map FPL element id -> player by trying to match id (db.id assumed to be FPL id)
+            for pdata in players:
+                pid = int(pdata.get('fpl_element_id') or pdata.get('id') or 0)
+                if pid in hist_totals:
+                    pdata['total_points'] = hist_totals[pid]['total_points_sum']
+                    pdata['gw1_points'] = hist_totals[pid]['gw1_points']
+                    pdata['historical_total'] = True
+                    pdata['historical_gw1'] = True
+
+        # Build opponent/FDR mapping per team and GW (reuse logic)
+        team_short_by_name = {t.name: t.short_name for t in teams}
+        team_id_by_name = {t.name: t.id for t in teams}
+
+        import re
+        def norm(s: str) -> str:
+            if not s:
+                return ''
+            return re.sub(r'[^a-z0-9]', '', s.lower())
+
+        canonical_by_norm = {norm(t.name): t.name for t in teams}
+
+        fdr_map_by_norm = {norm(t.name): (t.name, t.short_name) for t in teams}
+        fdr_map_by_id: dict[tuple[int, int], tuple[str, int]] = {}
+        fdr_map_by_name: dict[tuple[str, int], tuple[str, int]] = {}
+        for fx in fixtures:
+            home_name = canonical_by_norm.get(norm(fx.home_team), fx.home_team)
+            away_name = canonical_by_norm.get(norm(fx.away_team), fx.away_team)
+            home_id = team_id_by_name.get(home_name)
+            away_id = team_id_by_name.get(away_name)
+            fdr_map_by_name[(home_name, fx.gameweek)] = (away_name, fx.home_difficulty)
+            fdr_map_by_name[(away_name, fx.gameweek)] = (home_name, fx.away_difficulty)
+            if home_id is not None and away_id is not None:
+                fdr_map_by_id[(home_id, fx.gameweek)] = (away_name, fx.home_difficulty)
+                fdr_map_by_id[(away_id, fx.gameweek)] = (home_name, fx.away_difficulty)
+
+        for pdata in players:
+            team_name = canonical_by_norm.get(norm(pdata.get('team')), pdata.get('team'))
+            team_id = pdata.get('team_id')
+            pdata['team_short'] = team_short_by_name.get(team_name, team_name)
+            for gw in range(1, 10):
+                opp, fdr = None, None
+                if team_id and (team_id, gw) in fdr_map_by_id:
+                    opp_name, fdr_val = fdr_map_by_id[(team_id, gw)]
+                    opp = team_short_by_name.get(opp_name, (opp_name or '')[:3].upper())
+                    fdr = fdr_val
+                elif (team_name, gw) in fdr_map_by_name:
+                    opp_name, fdr_val = fdr_map_by_name[(team_name, gw)]
+                    opp = team_short_by_name.get(opp_name, (opp_name or '')[:3].upper())
+                    fdr = fdr_val
+                pdata[f'gw{gw}_opp'] = opp
+                pdata[f'gw{gw}_fdr'] = fdr
+
+        # Compute position-wise max GW points (for displaying under FDR)
+        positions = ['Goalkeeper', 'Defender', 'Midfielder', 'Forward']
+        max_by_pos: dict[str, dict[int, float]] = {pos: {gw: 0.0 for gw in range(1, 10)} for pos in positions}
+        for pos in positions:
+            for gw in range(1, 10):
+                key = f'gw{gw}_points'
+                vals = [float(p.get(key) or 0.0) for p in players if (p.get('position') == pos)]
+                max_by_pos[pos][gw] = max(vals) if vals else 0.0
+
+        watch_ids = db.get_watchlist_ids()
+        return render_template('players2.html', players=players, watch_ids=watch_ids, max_by_pos=max_by_pos)
+
+    @app.route('/players2')
+    def players2_page():
+        """Legacy URL: redirect to /players."""
+        from flask import redirect, url_for
+        return redirect(url_for('players_page'))
+
+    @app.route('/players/individual')
+    def players_individual_redirect():
+        """Redirect to a default player's page (e.g., Salah) if available."""
+        db = current_app.db_manager
+        players = db.get_all_players()
+        # Try several common variants for Salah's name
+        preferred_names = [
+            'Mohamed Salah', 'M. Salah', 'M.Salah', 'Salah', 'Mo Salah'
+        ]
+        target = None
+        lower_map = {p.name.lower(): p for p in players}
+        for name in preferred_names:
+            p = lower_map.get(name.lower())
+            if p:
+                target = p
+                break
+        # Fallback: choose the highest total_points player if Salah not found
+        if not target and players:
+            target = max(players, key=lambda p: p.total_points)
+        if target:
+            from flask import redirect, url_for
+            return redirect(url_for('player_page', player_id=target.id))
+        # Last resort: go to the players list (new page)
+        from flask import redirect, url_for
+        return redirect(url_for('players2_page'))
+
+    @app.route('/watchlist')
+    def watchlist_page():
+        db = current_app.db_manager
+        players = [p.to_dict() for p in db.get_watchlist_players()]
+        return render_template('watchlist.html', players=players)
+
+    @app.route('/api/watchlist/toggle', methods=['POST'])
+    def api_watchlist_toggle():
+        db = current_app.db_manager
+        data = request.get_json(force=True) or {}
+        player_id = data.get('player_id')
+        if not isinstance(player_id, int):
+            return jsonify({'ok': False, 'error': 'player_id required'}), 400
+        ids = set(db.get_watchlist_ids())
+        if player_id in ids:
+            ok = db.remove_from_watchlist(player_id)
+            return jsonify({'ok': ok, 'watched': False})
+        else:
+            ok = db.add_to_watchlist(player_id)
+            return jsonify({'ok': ok, 'watched': True})
+    @app.route('/player/<int:player_id>')
+    def player_page(player_id: int):
+        """Serve an individual player page"""
+        db_manager = current_app.db_manager
+        player = db_manager.get_player_by_id(player_id)
+        if not player:
+            return f"Player with id {player_id} not found", 404
+        # Convert to dict for simple rendering
+        pdata = player.to_dict() if hasattr(player, 'to_dict') else {
+            'id': player.id,
+            'name': player.name,
+            'position': player.position,
+            'team': player.team,
+            'price': player.price,
+            'total_points': player.total_points,
+            'form': getattr(player, 'form', 0),
+            'ownership': getattr(player, 'ownership', 0),
+            'chance_of_playing_next_round': getattr(player, 'chance_of_playing_next_round', 100),
+            'points_per_million': getattr(player, 'points_per_million', 0),
+            'gw1_points': getattr(player, 'gw1_points', 0),
+            'gw2_points': getattr(player, 'gw2_points', 0),
+            'gw3_points': getattr(player, 'gw3_points', 0),
+            'gw4_points': getattr(player, 'gw4_points', 0),
+            'gw5_points': getattr(player, 'gw5_points', 0),
+            'gw6_points': getattr(player, 'gw6_points', 0),
+            'gw7_points': getattr(player, 'gw7_points', 0),
+            'gw8_points': getattr(player, 'gw8_points', 0),
+            'gw9_points': getattr(player, 'gw9_points', 0),
+        }
+        # Pass watch status for filled star on load
+        is_watched = db_manager.is_on_watchlist(player_id)
+        return render_template('player.html', player=pdata, is_watched=is_watched)
+
+    @app.route('/squad')
+    def squad_page():
+        """Serve the Squad page with real squad data"""
+        try:
+            db_manager = current_app.db_manager
+            squad_service = SquadService(db_manager)
+            # Optional: pull GW1 historical totals to reflect on display
+            HIST_SEASON = request.args.get('hist_season', '2025/26')
+            try:
+                hist_gw1_rows = db_manager.get_historical_gw_stats(HIST_SEASON, 1)
+                hist_gw1_points = {int(r['fpl_element_id']): int(r.get('total_points', 0) or 0) for r in hist_gw1_rows}
+            except Exception:
+                hist_gw1_points = {}
+
+            # Get optimal squad strategy for GW1-9
+            strategy_data = squad_service.get_optimal_squad_for_gw1_9()
+
+            if not strategy_data:
+                # Return a simple error page instead of crashing
+                return render_template('squad.html',
+                                    weekly_data=[],
+                                    total_points=0,
+                                    total_transfers=0,
+                                    total_value=0,
+                                    remaining_budget=100.0,
+                                    error_message="Could not generate squad data. Please try again later.")
+
+            # Process strategy data for template
+            weekly_data = []
+            total_points = 0
+            total_transfers = 0
+
+            running_cumulative_total = 0.0
+            for gw in range(1, 10):  # GW1-9
+                gw_data = strategy_data[gw]
+                starting_xi = gw_data["starting_xi"]
+                bench = gw_data["bench"]
+                # Override GW1 points with historical totals for display consistency
+                if gw == 1 and hist_gw1_points:
+                    for p in starting_xi:
+                        pid = int(p.get('id') or 0)
+                        if pid in hist_gw1_points:
+                            p['gw1_points'] = hist_gw1_points[pid]
+                    for p in bench:
+                        pid = int(p.get('id') or 0)
+                        if pid in hist_gw1_points:
+                            p['gw1_points'] = hist_gw1_points[pid]
+
+                # Calculate points for this GW
+                gw_points_field = f"gw{gw}_points"
+                gw_points = sum(player.get(gw_points_field, 0) or 0 for player in starting_xi)
+
+                # Captaincy: select best scorer in XI and add bonus equal to their GW points
+                xi_sorted_for_captain = sorted(
+                    starting_xi,
+                    key=lambda p: (float(p.get(gw_points_field, 0) or 0), float(p.get('total_points', 0) or 0)),
+                    reverse=True
+                ) if starting_xi else []
+                captain_player = xi_sorted_for_captain[0] if xi_sorted_for_captain else None
+                vice_captain_player = xi_sorted_for_captain[1] if len(xi_sorted_for_captain) > 1 else None
+                captain_name = captain_player.get("name") if captain_player else None
+                vice_captain_name = vice_captain_player.get("name") if vice_captain_player else None
+                captain_bonus = (captain_player.get(gw_points_field, 0) or 0) if captain_player else 0
+
+                # Get transfer information
+                transfers_in = gw_data.get("transfers", {}).get("in", [])
+                transfers_out = gw_data.get("transfers", {}).get("out", [])
+
+                if gw > 1:  # GW1 has no transfers
+                    total_transfers += len(transfers_in)
+
+                # Hits: -4 per transfer beyond 1 free transfer each week (GW>1)
+                free_transfers = 1 if gw > 1 else 0
+                hits_over_free = max(0, len(transfers_in) - free_transfers)
+                hits_points = -4 * hits_over_free
+
+                # Total points with captaincy and hits
+                total_gw_points = gw_points + captain_bonus + hits_points
+                total_points += total_gw_points
+                running_cumulative_total += total_gw_points
+
+                # Create transfer mapping (who replaced whom)
+                transfer_mapping = {}
+                if gw > 1 and len(transfers_in) > 0 and len(transfers_out) > 0:
+                    # Map transfers in to transfers out (assuming they correspond in order)
+                    for i, player_in in enumerate(transfers_in):
+                        if i < len(transfers_out):
+                            transfer_mapping[player_in] = transfers_out[i]
+                        else:
+                            transfer_mapping[player_in] = "Unknown player"
+
+                # Calculate bench promotions/demotions
+                bench_promotions = []
+                bench_demotions = []
+                if gw > 1:
+                    prev_gw_data = strategy_data[gw - 1]
+                    prev_xi = prev_gw_data["starting_xi"]
+                    prev_bench = prev_gw_data["bench"]
+
+                    # Find players promoted from bench to starting XI
+                    bench_promotions = [p for p in starting_xi if p["name"] in [bp["name"] for bp in prev_bench]]
+
+                    # Find players demoted from starting XI to bench
+                    bench_demotions = [p for p in bench if p["name"] in [px["name"] for px in prev_xi]]
+
+                weekly_data.append({
+                    "gw": gw,
+                    "starting_xi": starting_xi,
+                    "bench": bench,
+                    "transfers_in": transfers_in,
+                    "transfers_out": transfers_out,
+                    "transfer_mapping": transfer_mapping,
+                    "bench_promotions": bench_promotions,
+                    "bench_demotions": bench_demotions,
+                    "points": gw_points,
+                    "captain_name": captain_name,
+                    "captain_bonus": captain_bonus,
+                    "vice_captain_name": vice_captain_name,
+                    "hits_points": hits_points,
+                    "total_with_captain_and_hits": total_gw_points,
+                    "squad_value": sum((p.get("price",0) or 0) for p in starting_xi + bench),
+                    "cumulative_total": running_cumulative_total,
+                    "formation": squad_service.get_formation(starting_xi)
+                })
+
+            # Calculate total squad value (use GW1 as reference)
+            gw1_data = strategy_data[1]
+            all_players = gw1_data["starting_xi"] + gw1_data["bench"]
+            total_value = sum(player.get("price", 0) or 0 for player in all_players)
+            remaining_budget = 100.0 - total_value
+
+            return render_template('squad.html',
+                                weekly_data=weekly_data,
+                                total_points=total_points,
+                                total_transfers=total_transfers,
+                                total_value=total_value,
+                                remaining_budget=remaining_budget)
+
+        except Exception as e:
+            print(f"Squad page error: {str(e)}")
+            # Return a simple error page instead of crashing
+            return render_template('squad.html',
+                                weekly_data=[],
+                                total_points=0,
+                                total_transfers=0,
+                                total_value=0,
+                                remaining_budget=100.0,
+                                error_message=f"Error generating squad page: {str(e)}")
+
+    # Legacy API routes for backward compatibility
+    @app.route('/api/players')
+    def api_players():
+        """Get all players as JSON"""
+        players = current_app.db_manager.get_all_players()
+        return jsonify([player.to_dict() for player in players])
+
+    @app.route('/api/teams')
+    def api_teams():
+        """Get all teams as JSON"""
+        teams = current_app.db_manager.get_all_teams()
+        # Attach a best-effort local logo path if present
+        import os
+        static_root = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'static')
+        assets_dir = os.path.join(static_root, 'assets', 'teams')
+        enriched = []
+        for team in teams:
+            data = team.to_dict()
+            short = (team.short_name or team.name).lower().replace(' ', '')
+            for ext in ['svg', 'png', 'jpg', 'jpeg', 'webp']:
+                candidate = os.path.join(assets_dir, f"{short}.{ext}")
+                if os.path.exists(candidate):
+                    data['logo_path'] = f"assets/teams/{short}.{ext}"
+                    break
+            enriched.append(data)
+        return jsonify(enriched)
+
+    @app.route('/team/<int:team_id>')
+    def team_page(team_id: int):
+        """Serve a team page with squad and fixtures"""
+        db_manager = current_app.db_manager
+        team = db_manager.get_team_by_id(team_id)
+        if not team:
+            return f"Team with id {team_id} not found", 404
+        # Squad
+        all_players = db_manager.get_all_players()
+        squad = [p.to_dict() for p in all_players if p.team == team.name]
+        # Fixtures schedule
+        fixtures = [f.to_dict() for f in db_manager.get_all_fixtures() if f.home_team == team.name or f.away_team == team.name]
+        # Resolve local team logo (downloaded into static/assets/teams)
+        import os
+        static_root = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'static')
+        assets_dir = os.path.join(static_root, 'assets', 'teams')
+        short = (team.short_name or team.name).lower().replace(' ', '')
+        possible_exts = ['svg', 'png', 'jpg', 'jpeg', 'webp']
+        logo_file = None
+        for ext in possible_exts:
+            candidate = os.path.join(assets_dir, f"{short}.{ext}")
+            if os.path.exists(candidate):
+                logo_file = f"assets/teams/{short}.{ext}"
+                break
+        # Mapping of team name to id for schedule links
+        teams_all = db_manager.get_all_teams()
+        team_id_by_name = {t.name: t.id for t in teams_all}
+        return render_template('team.html', team=team.to_dict(), squad=squad, fixtures=fixtures, team_logo_file=logo_file, team_id_by_name=team_id_by_name)
+
+    @app.route('/api/fdr')
+    def api_fdr():
+        """Get FDR data as JSON"""
+        fixtures = current_app.db_manager.get_all_fixtures()
+        return jsonify([fixture.to_dict() for fixture in fixtures])
+
+    @app.route('/account')
+    def account_page():
+        """Account page for managing FPL team ID"""
+        db_manager = current_app.db_manager
+        profiles = db_manager.get_all_user_profiles()
+        return render_template('account.html', profiles=profiles)
+
+    @app.route('/squad-live')
+    def squad_live_page():
+        """Live squad page showing actual FPL squad with GW tabs"""
+        db_manager = current_app.db_manager
+
+        # Get the first user profile (assuming single user for now)
+        profiles = db_manager.get_all_user_profiles()
+        if not profiles:
+            return render_template('squad-live.html', profile=None, squad=None, standings=None, weekly_data=None)
+
+        profile = profiles[0]
+        fpl_team_id = profile['fpl_team_id']
+
+        # Get current squad and standings
+        squad = db_manager.get_user_squad(fpl_team_id, 1)  # Try GW1 first
+
+        # If no squad data exists, try to sync from FPL API automatically
+        if not squad:
+            try:
+                live_service = LiveFPLService(db_manager)
+                # Sync profile and squad data
+                live_service.sync_user_profile(fpl_team_id)
+                live_service.sync_user_squad(fpl_team_id, 1)  # Sync GW1
+                live_service.sync_user_league_standings(fpl_team_id)
+
+                # Try to get squad data again
+                squad = db_manager.get_user_squad(fpl_team_id, 1)
+            except Exception as e:
+                print(f"Auto-sync failed: {e}")
+                # Continue without squad data - user will see the warning and can manually refresh
+
+        # Enrich squad data with player details
+        if squad:
+            try:
+                from backend.services.squad_service import SquadService
+                squad_service = SquadService(db_manager)
+
+                enriched_squad = []
+                for squad_player in squad:
+                    player = db_manager.get_player_by_id(squad_player['player_id'])
+                    if player:
+                        enriched_player = {
+                            'id': squad_player['player_id'],
+                            'name': str(player.name) if player.name else 'Unknown',  # SquadService expects 'name'
+                            'web_name': str(player.name) if player.name else 'Unknown',
+                            'team': str(player.team) if player.team else 'Unknown',
+                            'position': str(player.position) if player.position else 'Unknown',
+                            'price': float(player.price) if player.price else 0.0,
+                            'is_captain': bool(squad_player['is_captain']),
+                            'is_vice_captain': bool(squad_player['is_vice_captain']),
+                            'is_bench': bool(squad_player['is_bench']),
+                            'bench_position': squad_player['bench_position'],
+                            'transfer_in': bool(squad_player['transfer_in']),
+                            'transfer_out': bool(squad_player['transfer_out']),
+                            # Preserve all gameweek points for transfer analysis
+                            'gw1_points': float(squad_player.get('gw1_points', 0) or 0.0),
+                            'gw2_points': float(squad_player.get('gw2_points', 0) or 0.0),
+                            'gw3_points': float(squad_player.get('gw3_points', 0) or 0.0),
+                            'gw4_points': float(squad_player.get('gw4_points', 0) or 0.0),
+                            'gw5_points': float(squad_player.get('gw5_points', 0) or 0.0),
+                            'gw6_points': float(squad_player.get('gw6_points', 0) or 0.0),
+                            'gw7_points': float(squad_player.get('gw7_points', 0) or 0.0),
+                            'gw8_points': float(squad_player.get('gw8_points', 0) or 0.0),
+                            'gw9_points': float(squad_player.get('gw9_points', 0) or 0.0),
+                            'total_points': float(squad_player.get('total_points', 0) or 0.0),
+                            # Add GW1 specific fields for display
+                            'gw1_xp': float(squad_player.get('gw1_points', 0) or 0.0),
+                            'gw1_actual': 0.0,  # Will be populated from historical data if available
+                            'gw1_diff': 0.0  # Will be calculated as actual - xp
+                        }
+                        enriched_squad.append(enriched_player)
+
+                # Try to populate actual GW1 points from historical data
+                try:
+                    HIST_SEASON = '2025/26'  # Default season
+                    hist_totals = db_manager.get_historical_totals_for_season(HIST_SEASON)
+                    if hist_totals:
+                        for player in enriched_squad:
+                            if player.get('id') in hist_totals:
+                                player['gw1_actual'] = float(hist_totals[player['id']].get('gw1_points', 0))
+                            else:
+                                # Try to match by FPL element ID if available
+                                db_player = db_manager.get_player_by_id(player['id'])
+                                if db_player and db_player.fpl_element_id and db_player.fpl_element_id in hist_totals:
+                                    player['gw1_actual'] = float(hist_totals[db_player.fpl_element_id].get('gw1_points', 0))
+
+                            # Calculate the difference (Actual - xP)
+                            player['gw1_diff'] = player['gw1_actual'] - player['gw1_xp']
+                except Exception as e:
+                    print(f"Error fetching historical data: {e}")
+
+                squad = enriched_squad
+
+                # Generate weekly data for GW1-9
+                weekly_data = []
+
+                # GW1: Use actual FPL squad
+                gw1_data = {
+                    "gw": 1,
+                    "starting_xi": [p for p in squad if not p['is_bench']],
+                    "bench": [p for p in squad if p['is_bench']],
+                    "transfers_in": [],
+                    "transfers_out": [],
+                    "points": 0,  # Will be updated with actual points
+                    "captain_name": next((p['web_name'] for p in squad if p['is_captain']), None),
+                    "vice_captain_name": next((p['web_name'] for p in squad if p['is_vice_captain']), None),
+                    "hits_points": 0,
+                    "total_with_captain_and_hits": 0,
+                    "squad_value": sum(p['price'] for p in squad),
+                    "formation": squad_service.get_formation([p for p in squad if not p['is_bench']]) if squad else "Unknown"
+                }
+                weekly_data.append(gw1_data)
+
+                # GW2-9: Generate optimized squads based on GW1
+                if squad:
+                    try:
+                        squad_service = SquadService(db_manager)
+                        
+                        # Get user preference for maximum transfers per GW (default: 1)
+                        max_transfers_per_gw = request.args.get('max_transfers', 1, type=int)
+                        max_transfers_per_gw = max(1, min(5, max_transfers_per_gw))  # Clamp between 1-5
+
+                        # Convert enriched squad to format expected by SquadService
+                        gw1_squad_data = {
+                            "starting_xi": [p for p in squad if not p['is_bench']],
+                            "bench": [p for p in squad if p['is_bench']],
+                            "free_transfers_remaining": 1
+                        }
+                        
+                        # Get all players for optimization
+                        all_players = [player.to_dict() for player in db_manager.get_all_players()]
+                        
+                        # Note: all_players already have readable position values from database
+                        # No need to convert positions for SquadService
+
+                        # Generate optimized squads for GW2-9 using the new service
+                        for gw in range(2, 10):
+                            if gw == 2:
+                                # GW2: Apply transfers to GW1 squad
+                                gw_data = squad_service._create_optimized_gw_squad(
+                                    gw1_squad_data, all_players, gw, max_transfers_per_gw
+                                )
+                            else:
+                                # GW3-9: Use previous GW as base
+                                prev_gw_data = weekly_data[gw-2]  # -2 because weekly_data is 0-indexed
+                                prev_squad = {
+                                    "starting_xi": prev_gw_data["starting_xi"],
+                                    "bench": prev_gw_data["bench"],
+                                    "free_transfers_remaining": prev_gw_data.get("free_transfers_remaining", 1)
+                                }
+                                
+                                # Ensure all previous squad players have a 'name' field for SquadService
+                                for player in prev_squad["starting_xi"] + prev_squad["bench"]:
+                                    if 'name' not in player:
+                                        player['name'] = f"Player {player.get('id', 'Unknown')}"
+                                
+                                gw_data = squad_service._create_optimized_gw_squad(
+                                    prev_squad, all_players, gw, max_transfers_per_gw
+                                )
+
+                            # Add to weekly data
+                            starting_xi = gw_data.get("starting_xi", [])
+                            bench = gw_data.get("bench", [])
+
+                            # Ensure all players have required fields
+                            for player in starting_xi + bench:
+                                # Always enrich player data from database to ensure consistency
+                                if 'id' in player:
+                                    db_player = db_manager.get_player_by_id(player['id'])
+                                    if db_player:
+                                        player['name'] = db_player.name
+                                        player['position'] = str(db_player.position)  # Use readable position directly
+                                        player['team'] = db_player.team
+                                        player['price'] = db_player.price
+                                    else:
+                                        player['name'] = f"Player {player['id']}"
+                                        player['position'] = 'Unknown'
+                                        player['team'] = 'Unknown'
+                                        player['price'] = 0.0
+                                else:
+                                    player['name'] = "Unknown Player"
+                                    player['position'] = 'Unknown'
+                                    player['team'] = 'Unknown'
+                                    player['price'] = 0.0
+
+                            # Get transfer data with analysis
+                            transfers_in = gw_data.get("transfers", {}).get("in", [])
+                            transfers_out = gw_data.get("transfers", {}).get("out", [])
+                            
+                            # Extract transfer names for backward compatibility
+                            transfers_in_names = [p.get('name', 'Unknown') for p in transfers_in]
+                            transfers_out_names = [p.get('name', 'Unknown') for p in transfers_out]
+
+                            weekly_data.append({
+                                "gw": gw,
+                                "starting_xi": starting_xi,
+                                "bench": bench,
+                                "transfers_in": transfers_in_names,  # Backward compatibility
+                                "transfers_out": transfers_out_names,  # Backward compatibility
+                                "transfers_in_players": transfers_in,  # Full player objects with analysis
+                                "transfers_out_players": transfers_out,  # Full player objects with analysis
+                                "points": 0,  # Will be calculated
+                                "captain_name": gw_data.get("captain"),
+                                "vice_captain_name": gw_data.get("vice_captain"),
+                                "hits_points": gw_data.get("hits_points", 0),
+                                "total_with_captain_and_hits": 0,
+                                "squad_value": sum(p.get('price', 0) for p in starting_xi + bench),
+                                "formation": squad_service.get_formation(starting_xi)
+                            })
+
+                            # Update previous squad for next iteration
+                            if gw < 9:
+                                weekly_data[gw-1]["free_transfers_remaining"] = gw_data.get("free_transfers_remaining", 1)
+
+                    except Exception as e:
+                        print(f"Error generating optimized squads: {e}")
+                        # Fallback: create empty GW2-9 data
+                        for gw in range(2, 10):
+                            weekly_data.append({
+                                "gw": gw,
+                                "starting_xi": [],
+                                "bench": [],
+                                "transfers_in": [],
+                                "transfers_out": [],
+                                "points": 0,
+                                "captain_name": None,
+                                "vice_captain_name": None,
+                                "hits_points": 0,
+                                "total_with_captain_and_hits": 0,
+                                "squad_value": 0,
+                                "formation": "4-4-2"
+                            })
+            except Exception as e:
+                print(f"Error in squad enrichment: {e}")
+                # Continue without enriched data
+                pass
+
+        standings = db_manager.get_user_league_standings(fpl_team_id)
+
+        return render_template('squad-live.html', profile=profile, squad=squad, standings=standings, weekly_data=weekly_data)
+
+    @app.route('/api/account/save-team-id', methods=['POST'])
+    def save_team_id():
+        """Save FPL team ID to user profile"""
+        try:
+            data = request.get_json()
+            fpl_team_id = data.get('fpl_team_id')
+
+            if not fpl_team_id:
+                return jsonify({'success': False, 'error': 'FPL Team ID is required'}), 400
+
+            db_manager = current_app.db_manager
+            # First save the profile with just the team ID
+            profile_id = db_manager.save_user_profile(fpl_team_id)
+
+            # Then immediately sync data from FPL API to get team name and manager
+            live_service = LiveFPLService(db_manager)
+            sync_result = live_service.sync_user_profile(fpl_team_id)
+
+            if sync_result:
+                return jsonify({'success': True, 'profile_id': profile_id, 'message': 'Team ID saved and data synced from FPL'})
+            else:
+                return jsonify({'success': True, 'profile_id': profile_id, 'warning': 'Team ID saved but could not sync FPL data'})
+
+        except Exception as e:
+            return jsonify({'success': False, 'error': str(e)}), 500
+
+    @app.route('/api/account/sync-data', methods=['POST'])
+    def sync_fpl_data():
+        """Sync FPL data for a team ID"""
+        try:
+            data = request.get_json()
+            fpl_team_id = data.get('fpl_team_id')
+
+            if not fpl_team_id:
+                return jsonify({'success': False, 'error': 'FPL Team ID is required'}), 400
+
+            db_manager = current_app.db_manager
+            live_service = LiveFPLService(db_manager)
+
+            # Sync all data
+            results = live_service.sync_all_user_data(fpl_team_id)
+
+            return jsonify({
+                'success': True,
+                'results': results,
+                'message': f"Synced data for team {fpl_team_id}"
+            })
+        except Exception as e:
+            return jsonify({'success': False, 'error': str(e)}), 500
+
+    @app.route('/api/account/delete-profile', methods=['POST'])
+    def delete_profile():
+        """Delete a user profile"""
+        try:
+            data = request.get_json()
+            fpl_team_id = data.get('fpl_team_id')
+
+            if not fpl_team_id:
+                return jsonify({'success': False, 'error': 'FPL Team ID is required'}), 400
+
+            db_manager = current_app.db_manager
+            success = db_manager.delete_user_profile(fpl_team_id)
+
+            if success:
+                return jsonify({'success': True, 'message': f"Profile {fpl_team_id} deleted successfully"})
+            else:
+                return jsonify({'success': False, 'error': f"Profile {fpl_team_id} not found"}), 404
+
+        except Exception as e:
+            return jsonify({'success': False, 'error': str(e)}), 500
+
+    return app
+
+def run_app():
+    """Run the Flask application"""
+    app = create_app()
+    # Prefer configured PORT/DEBUG if provided
+    port = app.config.get('PORT', 5001)
+    debug = app.config.get('DEBUG', True)
+    app.run(host='0.0.0.0', port=port, debug=debug)

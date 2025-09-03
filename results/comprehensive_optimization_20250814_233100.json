@@ -1,0 +1,338 @@
+{
+  "timestamp": "20250814_233100",
+  "squad_optimization": {
+    "total_expected_points": 454.09999999999997,
+    "formation": "1-2-5-3",
+    "squad": [
+      {
+        "name": "M.Salah",
+        "position": "Midfielder",
+        "team": "Liverpool",
+        "total_points": 57.0,
+        "price": 14.5,
+        "gw1_points": 6.7,
+        "gw2_points": 6.1,
+        "gw3_points": 5.6,
+        "gw4_points": 7.0,
+        "gw5_points": 6.6,
+        "gw6_points": 5.7,
+        "gw7_points": 5.7,
+        "gw8_points": 7.4,
+        "gw9_points": 6.2
+      },
+      {
+        "name": "Haaland",
+        "position": "Forward",
+        "team": "Man City",
+        "total_points": 47.0,
+        "price": 14.0,
+        "gw1_points": 5.1,
+        "gw2_points": 6.3,
+        "gw3_points": 5.1,
+        "gw4_points": 5.8,
+        "gw5_points": 3.8,
+        "gw6_points": 6.6,
+        "gw7_points": 4.8,
+        "gw8_points": 5.1,
+        "gw9_points": 4.4
+      },
+      {
+        "name": "Palmer",
+        "position": "Midfielder",
+        "team": "Chelsea",
+        "total_points": 45.7,
+        "price": 10.5,
+        "gw1_points": 5.1,
+        "gw2_points": 4.9,
+        "gw3_points": 5.5,
+        "gw4_points": 4.6,
+        "gw5_points": 4.3,
+        "gw6_points": 5.9,
+        "gw7_points": 4.4,
+        "gw8_points": 4.3,
+        "gw9_points": 6.7
+      },
+      {
+        "name": "Watkins",
+        "position": "Forward",
+        "team": "Aston Villa",
+        "total_points": 44.8,
+        "price": 9.0,
+        "gw1_points": 5.2,
+        "gw2_points": 4.6,
+        "gw3_points": 4.8,
+        "gw4_points": 4.1,
+        "gw5_points": 5.7,
+        "gw6_points": 5.2,
+        "gw7_points": 6.6,
+        "gw8_points": 4.5,
+        "gw9_points": 4.1
+      },
+      {
+        "name": "Isak",
+        "position": "Forward",
+        "team": "Newcastle",
+        "total_points": 44.7,
+        "price": 10.5,
+        "gw1_points": 4.4,
+        "gw2_points": 4.5,
+        "gw3_points": 5.8,
+        "gw4_points": 5.7,
+        "gw5_points": 4.7,
+        "gw6_points": 4.1,
+        "gw7_points": 5.4,
+        "gw8_points": 4.7,
+        "gw9_points": 5.4
+      },
+      {
+        "name": "Eze",
+        "position": "Midfielder",
+        "team": "Crystal Palace",
+        "total_points": 39.6,
+        "price": 7.5,
+        "gw1_points": 4.1,
+        "gw2_points": 4.8,
+        "gw3_points": 4.0,
+        "gw4_points": 5.8,
+        "gw5_points": 4.4,
+        "gw6_points": 4.2,
+        "gw7_points": 4.0,
+        "gw8_points": 4.9,
+        "gw9_points": 3.4
+      },
+      {
+        "name": "Saka",
+        "position": "Midfielder",
+        "team": "Arsenal",
+        "total_points": 37.7,
+        "price": 10.0,
+        "gw1_points": 3.9,
+        "gw2_points": 5.9,
+        "gw3_points": 3.3,
+        "gw4_points": 4.8,
+        "gw5_points": 3.4,
+        "gw6_points": 3.7,
+        "gw7_points": 4.6,
+        "gw8_points": 3.6,
+        "gw9_points": 4.5
+      },
+      {
+        "name": "B.Fernandes",
+        "position": "Midfielder",
+        "team": "Man City",
+        "total_points": 35.3,
+        "price": 9.0,
+        "gw1_points": 3.4,
+        "gw2_points": 3.7,
+        "gw3_points": 4.9,
+        "gw4_points": 3.1,
+        "gw5_points": 4.1,
+        "gw6_points": 3.8,
+        "gw7_points": 5.3,
+        "gw8_points": 2.9,
+        "gw9_points": 4.1
+      },
+      {
+        "name": "Virgil",
+        "position": "Defender",
+        "team": "Arsenal",
+        "total_points": 35.1,
+        "price": 6.0,
+        "gw1_points": 4.2,
+        "gw2_points": 3.2,
+        "gw3_points": 3.5,
+        "gw4_points": 4.4,
+        "gw5_points": 4.6,
+        "gw6_points": 3.7,
+        "gw7_points": 3.3,
+        "gw8_points": 4.4,
+        "gw9_points": 3.8
+      },
+      {
+        "name": "S\u00e1nchez",
+        "position": "Goalkeeper",
+        "team": "Unknown",
+        "total_points": 33.7,
+        "price": 5.0,
+        "gw1_points": 4.0,
+        "gw2_points": 3.7,
+        "gw3_points": 4.0,
+        "gw4_points": 3.5,
+        "gw5_points": 3.7,
+        "gw6_points": 3.9,
+        "gw7_points": 3.3,
+        "gw8_points": 3.3,
+        "gw9_points": 4.3
+      },
+      {
+        "name": "Mu\u00f1oz",
+        "position": "Defender",
+        "team": "Arsenal",
+        "total_points": 33.5,
+        "price": 5.5,
+        "gw1_points": 2.9,
+        "gw2_points": 4.2,
+        "gw3_points": 3.2,
+        "gw4_points": 5.3,
+        "gw5_points": 3.7,
+        "gw6_points": 3.3,
+        "gw7_points": 3.9,
+        "gw8_points": 4.3,
+        "gw9_points": 2.7
+      },
+      {
+        "name": "Petrovi\u0107",
+        "position": "Goalkeeper",
+        "team": "Unknown",
+        "total_points": 33.4,
+        "price": 4.5,
+        "gw1_points": 3.4,
+        "gw2_points": 3.9,
+        "gw3_points": 3.3,
+        "gw4_points": 4.0,
+        "gw5_points": 3.5,
+        "gw6_points": 3.8,
+        "gw7_points": 3.8,
+        "gw8_points": 3.9,
+        "gw9_points": 3.8
+      }
+    ],
+    "starting_xi": [
+      {
+        "name": "S\u00e1nchez",
+        "position": "Goalkeeper",
+        "team": "Unknown",
+        "total_points": 33.7,
+        "price": 5.0
+      },
+      {
+        "name": "Virgil",
+        "position": "Defender",
+        "team": "Arsenal",
+        "total_points": 35.1,
+        "price": 6.0
+      },
+      {
+        "name": "M.Salah",
+        "position": "Midfielder",
+        "team": "Liverpool",
+        "total_points": 57.0,
+        "price": 14.5
+      },
+      {
+        "name": "Haaland",
+        "position": "Forward",
+        "team": "Man City",
+        "total_points": 47.0,
+        "price": 14.0
+      },
+      {
+        "name": "Palmer",
+        "position": "Midfielder",
+        "team": "Chelsea",
+        "total_points": 45.7,
+        "price": 10.5
+      },
+      {
+        "name": "Watkins",
+        "position": "Forward",
+        "team": "Aston Villa",
+        "total_points": 44.8,
+        "price": 9.0
+      },
+      {
+        "name": "Isak",
+        "position": "Forward",
+        "team": "Newcastle",
+        "total_points": 44.7,
+        "price": 10.5
+      },
+      {
+        "name": "Eze",
+        "position": "Midfielder",
+        "team": "Crystal Palace",
+        "total_points": 39.6,
+        "price": 7.5
+      },
+      {
+        "name": "Saka",
+        "position": "Midfielder",
+        "team": "Arsenal",
+        "total_points": 37.7,
+        "price": 10.0
+      },
+      {
+        "name": "B.Fernandes",
+        "position": "Midfielder",
+        "team": "Man City",
+        "total_points": 35.3,
+        "price": 9.0
+      },
+      {
+        "name": "Mu\u00f1oz",
+        "position": "Defender",
+        "team": "Arsenal",
+        "total_points": 33.5,
+        "price": 5.5
+      }
+    ],
+    "team_distribution": {
+      "Liverpool": 1,
+      "Man City": 2,
+      "Chelsea": 1,
+      "Aston Villa": 1,
+      "Newcastle": 1,
+      "Crystal Palace": 1,
+      "Arsenal": 3,
+      "Unknown": 2
+    },
+    "position_distribution": {
+      "Midfielder": 5,
+      "Forward": 3,
+      "Defender": 2,
+      "Goalkeeper": 2
+    },
+    "gameweek_breakdown": {
+      "1": 49.0,
+      "2": 51.900000000000006,
+      "3": 49.699999999999996,
+      "4": 54.099999999999994,
+      "5": 49.0,
+      "6": 50.099999999999994,
+      "7": 51.3,
+      "8": 49.4,
+      "9": 49.6
+    },
+    "optimization_stats": {
+      "iterations": 50000,
+      "improvements": 0
+    }
+  },
+  "transfer_optimization": {
+    "total_hits_taken": 0,
+    "total_net_benefit": 0,
+    "cumulative_points": {
+      "0": 0,
+      "1": 0,
+      "2": 0,
+      "3": 0,
+      "4": 0,
+      "5": 0,
+      "6": 0,
+      "7": 0,
+      "8": 0,
+      "9": 0
+    },
+    "gameweek_strategies": {
+      "1": [],
+      "2": [],
+      "3": [],
+      "4": [],
+      "5": [],
+      "6": [],
+      "7": [],
+      "8": [],
+      "9": []
+    }
+  }
+}

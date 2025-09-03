@@ -1,0 +1,1946 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>FPL Optimal Squad - GW1-9</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <style>
+        body { 
+            background-color: #f8f9fa; 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .navbar-brand { 
+            font-weight: bold; 
+            color: #2c3e50 !important; 
+        }
+        .nav-link { 
+            color: #34495e !important; 
+            font-weight: 500;
+        }
+        .nav-link.active { 
+            background-color: #3498db !important; 
+            color: white !important; 
+            border-radius: 5px;
+        }
+        .nav-link:hover { 
+            color: #3498db !important; 
+        }
+        h1, h2, h3 { 
+            color: #2c3e50; 
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+        }
+        .summary-card {
+            background: white;
+            padding: 12px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+            margin-bottom: 14px;
+        }
+        .gw-card {
+            background: white;
+            padding: 12px 14px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+            margin-bottom: 14px;
+        }
+        .position-badge { 
+            font-size: 0.8em; 
+            padding: 4px 8px; 
+            border-radius: 12px; 
+            color: white; 
+            font-weight: bold;
+        }
+        .gk { background-color: #dc3545; }
+        .def { background-color: #007bff; }
+        .mid { background-color: #28a745; }
+        .fwd { background-color: #ffc107; color: #212529; }
+        .transfer-in { background-color: #d4edda; border-left: 4px solid #28a745; }
+        .transfer-out { background-color: #f8d7da; border-left: 4px solid #dc3545; }
+        .no-transfer { background-color: #f8f9fa; border-left: 4px solid #6c757d; }
+        .player-row { padding: 8px; margin: 2px 0; border-radius: 5px; }
+        .formation-display { font-weight: bold; color: #2c3e50; }
+        .points-display { font-size: 1.2em; font-weight: bold; color: #28a745; }
+        .budget-info { font-size: 1.1em; color: #6c757d; }
+        .nav-tabs .nav-link { color: #495057; }
+        .nav-tabs .nav-link.active { color: #007bff; font-weight: 600; }
+        .transfer-summary {
+            background: #f8f9fa;
+            padding: 8px;
+            border-radius: 5px;
+            margin-top: 5px;
+            border-left: 3px solid #28a745;
+        }
+        /* Make the arrow between transfer IN/OUT much larger */
+        .transfer-summary .transfer-arrow {
+            font-size: 300%;
+            line-height: 0.6;
+            vertical-align: middle;
+            display: inline-block;
+        }
+        .transfer-summary small {
+            font-size: 0.85em;
+            line-height: 1.4;
+        }
+        .football-pitch {
+            background: linear-gradient(135deg, #2d5a27 0%, #4a7c59 50%, #2d5a27 100%);
+            border: 3px solid #ffffff;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+            position: relative;
+            min-height: 600px;
+        }
+        .pitch-lines {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+        }
+        .center-circle {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100px;
+            height: 100px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+        }
+        .center-line {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            width: 2px;
+            height: 100%;
+            background: rgba(255,255,255,0.3);
+        }
+        .penalty-area {
+            position: absolute;
+            top: 10%;
+            left: 5%;
+            width: 20%;
+            height: 80%;
+            border: 2px solid rgba(255,255,255,0.2);
+            border-radius: 10px;
+        }
+        .penalty-area.right {
+            left: 75%;
+        }
+        /* Formation lines to show player positioning */
+        .formation-line {
+            position: absolute;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 1px;
+        }
+        .formation-line.gk {
+            bottom: 15%;
+        }
+        .formation-line.def {
+            bottom: 30%;
+        }
+        .formation-line.mid {
+            bottom: 50%;
+        }
+        .formation-line.fwd {
+            bottom: 70%;
+        }
+        .player-position {
+            position: absolute;
+            width: 120px;
+            text-align: center;
+        }
+        .player-card {
+            background: white;
+            border-radius: 10px;
+            padding: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+            width: 120px;
+            min-height: 80px;
+            z-index: 10;
+            position: relative;
+        }
+        /* Top metrics nicer chips */
+        .gw-card .d-flex.flex-wrap.align-items-center { 
+            flex-wrap: wrap !important; 
+            gap: 6px; 
+            overflow-x: visible; 
+            justify-content: flex-start !important; /* keep chips left so buttons fit on right */
+        }
+        .gw-card .d-flex.flex-wrap.align-items-center > h4,
+        .gw-card .d-flex.flex-wrap.align-items-center > h5 {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #f9fbfd;
+            border: 1px solid #e6eaef;
+            border-radius: 9999px;
+            padding: 2px 8px;
+            margin: 0 6px 0 0;
+            font-weight: 600;
+            font-size: 0.95rem;
+            line-height: 1.2;
+            white-space: nowrap;
+        }
+        .gw-card .d-flex.flex-wrap.align-items-center > h4 .points-display,
+        .gw-card .d-flex.flex-wrap.align-items-center > h5 .points-display { color: #28a745; }
+        .player-flags { margin-top: 6px; }
+        .flag-badge {
+            display: inline-block;
+            margin-right: 6px;
+            font-size: 0.72em;
+            font-weight: 600;
+            padding: 2px 6px;
+            border-radius: 10px;
+            white-space: nowrap;
+        }
+        .flag-in { background: #d4edda; color: #155724; border: 1px solid #28a745; }
+        .flag-out { background: #f8d7da; color: #721c24; border: 1px solid #dc3545; }
+        .flag-promoted { background: #d1ecf1; color: #0c5460; border: 1px solid #17a2b8; }
+        .flag-demoted { background: #fff3cd; color: #856404; border: 1px solid #ffc107; }
+        .player-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+            z-index: 20;
+        }
+        .player-card.transfer-in {
+            border-color: #28a745;
+            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+        }
+        .player-card.transfer-out {
+            border-color: #dc3545;
+            background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+        }
+        .player-card.no-transfer {
+            border-color: #6c757d;
+        }
+        .player-name {
+            font-weight: bold;
+            font-size: 0.9em;
+            margin-bottom: 5px;
+            color: #2c3e50;
+        }
+        .player-team {
+            font-size: 0.8em;
+            color: #6c757d;
+            margin-bottom: 5px;
+        }
+        .player-stats {
+            font-size: 0.75em;
+            color: #495057;
+            line-height: 1.3;
+        }
+        .player-price {
+            font-weight: bold;
+            color: #28a745;
+        }
+        .player-points {
+            font-weight: bold;
+            color: #007bff;
+        }
+        .captain-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #ffc107;
+            color: #212529;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7em;
+            font-weight: bold;
+        }
+        .formation-label {
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #2c3e50;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: bold;
+        }
+        .substitutes-section {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        /* Bottom-of-page transfer panel */
+        #bottomTransfersPanel {
+            background: #f8f9fa;
+            border-left: 3px solid #28a745;
+            border-radius: 6px;
+            padding: 10px 12px;
+            margin-top: 12px;
+        }
+        .substitute-player {
+            background: white;
+            border-radius: 8px;
+            padding: 12px;
+            margin: 8px 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            border-left: 4px solid #6c757d;
+        }
+        .substitute-player.transfer-in {
+            border-left-color: #28a745;
+        }
+        .substitute-player.transfer-out {
+            border-left-color: #dc3545;
+        }
+        .view-toggle {
+            text-align: center;
+            margin: 10px 0 12px 0;
+        }
+        .view-toggle .btn-group {
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .view-toggle .btn {
+            padding: 10px 20px;
+            font-weight: 500;
+        }
+        .view-toggle .btn-check:checked + .btn {
+            background-color: #007bff;
+            border-color: #007bff;
+            color: white;
+        }
+        .table-view {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .table-view .table {
+            margin-bottom: 0;
+        }
+        .table-view .table th {
+            border-top: none;
+            font-weight: 600;
+            color: #2c3e50;
+            background-color: #eaf4ff; /* match Players header blue */
+            border-color: #dee2e6;
+        }
+        .table-view .table td {
+            vertical-align: middle;
+            padding: 12px 8px;
+        }
+        .table-view .position-badge {
+            font-size: 0.75em;
+            padding: 4px 6px;
+        }
+        /* Make player/team links look like normal text but still clickable */
+        .table-view a,
+        .substitutes-section a,
+        .player-card a,
+        .transfer-summary a {
+            color: inherit !important;
+            text-decoration: none !important;
+        }
+        .table-view a:hover,
+        .substitutes-section a:hover,
+        .player-card a:hover,
+        .transfer-summary a:hover {
+            color: inherit !important;
+            text-decoration: none !important;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body class="p-4">
+    {% include '_navbar.html' %}
+    
+    <div class="container-fluid">
+        
+        <!-- Summary Section removed by request -->
+        
+        <!-- Weekly Tabs with GW navigation (tabs placed immediately to the right of arrows) -->
+        <div class="d-flex align-items-center mb-2 flex-wrap" style="gap:8px;">
+        <div class="btn-group" role="group" aria-label="GW navigation">
+            <button class="btn btn-outline-secondary" id="prevGw" title="Previous GW"><i class="fas fa-chevron-left"></i></button>
+            <button class="btn btn-outline-secondary" id="nextGw" title="Next GW"><i class="fas fa-chevron-right"></i></button>
+        </div>
+        <ul class="nav nav-tabs ms-2" id="gwTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="gw1-tab" data-bs-toggle="tab" data-bs-target="#gw1" type="button" role="tab" data-gw="1">
+                    GW1
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="gw2-tab" data-bs-toggle="tab" data-bs-target="#gw2" type="button" role="tab" data-gw="2">
+                    GW2
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="gw3-tab" data-bs-toggle="tab" data-bs-target="#gw3" type="button" role="tab" data-gw="3">
+                    GW3
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="gw4-tab" data-bs-toggle="tab" data-bs-target="#gw4" type="button" role="tab" data-gw="4">
+                    GW4
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="gw5-tab" data-bs-toggle="tab" data-bs-target="#gw5" type="button" role="tab" data-gw="5">
+                    GW5
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="gw6-tab" data-bs-toggle="tab" data-bs-target="#gw6" type="button" role="tab" data-gw="6">
+                    GW6
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="gw7-tab" data-bs-toggle="tab" data-bs-target="#gw7" type="button" role="tab" data-gw="7">
+                    GW7
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="gw8-tab" data-bs-toggle="tab" data-bs-target="#gw8" type="button" role="tab" data-gw="8">
+                    GW8
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="gw9-tab" data-bs-toggle="tab" data-bs-target="#gw9" type="button" role="tab" data-gw="9">
+                    GW9
+                </button>
+            </li>
+        </ul>
+        </div>
+        
+        <!-- Weekly Content -->
+        <div class="tab-content" id="gwTabContent">
+            <div class="tab-pane fade show active" id="gw1" role="tabpanel">
+                <div class="gw-card">
+                    <div class="row mb-3">
+                        <div class="col-md-3">
+                            <h3>GW1 - <span id="gw1Formation">4-4-2</span></h3>
+                        </div>
+                        <div class="col-md-6 d-flex gap-3 flex-wrap align-items-center justify-content-start">
+                            <h4 class="mb-0">Team Points: <span class="points-display" id="gw1Points">0</span></h4>
+                            <h5 class="mb-0">Hits: <span id="gw1Hits">0</span></h5>
+                            <h5 class="mb-0">GW xP: <span class="points-display" id="gw1Total">0</span></h5>
+                            <h5 class="mb-0">All weeks: <span class="points-display" id="gw1Cumulative">0</span></h5>
+                            <h5 class="mb-0">Squad Value: <span class="points-display" id="gw1Value">0</span></h5>
+                        </div>
+                        <div class="col-md-3 d-flex justify-content-end align-items-start ms-auto">
+                            <div class="btn-group" role="group">
+                                <input type="radio" class="btn-check" name="gw1ViewTop" id="gw1TableTop" value="table" checked>
+                                <label class="btn btn-outline-primary" for="gw1TableTop">
+                                    <i class="fas fa-table"></i> Table View
+                                </label>
+                                <input type="radio" class="btn-check" name="gw1ViewTop" id="gw1PitchTop" value="pitch">
+                                <label class="btn btn-outline-primary" for="gw1PitchTop">
+                                    <i class="fas fa-futbol"></i> Pitch View
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    
+                    
+                    <!-- Transfers summary (always visible counts) -->
+                    <div class="mb-2">
+                        <h5 class="mb-0">Transfers: <span id="gw1TransfersIn">0</span> IN, <span id="gw1TransfersOut">0</span> OUT</h5>
+                        <div id="gw1TransferSummary" class="transfer-summary" style="display: none;"></div>
+                    </div>
+                    
+                    <!-- Compact Table View -->
+                    <div id="gw1TableView" class="table-view">
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>Position</th>
+                                        <th>Name</th>
+                                        <th>Team</th>
+                                        <th>Price</th>
+                                        <th>xP</th>
+                                        <th>Total Points</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="gw1TableBody">
+                                    <!-- Table will be populated by JavaScript -->
+                                </tbody>
+                                <tfoot>
+                                  <tr>
+                                    <th colspan="3" class="text-end">Totals</th>
+                                    <th id="gw1SumPrice">£0M</th>
+                                    <th id="gw1SumXp">0</th>
+                                    <th id="gw1SumTotal">0</th>
+                                  </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <!-- Football Formation Layout -->
+                    <div id="gw1PitchView" class="football-pitch" style="display: none;">
+                        <div class="formation-label" id="gw1FormationLabel">4-4-2</div>
+                        
+                        <!-- Pitch Lines -->
+                        <div class="pitch-lines">
+                            <div class="center-circle"></div>
+                            <div class="center-line"></div>
+                            <div class="penalty-area"></div>
+                            <div class="penalty-area right"></div>
+                            <!-- Formation lines -->
+                            <div class="formation-line gk"></div>
+                            <div class="formation-line def"></div>
+                            <div class="formation-line mid"></div>
+                            <div class="formation-line fwd"></div>
+                        </div>
+                        
+                        <!-- Starting XI positioned on pitch -->
+                        <div id="gw1StartingXI">
+                            <!-- Starting XI will be populated by JavaScript -->
+                        </div>
+                    </div>
+                    
+                    <!-- Substitutes Section -->
+                    <div class="substitutes-section">
+                        <h4><i class="fas fa-users"></i> Substitutes</h4>
+                        <div class="row" id="gw1Bench">
+                            <!-- Bench will be populated by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="tab-pane fade" id="gw2" role="tabpanel">
+                <div class="gw-card">
+                    <div class="row mb-3">
+                        <div class="col-md-3">
+                            <h3>GW2 - <span id="gw2Formation">4-4-2</span></h3>
+                        </div>
+                        <div class="col-md-6 d-flex gap-3 flex-wrap align-items-center">
+                            <h4 class="mb-0">Team Points: <span class="points-display" id="gw2Points">0</span></h4>
+                            <h5 class="mb-0">Captain: <span id="gw2Captain">-</span> (+<span id="gw2CaptainBonus">0</span>)</h5>
+                            <h5 class="mb-0">Hits: <span id="gw2Hits">0</span></h5>
+                            <h5 class="mb-0">GW Total: <span class="points-display" id="gw2Total">0</span></h5>
+                            <h5 class="mb-0">All weeks: <span class="points-display" id="gw2Cumulative">0</span></h5>
+                            <h5 class="mb-0">Squad Value: <span class="points-display" id="gw2Value">0</span></h5>
+                        </div>
+                        <div class="col-md-3 d-flex justify-content-end align-items-start">
+                            <div class="btn-group" role="group">
+                                <input type="radio" class="btn-check" name="gw2ViewTop" id="gw2TableTop" value="table" checked>
+                                <label class="btn btn-outline-primary" for="gw2TableTop">
+                                    <i class="fas fa-table"></i> Table View
+                                </label>
+                                <input type="radio" class="btn-check" name="gw2ViewTop" id="gw2PitchTop" value="pitch">
+                                <label class="btn btn-outline-primary" for="gw2PitchTop">
+                                    <i class="fas fa-futbol"></i> Pitch View
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    
+                    
+                    <!-- Transfers summary (always visible counts) -->
+                    <div class="mb-2">
+                        <h5 class="mb-0">Transfers: <span id="gw2TransfersIn">0</span> IN, <span id="gw2TransfersOut">0</span> OUT</h5>
+                        <div id="gw2TransferSummary" class="transfer-summary" style="display: none;"></div>
+                    </div>
+                    
+                    <!-- Compact Table View -->
+                    <div id="gw2TableView" class="table-view">
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>Position</th>
+                                        <th>Name</th>
+                                        <th>Team</th>
+                                        <th>Price</th>
+                                        <th>xP</th>
+                                        <th>Total Points</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="gw2TableBody">
+                                    <!-- Table will be populated by JavaScript -->
+                                </tbody>
+                                <tfoot>
+                                  <tr>
+                                    <th colspan="3" class="text-end">Totals</th>
+                                    <th id="gw2SumPrice">£0M</th>
+                                    <th id="gw2SumXp">0</th>
+                                    <th id="gw2SumTotal">0</th>
+                                  </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <!-- Football Formation Layout -->
+                    <div id="gw2PitchView" class="football-pitch" style="display: none;">
+                        <div class="formation-label" id="gw2FormationLabel">4-4-2</div>
+                        
+                        <!-- Pitch Lines -->
+                        <div class="pitch-lines">
+                            <div class="center-circle"></div>
+                            <div class="center-line"></div>
+                            <div class="penalty-area"></div>
+                            <div class="penalty-area right"></div>
+                        </div>
+                        
+                        <!-- Starting XI positioned on pitch -->
+                        <div id="gw2StartingXI">
+                            <!-- Starting XI will be populated by JavaScript -->
+                        </div>
+                    </div>
+                    
+                    <!-- Substitutes Section -->
+                    <div class="substitutes-section">
+                        <h4><i class="fas fa-users"></i> Substitutes</h4>
+                        <div class="row" id="gw2Bench">
+                            <!-- Bench will be populated by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="tab-pane fade" id="gw3" role="tabpanel">
+                <div class="gw-card">
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <h3>GW3 - <span id="gw3Formation">4-4-2</span></h3>
+                        </div>
+                        <div class="col-md-8 d-flex gap-4 flex-wrap align-items-center">
+                            <h4 class="mb-0">Team Points: <span class="points-display" id="gw3Points">0</span></h4>
+                            <h5 class="mb-0">Captain: <span id="gw3Captain">-</span> (+<span id="gw3CaptainBonus">0</span>)</h5>
+                            <h5 class="mb-0">Hits: <span id="gw3Hits">0</span></h5>
+                            <h5 class="mb-0">GW Total: <span class="points-display" id="gw3Total">0</span></h5>
+                            <h5 class="mb-0">All weeks: <span class="points-display" id="gw3Cumulative">0</span></h5>
+                        </div>
+                        <div class="col-md-4">
+                            <h4>Transfers: <span id="gw3TransfersIn">0</span> IN, <span id="gw3TransfersOut">0</span> OUT</h4>
+                            <div id="gw3TransferSummary" class="transfer-summary" style="display: none;">
+                                <!-- Transfer summary will be populated by JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- View Toggle -->
+                    <div class="view-toggle mb-3">
+                        <div class="btn-group" role="group">
+                            <input type="radio" class="btn-check" name="gw3View" id="gw3Table" value="table" checked>
+                            <label class="btn btn-outline-primary" for="gw3Table">
+                                <i class="fas fa-table"></i> Table View
+                            </label>
+                            
+                            <input type="radio" class="btn-check" name="gw3View" id="gw3Pitch" value="pitch">
+                            <label class="btn btn-outline-primary" for="gw3Pitch">
+                                <i class="fas fa-futbol"></i> Pitch View
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <!-- Compact Table View -->
+                    <div id="gw3TableView" class="table-view">
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>Position</th>
+                                        <th>Name</th>
+                                        <th>Team</th>
+                                        <th>Price</th>
+                                        <th>xP</th>
+                                        <th>Total Points</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="gw3TableBody">
+                                    <!-- Table will be populated by JavaScript -->
+                                </tbody>
+                                <tfoot>
+                                  <tr>
+                                    <th colspan="3" class="text-end">Totals</th>
+                                    <th id="gw3SumPrice">£0M</th>
+                                    <th id="gw3SumXp">0</th>
+                                    <th id="gw3SumTotal">0</th>
+                                  </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <!-- Football Formation Layout -->
+                    <div id="gw3PitchView" class="football-pitch" style="display: none;">
+                        <div class="formation-label" id="gw3FormationLabel">4-4-2</div>
+                        
+                        <!-- Pitch Lines -->
+                        <div class="pitch-lines">
+                            <div class="center-circle"></div>
+                            <div class="center-line"></div>
+                            <div class="penalty-area"></div>
+                            <div class="penalty-area right"></div>
+                        </div>
+                        
+                        <!-- Starting XI positioned on pitch -->
+                        <div id="gw3StartingXI">
+                            <!-- Starting XI will be populated by JavaScript -->
+                        </div>
+                    </div>
+                    
+                    <!-- Substitutes Section -->
+                    <div class="substitutes-section">
+                        <h4><i class="fas fa-users"></i> Substitutes</h4>
+                        <div class="row" id="gw3Bench">
+                            <!-- Bench will be populated by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="tab-pane fade" id="gw4" role="tabpanel">
+                <div class="gw-card">
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <h3>GW4 - <span id="gw4Formation">4-4-2</span></h3>
+                        </div>
+                        <div class="col-md-8 d-flex gap-4 flex-wrap align-items-center">
+                            <h4 class="mb-0">Team Points: <span class="points-display" id="gw4Points">0</span></h4>
+                            <h5 class="mb-0">Captain: <span id="gw4Captain">-</span> (+<span id="gw4CaptainBonus">0</span>)</h5>
+                            <h5 class="mb-0">Hits: <span id="gw4Hits">0</span></h5>
+                            <h5 class="mb-0">GW Total: <span class="points-display" id="gw4Total">0</span></h5>
+                            <h5 class="mb-0">All weeks: <span class="points-display" id="gw4Cumulative">0</span></h5>
+                        </div>
+                        <div class="col-md-4">
+                            <h4>Transfers: <span id="gw4TransfersIn">0</span> IN, <span id="gw4TransfersOut">0</span> OUT</h4>
+                            <div id="gw4TransferSummary" class="transfer-summary" style="display: none;">
+                                <!-- Transfer summary will be populated by JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- View Toggle -->
+                    <div class="view-toggle mb-3">
+                        <div class="btn-group" role="group">
+                            <input type="radio" class="btn-check" name="gw4View" id="gw4Table" value="table" checked>
+                            <label class="btn btn-outline-primary" for="gw4Table">
+                                <i class="fas fa-table"></i> Table View
+                            </label>
+                            
+                            <input type="radio" class="btn-check" name="gw4View" id="gw4Pitch" value="pitch">
+                            <label class="btn btn-outline-primary" for="gw4Pitch">
+                                <i class="fas fa-futbol"></i> Pitch View
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <!-- Compact Table View -->
+                    <div id="gw4TableView" class="table-view">
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>Position</th>
+                                        <th>Name</th>
+                                        <th>Team</th>
+                                        <th>Price</th>
+                                        <th>xP</th>
+                                        <th>Total Points</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="gw4TableBody">
+                                    <!-- Table will be populated by JavaScript -->
+                                </tbody>
+                                <tfoot>
+                                  <tr>
+                                    <th colspan="3" class="text-end">Totals</th>
+                                    <th id="gw4SumPrice">£0M</th>
+                                    <th id="gw4SumXp">0</th>
+                                    <th id="gw4SumTotal">0</th>
+                                  </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <!-- Football Formation Layout -->
+                    <div id="gw4PitchView" class="football-pitch" style="display: none;">
+                        <div class="formation-label" id="gw4FormationLabel">4-4-2</div>
+                        
+                        <!-- Pitch Lines -->
+                        <div class="pitch-lines">
+                            <div class="center-circle"></div>
+                            <div class="center-line"></div>
+                            <div class="penalty-area"></div>
+                            <div class="penalty-area right"></div>
+                        </div>
+                        
+                        <!-- Starting XI positioned on pitch -->
+                        <div id="gw4StartingXI">
+                            <!-- Starting XI will be populated by JavaScript -->
+                        </div>
+                    </div>
+                    
+                    <!-- Substitutes Section -->
+                    <div class="substitutes-section">
+                        <h4><i class="fas fa-users"></i> Substitutes</h4>
+                        <div class="row" id="gw4Bench">
+                            <!-- Bench will be populated by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="tab-pane fade" id="gw5" role="tabpanel">
+                <div class="gw-card">
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <h3>GW5 - <span id="gw5Formation">4-4-2</span></h3>
+                        </div>
+                        <div class="col-md-8 d-flex gap-4 flex-wrap align-items-center">
+                            <h4 class="mb-0">Team Points: <span class="points-display" id="gw5Points">0</span></h4>
+                            <h5 class="mb-0">Captain: <span id="gw5Captain">-</span> (+<span id="gw5CaptainBonus">0</span>)</h5>
+                            <h5 class="mb-0">Hits: <span id="gw5Hits">0</span></h5>
+                            <h5 class="mb-0">GW Total: <span class="points-display" id="gw5Total">0</span></h5>
+                            <h5 class="mb-0">All weeks: <span class="points-display" id="gw5Cumulative">0</span></h5>
+                        </div>
+                        <div class="col-md-4">
+                            <h4>Transfers: <span id="gw5TransfersIn">0</span> IN, <span id="gw5TransfersOut">0</span> OUT</h4>
+                            <div id="gw5TransferSummary" class="transfer-summary" style="display: none;">
+                                <!-- Transfer summary will be populated by JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- View Toggle -->
+                    <div class="view-toggle mb-3">
+                        <div class="btn-group" role="group">
+                            <input type="radio" class="btn-check" name="gw5View" id="gw5Table" value="table" checked>
+                            <label class="btn btn-outline-primary" for="gw5Table">
+                                <i class="fas fa-table"></i> Table View
+                            </label>
+                            
+                            <input type="radio" class="btn-check" name="gw5View" id="gw5Pitch" value="pitch">
+                            <label class="btn btn-outline-primary" for="gw5Pitch">
+                                <i class="fas fa-futbol"></i> Pitch View
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <!-- Compact Table View -->
+                    <div id="gw5TableView" class="table-view">
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>Position</th>
+                                        <th>Name</th>
+                                        <th>Team</th>
+                                        <th>Price</th>
+                                        <th>xP</th>
+                                        <th>Total Points</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="gw5TableBody">
+                                    <!-- Table will be populated by JavaScript -->
+                                </tbody>
+                                <tfoot>
+                                  <tr>
+                                    <th colspan="3" class="text-end">Totals</th>
+                                    <th id="gw5SumPrice">£0M</th>
+                                    <th id="gw5SumXp">0</th>
+                                    <th id="gw5SumTotal">0</th>
+                                  </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <!-- Football Formation Layout -->
+                    <div id="gw5PitchView" class="football-pitch" style="display: none;">
+                        <div class="formation-label" id="gw5FormationLabel">4-4-2</div>
+                        
+                        <!-- Pitch Lines -->
+                        <div class="pitch-lines">
+                            <div class="center-circle"></div>
+                            <div class="center-line"></div>
+                            <div class="penalty-area"></div>
+                            <div class="penalty-area right"></div>
+                        </div>
+                        
+                        <!-- Starting XI positioned on pitch -->
+                        <div id="gw5StartingXI">
+                            <!-- Starting XI will be populated by JavaScript -->
+                        </div>
+                    </div>
+                    
+                    <!-- Substitutes Section -->
+                    <div class="substitutes-section">
+                        <h4><i class="fas fa-users"></i> Substitutes</h4>
+                        <div class="row" id="gw5Bench">
+                            <!-- Bench will be populated by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="tab-pane fade" id="gw6" role="tabpanel">
+                <div class="gw-card">
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <h3>GW6 - <span id="gw6Formation">4-4-2</span></h3>
+                        </div>
+                        <div class="col-md-8 d-flex gap-4 flex-wrap align-items-center">
+                            <h4 class="mb-0">Team Points: <span class="points-display" id="gw6Points">0</span></h4>
+                            <h5 class="mb-0">Captain: <span id="gw6Captain">-</span> (+<span id="gw6CaptainBonus">0</span>)</h5>
+                            <h5 class="mb-0">Hits: <span id="gw6Hits">0</span></h5>
+                            <h5 class="mb-0">GW Total: <span class="points-display" id="gw6Total">0</span></h5>
+                            <h5 class="mb-0">All weeks: <span class="points-display" id="gw6Cumulative">0</span></h5>
+                        </div>
+                        <div class="col-md-4">
+                            <h4>Transfers: <span id="gw6TransfersIn">0</span> IN, <span id="gw6TransfersOut">0</span> OUT</h4>
+                            <div id="gw6TransferSummary" class="transfer-summary" style="display: none;">
+                                <!-- Transfer summary will be populated by JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- View Toggle -->
+                    <div class="view-toggle mb-3">
+                        <div class="btn-group" role="group">
+                            <input type="radio" class="btn-check" name="gw6View" id="gw6Table" value="table" checked>
+                            <label class="btn btn-outline-primary" for="gw6Table">
+                                <i class="fas fa-table"></i> Table View
+                            </label>
+                            
+                            <input type="radio" class="btn-check" name="gw6View" id="gw6Pitch" value="pitch">
+                            <label class="btn btn-outline-primary" for="gw6Pitch">
+                                <i class="fas fa-futbol"></i> Pitch View
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <!-- Compact Table View -->
+                    <div id="gw6TableView" class="table-view">
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>Position</th>
+                                        <th>Name</th>
+                                        <th>Team</th>
+                                        <th>Price</th>
+                                        <th>xP</th>
+                                        <th>Total Points</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="gw6TableBody">
+                                    <!-- Table will be populated by JavaScript -->
+                                </tbody>
+                                <tfoot>
+                                  <tr>
+                                    <th colspan="3" class="text-end">Totals</th>
+                                    <th id="gw6SumPrice">£0M</th>
+                                    <th id="gw6SumXp">0</th>
+                                    <th id="gw6SumTotal">0</th>
+                                  </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <!-- Football Formation Layout -->
+                    <div id="gw6PitchView" class="football-pitch" style="display: none;">
+                        <div class="formation-label" id="gw6FormationLabel">4-4-2</div>
+                        
+                        <!-- Pitch Lines -->
+                        <div class="pitch-lines">
+                            <div class="center-circle"></div>
+                            <div class="center-line"></div>
+                            <div class="penalty-area"></div>
+                            <div class="penalty-area right"></div>
+                        </div>
+                        
+                        <!-- Starting XI positioned on pitch -->
+                        <div id="gw6StartingXI">
+                            <!-- Starting XI will be populated by JavaScript -->
+                        </div>
+                    </div>
+                    
+                    <!-- Substitutes Section -->
+                    <div class="substitutes-section">
+                        <h4><i class="fas fa-users"></i> Substitutes</h4>
+                        <div class="row" id="gw6Bench">
+                            <!-- Bench will be populated by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="tab-pane fade" id="gw7" role="tabpanel">
+                <div class="gw-card">
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <h3>GW7 - <span id="gw7Formation">4-4-2</span></h3>
+                        </div>
+                        <div class="col-md-8 d-flex gap-4 flex-wrap align-items-center">
+                            <h4 class="mb-0">Team Points: <span class="points-display" id="gw7Points">0</span></h4>
+                            <h5 class="mb-0">Captain: <span id="gw7Captain">-</span> (+<span id="gw7CaptainBonus">0</span>)</h5>
+                            <h5 class="mb-0">Hits: <span id="gw7Hits">0</span></h5>
+                            <h5 class="mb-0">GW Total: <span class="points-display" id="gw7Total">0</span></h5>
+                            <h5 class="mb-0">All weeks: <span class="points-display" id="gw7Cumulative">0</span></h5>
+                        </div>
+                        <div class="col-md-4">
+                            <h4>Transfers: <span id="gw7TransfersIn">0</span> IN, <span id="gw7TransfersOut">0</span> OUT</h4>
+                            <div id="gw7TransferSummary" class="transfer-summary" style="display: none;">
+                                <!-- Transfer summary will be populated by JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- View Toggle -->
+                    <div class="view-toggle mb-3">
+                        <div class="btn-group" role="group">
+                            <input type="radio" class="btn-check" name="gw7View" id="gw7Table" value="table" checked>
+                            <label class="btn btn-outline-primary" for="gw7Table">
+                                <i class="fas fa-table"></i> Table View
+                            </label>
+                            
+                            <input type="radio" class="btn-check" name="gw7View" id="gw7Pitch" value="pitch">
+                            <label class="btn btn-outline-primary" for="gw7Pitch">
+                                <i class="fas fa-futbol"></i> Pitch View
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <!-- Compact Table View -->
+                    <div id="gw7TableView" class="table-view">
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>Position</th>
+                                        <th>Name</th>
+                                        <th>Team</th>
+                                        <th>Price</th>
+                                        <th>xP</th>
+                                        <th>Total Points</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="gw7TableBody">
+                                    <!-- Table will be populated by JavaScript -->
+                                </tbody>
+                                <tfoot>
+                                  <tr>
+                                    <th colspan="3" class="text-end">Totals</th>
+                                    <th id="gw7SumPrice">£0M</th>
+                                    <th id="gw7SumXp">0</th>
+                                    <th id="gw7SumTotal">0</th>
+                                  </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <!-- Football Formation Layout -->
+                    <div id="gw7PitchView" class="football-pitch" style="display: none;">
+                        <div class="formation-label" id="gw7FormationLabel">4-4-2</div>
+                        
+                        <!-- Pitch Lines -->
+                        <div class="pitch-lines">
+                            <div class="center-circle"></div>
+                            <div class="center-line"></div>
+                            <div class="penalty-area"></div>
+                            <div class="penalty-area right"></div>
+                        </div>
+                        
+                        <!-- Starting XI positioned on pitch -->
+                        <div id="gw7StartingXI">
+                            <!-- Starting XI will be populated by JavaScript -->
+                        </div>
+                    </div>
+                    
+                    <!-- Substitutes Section -->
+                    <div class="substitutes-section">
+                        <h4><i class="fas fa-users"></i> Substitutes</h4>
+                        <div class="row" id="gw7Bench">
+                            <!-- Bench will be populated by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="tab-pane fade" id="gw8" role="tabpanel">
+                <div class="gw-card">
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <h3>GW8 - <span id="gw8Formation">4-4-2</span></h3>
+                        </div>
+                        <div class="col-md-8 d-flex gap-4 flex-wrap align-items-center">
+                            <h4 class="mb-0">Team Points: <span class="points-display" id="gw8Points">0</span></h4>
+                            <h5 class="mb-0">Captain: <span id="gw8Captain">-</span> (+<span id="gw8CaptainBonus">0</span>)</h5>
+                            <h5 class="mb-0">Hits: <span id="gw8Hits">0</span></h5>
+                            <h5 class="mb-0">GW Total: <span class="points-display" id="gw8Total">0</span></h5>
+                            <h5 class="mb-0">All weeks: <span class="points-display" id="gw8Cumulative">0</span></h5>
+                        </div>
+                        <div class="col-md-4">
+                            <h4>Transfers: <span id="gw8TransfersIn">0</span> IN, <span id="gw8TransfersOut">0</span> OUT</h4>
+                            <div id="gw8TransferSummary" class="transfer-summary" style="display: none;">
+                                <!-- Transfer summary will be populated by JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- View Toggle -->
+                    <div class="view-toggle mb-3">
+                        <div class="btn-group" role="group">
+                            <input type="radio" class="btn-check" name="gw8View" id="gw8Table" value="table" checked>
+                            <label class="btn btn-outline-primary" for="gw8Table">
+                                <i class="fas fa-table"></i> Table View
+                            </label>
+                            
+                            <input type="radio" class="btn-check" name="gw8View" id="gw8Pitch" value="pitch">
+                            <label class="btn btn-outline-primary" for="gw8Pitch">
+                                <i class="fas fa-futbol"></i> Pitch View
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <!-- Compact Table View -->
+                    <div id="gw8TableView" class="table-view">
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>Position</th>
+                                        <th>Name</th>
+                                        <th>Team</th>
+                                        <th>Price</th>
+                                        <th>xP</th>
+                                        <th>Total Points</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="gw8TableBody">
+                                    <!-- Table will be populated by JavaScript -->
+                                </tbody>
+                                <tfoot>
+                                  <tr>
+                                    <th colspan="3" class="text-end">Totals</th>
+                                    <th id="gw8SumPrice">£0M</th>
+                                    <th id="gw8SumXp">0</th>
+                                    <th id="gw8SumTotal">0</th>
+                                  </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <!-- Football Formation Layout -->
+                    <div id="gw8PitchView" class="football-pitch" style="display: none;">
+                        <div class="formation-label" id="gw8FormationLabel">4-4-2</div>
+                        
+                        <!-- Pitch Lines -->
+                        <div class="pitch-lines">
+                            <div class="center-circle"></div>
+                            <div class="center-line"></div>
+                            <div class="penalty-area"></div>
+                            <div class="penalty-area right"></div>
+                        </div>
+                        
+                        <!-- Starting XI positioned on pitch -->
+                        <div id="gw8StartingXI">
+                            <!-- Starting XI will be populated by JavaScript -->
+                        </div>
+                    </div>
+                    
+                    <!-- Substitutes Section -->
+                    <div class="substitutes-section">
+                        <h4><i class="fas fa-users"></i> Substitutes</h4>
+                        <div class="row" id="gw8Bench">
+                            <!-- Bench will be populated by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="tab-pane fade" id="gw9" role="tabpanel">
+                <div class="gw-card">
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <h3>GW9 - <span id="gw9Formation">4-4-2</span></h3>
+                        </div>
+                        <div class="col-md-8 d-flex gap-4 flex-wrap align-items-center">
+                            <h4 class="mb-0">Team Points: <span class="points-display" id="gw9Points">0</span></h4>
+                            <h5 class="mb-0">Captain: <span id="gw9Captain">-</span> (+<span id="gw9CaptainBonus">0</span>)</h5>
+                            <h5 class="mb-0">Hits: <span id="gw9Hits">0</span></h5>
+                            <h5 class="mb-0">GW Total: <span class="points-display" id="gw9Total">0</span></h5>
+                            <h5 class="mb-0">All weeks: <span class="points-display" id="gw9Cumulative">0</span></h5>
+                        </div>
+                        <div class="col-md-4">
+                            <h4>Transfers: <span id="gw9TransfersIn">0</span> IN, <span id="gw9TransfersOut">0</span> OUT</h4>
+                            <div id="gw9TransferSummary" class="transfer-summary" style="display: none;">
+                                <!-- Transfer summary will be populated by JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- View Toggle -->
+                    <div class="view-toggle mb-3">
+                        <div class="btn-group" role="group">
+                            <input type="radio" class="btn-check" name="gw9View" id="gw9Table" value="table" checked>
+                            <label class="btn btn-outline-primary" for="gw9Table">
+                                <i class="fas fa-table"></i> Table View
+                            </label>
+                            
+                            <input type="radio" class="btn-check" name="gw9View" id="gw9Pitch" value="pitch">
+                            <label class="btn btn-outline-primary" for="gw9Pitch">
+                                <i class="fas fa-futbol"></i> Pitch View
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <!-- Compact Table View -->
+                    <div id="gw9TableView" class="table-view">
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>Position</th>
+                                        <th>Name</th>
+                                        <th>Team</th>
+                                        <th>Price</th>
+                                        <th>xP</th>
+                                        <th>Total Points</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="gw9TableBody">
+                                    <!-- Table will be populated by JavaScript -->
+                                </tbody>
+                                <tfoot>
+                                  <tr>
+                                    <th colspan="3" class="text-end">Totals</th>
+                                    <th id="gw9SumPrice">£0M</th>
+                                    <th id="gw9SumXp">0</th>
+                                    <th id="gw9SumTotal">0</th>
+                                  </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <!-- Football Formation Layout -->
+                    <div id="gw9PitchView" class="football-pitch" style="display: none;">
+                        <div class="formation-label" id="gw9FormationLabel">4-4-2</div>
+                        
+                        <!-- Pitch Lines -->
+                        <div class="pitch-lines">
+                            <div class="center-circle"></div>
+                            <div class="center-line"></div>
+                            <div class="penalty-area"></div>
+                            <div class="penalty-area right"></div>
+                        </div>
+                        
+                        <!-- Starting XI positioned on pitch -->
+                        <div id="gw9StartingXI">
+                            <!-- Starting XI will be populated by JavaScript -->
+                        </div>
+                    </div>
+                    
+                    <!-- Substitutes Section -->
+                    <div class="substitutes-section">
+                        <h4><i class="fas fa-users"></i> Substitutes</h4>
+                        <div class="row" id="gw9Bench">
+                            <!-- Bench will be populated by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        $(document).ready(function() {
+            // Initialize with GW1 data
+            if (weeklyData && weeklyData.length > 0) {
+                const gw1Data = weeklyData.find(d => d.gw === 1);
+                if (gw1Data) {
+                    console.log('Initializing with GW1 data:', gw1Data);
+                    updateGWData(1, gw1Data);
+                } else {
+                    console.error('No GW1 data found in weeklyData');
+                }
+            } else {
+                console.error('No weeklyData available');
+            }
+            
+            // Tab shown handler (Bootstrap event)
+            $('button[data-bs-toggle="tab"]').on('shown.bs.tab', function (event) {
+                const targetId = $(event.target).attr('data-bs-target'); // e.g. #gw3
+                const gwMatch = targetId && targetId.match(/#gw(\d+)/);
+                const gw = gwMatch ? parseInt(gwMatch[1], 10) : null;
+                if (gw) {
+                    updateActiveTab(gw);
+                }
+            });
+            // Arrow navigation between tabs (same UX as FDR page)
+            const getActiveIndex = () => $('#gwTabs button.nav-link').index($('#gwTabs button.nav-link.active'));
+            $('#prevGw').on('click', function(){
+                const $btns = $('#gwTabs button.nav-link');
+                const i = getActiveIndex();
+                if (i > 0) new bootstrap.Tab($btns[i-1]).show();
+            });
+            $('#nextGw').on('click', function(){
+                const $btns = $('#gwTabs button.nav-link');
+                const i = getActiveIndex();
+                if (i < $btns.length - 1) new bootstrap.Tab($btns[i+1]).show();
+            });
+
+            // View toggle for GW1 (top controls)
+            $('#gw1TableTop').on('change', function() {
+                if ($(this).is(':checked')) {
+                    $('#gw1TableView').show();
+                    $('#gw1PitchView').hide();
+                    $('#gw1TableTop').prop('checked', true);
+                }
+            });
+            $('#gw1PitchTop').on('change', function() {
+                if ($(this).is(':checked')) {
+                    $('#gw1TableView').hide();
+                    $('#gw1PitchView').show();
+                    $('#gw1PitchTop').prop('checked', true);
+                }
+            });
+            
+            // View toggle for GW2 (top controls)
+            $('#gw2TableTop').on('change', function() {
+                if ($(this).is(':checked')) {
+                    $('#gw2TableView').show();
+                    $('#gw2PitchView').hide();
+                    $('#gw2TableTop').prop('checked', true);
+                }
+            });
+            $('#gw2PitchTop').on('change', function() {
+                if ($(this).is(':checked')) {
+                    $('#gw2TableView').hide();
+                    $('#gw2PitchView').show();
+                    $('#gw2PitchTop').prop('checked', true);
+                }
+            });
+
+            // Generic view toggles for GW3-9
+            for (let gw = 3; gw <= 9; gw++) {
+                $(`#gw${gw}Table`).on('change', function() {
+                    if ($(this).is(':checked')) {
+                        $(`#gw${gw}TableView`).show();
+                        $(`#gw${gw}PitchView`).hide();
+                    }
+                });
+                $(`#gw${gw}Pitch`).on('change', function() {
+                    if ($(this).is(':checked')) {
+                        $(`#gw${gw}TableView`).hide();
+                        $(`#gw${gw}PitchView`).show();
+                    }
+                });
+            }
+
+            // Reposition Table/Pitch toggles inline with Transfers header for all GWs
+            function repositionViewToggles(){
+                try {
+                    for (let gw=1; gw<=9; gw++){
+                        const $card = $(`#gw${gw} .gw-card`).first();
+                        if (!$card.length) continue;
+                        const $row = $card.find('> .row.mb-3').first();
+                        // 1) Move Transfers IN/OUT heading directly under GW - Formation (left column)
+                        const $countsHead = $card.find(`#gw${gw}TransfersIn`).closest('h4, h5');
+                        const $formationCol = $row.find('.col-md-3, .col-md-4').first();
+                        if ($countsHead.length && $formationCol.length){
+                            $countsHead.addClass('mb-0 mt-1 small');
+                            // If counts were not in the header row, remove their original wrapper to avoid extra spacing
+                            const $wrapper = $countsHead.parent();
+                            $countsHead.detach();
+                            $formationCol.append($countsHead);
+                            if ($wrapper.hasClass('mb-2') || $wrapper.hasClass('col-md-4')){ $wrapper.remove(); }
+                        }
+                        // 2) Move Table/Pitch toggle to the far right of the top row
+                        // Find an existing btn-group that contains table/pitch buttons for this GW
+                        let $btnGroup = $card.find('.btn-group:has(.fa-table)');
+                        if ($btnGroup.length){
+                            // Pick the first group's element
+                            $btnGroup = $($btnGroup.get(0));
+                            const $rightFlex = $row.find('.col-md-6.d-flex, .col-md-8.d-flex, .col-md-3.d-flex').last();
+                            if ($rightFlex.length){
+                                $btnGroup.find('.btn').addClass('btn-sm');
+                                $btnGroup.addClass('ms-auto');
+                                $rightFlex.append($btnGroup);
+                            }
+                        } else {
+                            // For GW3-9 the toggle might be in a separate .view-toggle; move it to the right
+                            const $viewToggle = $card.find('.view-toggle .btn-group');
+                            if ($viewToggle.length){
+                                const $rightFlex = $row.find('.col-md-6.d-flex, .col-md-8.d-flex').last();
+                                $viewToggle.find('.btn').addClass('btn-sm');
+                                $viewToggle.addClass('ms-auto');
+                                if ($rightFlex.length){ $rightFlex.append($viewToggle); }
+                                $card.find('.view-toggle').remove();
+                            }
+                        }
+                    }
+                } catch(e) { console.error('reposition toggles failed', e); }
+            }
+            repositionViewToggles();
+
+            // Restore bottom-of-page transfer panel with overall counts for the active GW
+            function renderBottomTransfers(gw){
+                try {
+                    const data = (weeklyData || []).find(d => d.gw === gw);
+                    if (!data) return;
+                    const transfersIn = data.transfers_in || [];
+                    const transfersOut = data.transfers_out || [];
+                    const mapping = data.transfer_mapping || {};
+                    const inCt = transfersIn.length;
+                    const outCt = transfersOut.length;
+
+                    // Build details HTML directly from data
+                    const posBadge = (pos) => {
+                        if (!pos) return '';
+                        const cls = pos === 'Goalkeeper' ? 'gk' : pos === 'Defender' ? 'def' : pos === 'Midfielder' ? 'mid' : 'fwd';
+                        return `<span class="position-badge ${cls} ms-2">${pos.substring(0,3)}</span>`;
+                    };
+                    const getPosForIn = (name) => {
+                        const curr = (weeklyData.find(d => d.gw === gw) || {starting_xi:[], bench:[]});
+                        const all = [...(curr.starting_xi||[]), ...(curr.bench||[])];
+                        const p = all.find(x => x.name === name);
+                        return p ? p.position : '';
+                    };
+                    const getPosForOut = (name) => {
+                        if (gw <= 1) return '';
+                        const prev = (weeklyData.find(d => d.gw === (gw-1)) || {starting_xi:[], bench:[]});
+                        const all = [...(prev.starting_xi||[]), ...(prev.bench||[])];
+                        const p = all.find(x => x.name === name);
+                        return p ? p.position : '';
+                    };
+
+                    let details = '';
+                    const hasMapping = Object.keys(mapping).length > 0;
+                    if (hasMapping) {
+                        details += '<div><strong>Transfers this GW:</strong></div>';
+                        details += '<ul class="list-unstyled mb-0">';
+                        Object.entries(mapping).forEach(([inName, outName]) => {
+                            details += `
+                                <li class="mb-1">
+                                    <span class="badge bg-success me-2">IN</span>
+                                    <strong>${inName}</strong>${posBadge(getPosForIn(inName))}
+                                    <span class="mx-2 text-muted transfer-arrow">→</span>
+                                    <span class="badge bg-danger me-2">OUT</span>
+                                    <span>${outName || ''}</span>${posBadge(getPosForOut(outName))}
+                                </li>`;
+                        });
+                        details += '</ul>';
+                    } else {
+                        if (inCt > 0) {
+                            details += '<div class="mb-1"><strong>IN:</strong> ' + transfersIn.map(n => `<span class=\"badge bg-success me-1\">${n}</span>${posBadge(getPosForIn(n))}`).join(' ') + '</div>';
+                        }
+                        if (outCt > 0) {
+                            details += '<div><strong>OUT:</strong> ' + transfersOut.map(n => `<span class=\"badge bg-danger me-1\">${n}</span>${posBadge(getPosForOut(n))}`).join(' ') + '</div>';
+                        }
+                    }
+
+                    const $container = $('#gwTabContent');
+                    if (!$('#bottomTransfersPanel').length){
+                        $container.after(`<div id="bottomTransfersPanel"><h5 class="mb-1">Transfers: ${inCt} IN, ${outCt} OUT</h5><div id="bottomTransfersDetails"></div></div>`);
+                    } else {
+                        $('#bottomTransfersPanel h5').html(`Transfers: ${inCt} IN, ${outCt} OUT`);
+                    }
+                    $('#bottomTransfersDetails').html(details || '<div class="text-muted">No transfers this gameweek.</div>');
+                } catch(e) { console.error('bottom transfers failed', e); }
+            }
+            // Render for initial tab
+            renderBottomTransfers(1);
+            // Update on tab change
+            $('button[data-bs-toggle="tab"]').on('shown.bs.tab', function (event) {
+                const targetId = $(event.target).attr('data-bs-target');
+                const gwMatch = targetId && targetId.match(/#gw(\d+)/);
+                const gw = gwMatch ? parseInt(gwMatch[1], 10) : null;
+                if (gw) renderBottomTransfers(gw);
+            });
+        });
+        
+        // Global variables accessible to all functions
+        const weeklyData = {{ weekly_data|tojson }};
+        const totalPoints = {{ total_points }};
+        const totalTransfers = {{ total_transfers }};
+        const totalValue = {{ total_value }};
+        const remainingBudget = {{ remaining_budget }};
+        
+        function loadSquadData() {
+            
+            // Update summary section
+            $('#totalPoints').text(totalPoints.toFixed(1));
+            $('#totalTransfers').text(totalTransfers);
+            $('#squadValue').text('£' + totalValue.toFixed(1) + 'M');
+            $('#remainingBudget').text('£' + remainingBudget.toFixed(1) + 'M');
+            
+            // Populate each gameweek
+            weeklyData.forEach(gwData => {
+                updateGWData(gwData.gw, gwData);
+            });
+        }
+        
+        function updateGWData(gw, data) {
+            // Update formation
+            $(`#gw${gw}Formation`).text(data.formation);
+            $(`#gw${gw}FormationLabel`).text(data.formation);
+            
+            // Update points
+            $(`#gw${gw}Points`).text((data.points || 0).toFixed(1));
+            $(`#gw${gw}Captain`).text(data.captain_name || '-');
+            $(`#gw${gw}CaptainBonus`).text(((data.captain_bonus || 0)).toFixed(1));
+            $(`#gw${gw}Hits`).text(data.hits_points || 0);
+            $(`#gw${gw}Total`).text(((data.total_with_captain_and_hits || 0)).toFixed(1));
+            $(`#gw${gw}Cumulative`).text(((data.cumulative_total || 0)).toFixed(1));
+            
+            // Update transfers
+            $(`#gw${gw}TransfersIn`).text(data.transfers_in.length);
+            $(`#gw${gw}TransfersOut`).text(data.transfers_out.length);
+            renderTransferSummary(gw, data);
+            
+            // Update unified table view (XI + Bench) with captain and hits columns
+            populateTableView(gw, data.starting_xi || [], data.bench || [], data.captain_name || '', data.vice_captain_name || '', data.hits_points || 0);
+
+            // Update starting XI on pitch
+            populateStartingXI(gw, data.starting_xi);
+            
+            // Hide separate bench section (all players shown in one table now)
+            $(`#gw${gw}Bench`).closest('.substitutes-section').hide();
+
+            // Hide Captain line in the top panel (now displayed inline in table)
+            $(`#gw${gw}Captain`).closest('h5').hide();
+        }
+        
+        function populateTableView(gw, startingPlayers, benchPlayers, captainName, viceCaptainName, hitsPoints) {
+            const table = $(`#gw${gw}TableView table`);
+            // Ensure unified header columns in requested order (+ blank GW Points column)
+            table.find('thead tr').html('<th>Name</th><th>Position</th><th>Status</th><th>Team</th><th>Price</th><th>xP</th><th>GW Points</th><th>Captain Points</th><th>Hits</th><th>Total GW Points</th>');
+            const tableBody = $(`#gw${gw}TableBody`);
+            tableBody.empty();
+            const players = [...startingPlayers.map(p=>({ ...p, __status:'Starting XI'})), ...benchPlayers.map(p=>({ ...p, __status:'Bench'}))];
+            console.log(`Populating unified table for GW${gw} with ${players.length} players`);
+            const positionOrder = ['Goalkeeper','Defender','Midfielder','Forward'];
+            const statusOrder = ['Starting XI', 'Bench']; // Z-A grouping: Starting XI first, then Bench
+            let sumPrice = 0, sumXp = 0, sumTotal = 0, sumCaptain = 0, sumHits = 0;
+            statusOrder.forEach(status => {
+                positionOrder.forEach(pos => {
+                    players.filter(p => p.__status === status && p.position === pos).forEach(player => {
+                        const row = $('<tr>');
+                        const positionClass = player.position === 'Goalkeeper' ? 'gk' : player.position === 'Defender' ? 'def' : player.position === 'Midfielder' ? 'mid' : 'fwd';
+                        const price = parseFloat(player.price || 0) || 0;
+                        const xp = parseFloat(player['gw' + gw + '_points'] || 0) || 0;
+                        const total = xp; // Total GW Points equals this GW's points
+                        const isCaptain = !!(captainName && player.name === captainName);
+                        const isVice = status === 'Starting XI' && !!(viceCaptainName && player.name === viceCaptainName) && !isCaptain;
+                        const captainPts = isCaptain ? xp : 0;
+                        const hitPts = 0; // team-level only
+                        sumPrice += price; sumXp += xp; sumTotal += total; sumCaptain += captainPts; sumHits += hitPts;
+                        const statusBadge = status === 'Starting XI' ? '<span class="badge bg-success">Starting XI</span>' : '<span class="badge bg-secondary">Bench</span>';
+                        const nameHtml = isCaptain
+                            ? `<strong><a href="/player/${player.id}" class="text-decoration-none">${player.name}</a></strong> <span class=\"badge bg-warning text-dark\">Captain</span>`
+                            : (isVice
+                                ? `<strong><a href="/player/${player.id}" class="text-decoration-none">${player.name}</a></strong> <span class=\"badge bg-info text-dark\">Vice</span>`
+                                : `<strong><a href="/player/${player.id}" class="text-decoration-none">${player.name}</a></strong>`);
+                        row.html(`
+                            <td>${nameHtml}</td>
+                            <td><span class="position-badge ${positionClass}">${player.position.substring(0,3)}</span></td>
+                            <td>${statusBadge}</td>
+                            <td>${player.team_id ? `<a href=\"/team/${player.team_id}\" class=\"text-decoration-none\">${player.team}</a>` : player.team}</td>
+                            <td>£${price.toFixed(1)}M</td>
+                            <td>${xp.toFixed(1)}</td>
+                            <td></td>
+                            <td>${captainPts.toFixed(1)}</td>
+                            <td>${hitPts.toFixed(0)}</td>
+                            <td>${total.toFixed(1)}</td>
+                        `);
+                        tableBody.append(row);
+                    });
+                });
+            });
+            // Footer: rebuild to ensure alignment with current 10 columns
+            table.find('tfoot').remove();
+            // Totals under Price, xP, (blank GW Points), Captain Points, Hits, Total GW Points
+            table.append('<tfoot><tr><th colspan="4" class="text-end">Totals</th><th id="gw'+gw+'SumPrice"></th><th id="gw'+gw+'SumXp"></th><th></th><th id="gw'+gw+'SumCaptain"></th><th id="gw'+gw+'SumHits"></th><th id="gw'+gw+'SumTotal"></th></tr></tfoot>');
+            $(`#gw${gw}SumPrice`).text('£' + sumPrice.toFixed(1) + 'M');
+            $(`#gw${gw}SumXp`).text(sumXp.toFixed(1));
+            $(`#gw${gw}SumCaptain`).text(sumCaptain.toFixed(1));
+            $(`#gw${gw}SumHits`).text((hitsPoints||0).toFixed(0));
+            $(`#gw${gw}SumTotal`).text(sumTotal.toFixed(1));
+        }
+        
+        function populateStartingXI(gw, players) {
+            try {
+                const container = $(`#gw${gw}StartingXI`);
+                container.empty();
+                
+                console.log(`Populating GW${gw} with ${players.length} players:`, players);
+                
+                // Group players by position
+                const gk = players.filter(p => p.position === 'Goalkeeper');
+                const def = players.filter(p => p.position === 'Defender');
+                const mid = players.filter(p => p.position === 'Midfielder');
+                const fwd = players.filter(p => p.position === 'Forward');
+                
+                console.log(`GW${gw} positions - GK: ${gk.length}, DEF: ${def.length}, MID: ${mid.length}, FWD: ${fwd.length}`);
+                console.log(`Total players to position: ${gk.length + def.length + mid.length + fwd.length}`);
+                
+                // Position goalkeeper (always at the bottom center)
+                if (gk.length > 0) {
+                    const player = gk[0];
+                    console.log(`Positioning goalkeeper: ${player.name}`);
+                    const playerCard = createPlayerCard(player, gw);
+                    playerCard.css({
+                        position: 'absolute',
+                        bottom: '5%',
+                        left: '50%',
+                        transform: 'translateX(-50%)'
+                    });
+                    container.append(playerCard);
+                    console.log(`Goalkeeper ${player.name} appended. Container now has ${container.children().length} children`);
+                }
+                
+                // Position defenders (in a line above goalkeeper)
+                def.forEach((player, index) => {
+                    console.log(`Positioning defender ${index}: ${player.name}`);
+                    const playerCard = createPlayerCard(player, gw);
+                    const totalDefs = def.length;
+                    let leftPos, topPos;
+                    
+                    if (totalDefs === 1) {
+                        // Single defender - center
+                        leftPos = '50%';
+                        topPos = '75%';
+                    } else if (totalDefs === 2) {
+                        // Two defenders - spread out
+                        leftPos = index === 0 ? '35%' : '65%';
+                        topPos = '75%';
+                    } else if (totalDefs === 3) {
+                        // Three defenders - spread out
+                        leftPos = index === 0 ? '25%' : (index === 1 ? '50%' : '75%');
+                        topPos = '75%';
+                    } else if (totalDefs === 4) {
+                        // Four defenders - spread out
+                        leftPos = index === 0 ? '20%' : (index === 1 ? '40%' : (index === 2 ? '60%' : '80%'));
+                        topPos = '75%';
+                    } else if (totalDefs === 5) {
+                        // Five defenders - spread out
+                        leftPos = index === 0 ? '15%' : (index === 1 ? '30%' : (index === 2 ? '50%' : (index === 3 ? '70%' : '85%')));
+                        topPos = '75%';
+                    }
+                    
+                    console.log(`Defender ${player.name} positioned at left: ${leftPos}, top: ${topPos}`);
+                    
+                    playerCard.css({
+                        position: 'absolute',
+                        top: topPos,
+                        left: leftPos,
+                        transform: 'translateX(-50%)'
+                    });
+                    container.append(playerCard);
+                    console.log(`Defender ${player.name} appended. Container now has ${container.children().length} children`);
+                });
+                
+                // Position midfielders (in the middle section)
+                mid.forEach((player, index) => {
+                    console.log(`Positioning midfielder ${index}: ${player.name}`);
+                    const playerCard = createPlayerCard(player, gw);
+                    const totalMids = mid.length;
+                    let leftPos, topPos;
+                    
+                    if (totalMids === 1) {
+                        // Single midfielder - center
+                        leftPos = '50%';
+                        topPos = '50%';
+                    } else if (totalMids === 2) {
+                        // Two midfielders - spread out
+                        leftPos = index === 0 ? '35%' : '65%';
+                        topPos = '50%';
+                    } else if (totalMids === 3) {
+                        // Three midfielders - spread out
+                        leftPos = index === 0 ? '25%' : (index === 1 ? '50%' : '75%');
+                        topPos = '50%';
+                    } else if (totalMids === 4) {
+                        // Four midfielders - spread out
+                        leftPos = index === 0 ? '20%' : (index === 1 ? '40%' : (index === 2 ? '60%' : '80%'));
+                        topPos = '50%';
+                    } else if (totalMids === 5) {
+                        // Five midfielders - spread out
+                        leftPos = index === 0 ? '15%' : (index === 1 ? '30%' : (index === 2 ? '50%' : (index === 3 ? '70%' : '85%')));
+                        topPos = '50%';
+                    } else if (totalMids >= 6) {
+                        // Six or more midfielders - spread out in multiple rows
+                        const row = Math.floor(index / 3);
+                        const col = index % 3;
+                        leftPos = col === 0 ? '25%' : (col === 1 ? '50%' : '75%');
+                        topPos = row === 0 ? '45%' : '55%';
+                    }
+                    
+                    console.log(`Midfielder ${player.name} positioned at left: ${leftPos}, top: ${topPos}`);
+                    
+                    playerCard.css({
+                        position: 'absolute',
+                        top: topPos,
+                        left: leftPos,
+                        transform: 'translateX(-50%)'
+                    });
+                    container.append(playerCard);
+                    console.log(`Midfielder ${player.name} appended. Container now has ${container.children().length} children`);
+                });
+                
+                // Position forwards (in the top section)
+                fwd.forEach((player, index) => {
+                    console.log(`Positioning forward ${index}: ${player.name}`);
+                    const playerCard = createPlayerCard(player, gw);
+                    const totalFwds = fwd.length;
+                    let leftPos, topPos;
+                    
+                    if (totalFwds === 1) {
+                        // Single forward - center
+                        leftPos = '50%';
+                        topPos = '15%';
+                    } else if (totalFwds === 2) {
+                        // Two forwards - spread out
+                        leftPos = index === 0 ? '35%' : '65%';
+                        topPos = '15%';
+                    } else if (totalFwds === 3) {
+                        // Three forwards - spread out
+                        leftPos = index === 0 ? '25%' : (index === 1 ? '50%' : '75%');
+                        topPos = '15%';
+                    } else if (totalFwds === 4) {
+                        // Four forwards - spread out
+                        leftPos = index === 0 ? '20%' : (index === 1 ? '40%' : (index === 2 ? '60%' : '80%'));
+                        topPos = '15%';
+                    }
+                    
+                    console.log(`Forward ${player.name} positioned at left: ${leftPos}, top: ${topPos}`);
+                    console.log(`Forward card created:`, playerCard);
+                    
+                    playerCard.css({
+                        position: 'absolute',
+                        top: topPos,
+                        left: leftPos,
+                        transform: 'translateX(-50%)'
+                    });
+                    
+                    console.log(`Forward ${player.name} CSS applied:`, playerCard.css());
+                    container.append(playerCard);
+                    console.log(`Forward ${player.name} appended. Container now has ${container.children().length} children`);
+                });
+                
+                console.log(`GW${gw} positioning complete. Total players positioned: ${gk.length + def.length + mid.length + fwd.length}`);
+                console.log(`Final container children count: ${container.children().length}`);
+                
+            } catch (error) {
+                console.error(`Error in populateStartingXI for GW${gw}:`, error);
+                console.error('Error details:', error.message, error.stack);
+            }
+        }
+        
+        function createPlayerCard(player, gw) {
+            const card = $('<div>').addClass('player-card');
+            
+            // Check if player is a transfer in/out for this gameweek
+            const gwData = weeklyData.find(d => d.gw === gw);
+            const isTransferIn = gwData && gwData.transfers_in.includes(player.name);
+            const isTransferOut = gwData && gwData.transfers_out.includes(player.name);
+            const isBenchPromotion = gwData && gwData.bench_promotions.some(p => p.name === player.name);
+            
+            if (isTransferIn) card.addClass('transfer-in');
+            else if (isTransferOut) card.addClass('transfer-out');
+            else card.addClass('no-transfer');
+            
+            let cardHtml = '';
+            
+            // For now, no captain logic (could be added later)
+            
+            cardHtml += `
+                <div class="player-name">${player.name}</div>
+                <div class="player-team">${player.team}</div>
+                <div class="player-stats">
+                    <div class="player-price">£${player.price}M</div>
+                    <div class="player-points">${player['gw' + gw + '_points'] || 0} pts</div>
+                </div>
+            `;
+            
+            // Visibility flags (badges)
+            const flags = [];
+            if (isTransferIn) flags.push('<span class="flag-badge flag-in"><i class="fas fa-plus-circle"></i> Transfer In</span>');
+            if (isTransferOut) flags.push('<span class="flag-badge flag-out"><i class="fas fa-minus-circle"></i> Transfer Out</span>');
+            if (isBenchPromotion) flags.push('<span class="flag-badge flag-promoted"><i class="fas fa-arrow-up"></i> Promoted from Bench</span>');
+            if (flags.length > 0) {
+                cardHtml += `<div class="player-flags">${flags.join('')}</div>`;
+            }
+            
+            card.html(cardHtml);
+            return card;
+        }
+        
+        function populateBench(gw, players) {
+            const container = $(`#gw${gw}Bench`);
+            container.empty();
+            
+            players.forEach(player => {
+                const benchCard = createBenchCard(player, gw);
+                container.append(benchCard);
+            });
+        }
+        
+        function renderTransferSummary(gw, data) {
+            const container = $(`#gw${gw}TransferSummary`);
+            // Place the detailed transfer panel directly below the main table view
+            try {
+                const $tableView = $(`#gw${gw}TableView`);
+                if ($tableView.length) {
+                    container.detach();
+                    $tableView.after(container);
+                } else {
+                    // Fallback to end of the GW card
+                    const $card = $(`#gw${gw} .gw-card`).first();
+                    if ($card.length) container.appendTo($card);
+                }
+            } catch(_e) {}
+            const transfersIn = data.transfers_in || [];
+            const transfersOut = data.transfers_out || [];
+            const mapping = data.transfer_mapping || {};
+            if ((!transfersIn || transfersIn.length === 0) && (!transfersOut || transfersOut.length === 0)) {
+                container.hide();
+                container.empty();
+                return;
+            }
+            const posBadge = (pos) => {
+                if (!pos) return '';
+                const cls = pos === 'Goalkeeper' ? 'gk' : pos === 'Defender' ? 'def' : pos === 'Midfielder' ? 'mid' : 'fwd';
+                return `<span class="position-badge ${cls} ms-2">${pos.substring(0,3)}</span>`;
+            };
+            const getPosForIn = (name) => {
+                const curr = (weeklyData.find(d => d.gw === gw) || {starting_xi:[], bench:[]});
+                const all = [...(curr.starting_xi||[]), ...(curr.bench||[])];
+                const p = all.find(x => x.name === name);
+                return p ? p.position : '';
+            };
+            const getPosForOut = (name) => {
+                if (gw <= 1) return '';
+                const prev = (weeklyData.find(d => d.gw === (gw-1)) || {starting_xi:[], bench:[]});
+                const all = [...(prev.starting_xi||[]), ...(prev.bench||[])];
+                const p = all.find(x => x.name === name);
+                return p ? p.position : '';
+            };
+            let html = '';
+            const hasMapping = Object.keys(mapping).length > 0;
+            if (hasMapping) {
+                html += '<div><strong>Transfers this GW:</strong></div>';
+                html += '<ul class="list-unstyled mb-0">';
+                Object.entries(mapping).forEach(([inName, outName]) => {
+                    html += `
+                        <li class="mb-1">
+                            <span class="badge bg-success me-2">IN</span>
+                            <strong>${inName}</strong>${posBadge(getPosForIn(inName))}
+                            <span class="mx-2 text-muted transfer-arrow">→</span>
+                            <span class="badge bg-danger me-2">OUT</span>
+                            <span>${outName || ''}</span>${posBadge(getPosForOut(outName))}
+                        </li>`;
+                });
+                html += '</ul>';
+            } else {
+                if (transfersIn.length > 0) {
+                    html += '<div class="mb-1"><strong>IN:</strong> ' + transfersIn.map(n => `<span class=\"badge bg-success me-1\">${n}</span>${posBadge(getPosForIn(n))}`).join(' ') + '</div>';
+                }
+                if (transfersOut.length > 0) {
+                    html += '<div><strong>OUT:</strong> ' + transfersOut.map(n => `<span class=\"badge bg-danger me-1\">${n}</span>${posBadge(getPosForOut(n))}`).join(' ') + '</div>';
+                }
+            }
+            container.html(html).show();
+        }
+        function createBenchCard(player, gw) {
+            const card = $('<div>').addClass('col-md-6 col-lg-3 mb-2');
+            
+            const benchPlayer = $('<div>').addClass('substitute-player');
+            
+            // Check if player is a transfer in/out for this gameweek
+            const gwData = weeklyData.find(d => d.gw === gw);
+            const isTransferIn = gwData && gwData.transfers_in.includes(player.name);
+            const isTransferOut = gwData && gwData.transfers_out.includes(player.name);
+            const isBenchDemotion = gwData && gwData.bench_demotions.some(p => p.name === player.name);
+            
+            if (isTransferIn) benchPlayer.addClass('transfer-in');
+            else if (isTransferOut) benchPlayer.addClass('transfer-out');
+            
+            const positionClass = player.position === 'Goalkeeper' ? 'gk' : 
+                                player.position === 'Defender' ? 'def' : 
+                                player.position === 'Midfielder' ? 'mid' : 'fwd';
+            
+            // Build flags for bench
+            const benchFlags = [];
+            if (isTransferIn) benchFlags.push('<span class="flag-badge flag-in"><i class="fas fa-plus-circle"></i> Transfer In</span>');
+            if (isTransferOut) benchFlags.push('<span class="flag-badge flag-out"><i class="fas fa-minus-circle"></i> Transfer Out</span>');
+            if (isBenchDemotion) benchFlags.push('<span class="flag-badge flag-demoted"><i class="fas fa-arrow-down"></i> Demoted to Bench</span>');
+
+            benchPlayer.html(`
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <div class="player-name">${player.name}</div>
+                        <div class="player-team">${player.team}</div>
+                        <div class="player-stats">
+                            <span class="player-price">£${player.price}M</span> | 
+                            <span class="player-points">${player['gw' + gw + '_points'] || 0} pts</span>
+                        </div>
+                        ${benchFlags.length > 0 ? `<div class="player-flags mt-1">${benchFlags.join('')}</div>` : ''}
+                    </div>
+                    <span class="position-badge ${positionClass}">
+                        ${player.position.substring(0, 3)}
+                    </span>
+                </div>
+            `);
+            
+            card.append(benchPlayer);
+            return card;
+        }
+        
+        function updateActiveTab(gw) {
+            // Remove active class from all tabs
+            $('.nav-link').removeClass('active');
+            
+            // Add active class to clicked tab
+            $(`.nav-link[data-gw="${gw}"]`).addClass('active');
+            
+            // Update content for selected gameweek
+            if (weeklyData && weeklyData.length > 0) {
+                const gwData = weeklyData.find(d => d.gw === gw);
+                if (gwData) {
+                    console.log(`Updating content for GW${gw}:`, gwData);
+                    updateGWData(gw, gwData);
+                } else {
+                    console.error(`No data found for GW${gw}`);
+                }
+            }
+        }
+        
+        // Show table view by default for GW1
+        $(document).ready(function() {
+            $('#gw1TableView').show();
+            $('#gw1PitchView').hide();
+            
+            // Load squad data when page loads
+            loadSquadData();
+        });
+    </script>
+</body>
+</html>
+

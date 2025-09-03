@@ -1,0 +1,93 @@
+# Branch Protection Rules
+# This file defines the protection rules for main branches
+
+branches:
+  - name: main
+    protection:
+      required_status_checks:
+        strict: true
+        contexts:
+          - "test-backend (3.9)"
+          - "test-backend (3.10)"
+          - "test-backend (3.11)"
+          - "test-frontend"
+          - "test-integration"
+          - "quality-checks"
+          - "security-scan"
+          - "dependency-check"
+      
+      enforce_admins: true
+      required_pull_request_reviews:
+        required_approving_review_count: 2
+        dismiss_stale_reviews: true
+        require_code_owner_reviews: true
+        required_reviewers:
+          - "code-owners"
+      
+      restrictions:
+        users: []
+        teams: []
+      
+      allow_force_pushes: false
+      allow_deletions: false
+      block_creations: false
+      required_conversation_resolution: true
+      require_signed_commits: false
+      require_linear_history: false
+      lock_branch: false
+      allow_fork_syncing: true
+
+  - name: develop
+    protection:
+      required_status_checks:
+        strict: true
+        contexts:
+          - "test-backend (3.11)"
+          - "test-frontend"
+          - "quality-checks"
+      
+      enforce_admins: false
+      required_pull_request_reviews:
+        required_approving_review_count: 1
+        dismiss_stale_reviews: true
+        require_code_owner_reviews: false
+      
+      restrictions:
+        users: []
+        teams: []
+      
+      allow_force_pushes: false
+      allow_deletions: false
+      block_creations: false
+      required_conversation_resolution: true
+      require_signed_commits: false
+      require_linear_history: false
+      lock_branch: false
+      allow_fork_syncing: true
+
+# Code Owners
+# This file defines who is responsible for different parts of the codebase
+codeowners:
+  - path: "backend/"
+    owners:
+      - "@backend-team"
+      - "@senior-developers"
+  
+  - path: "tests/"
+    owners:
+      - "@qa-team"
+      - "@backend-team"
+  
+  - path: "fpl-frontend/"
+    owners:
+      - "@frontend-team"
+      - "@senior-developers"
+  
+  - path: "*.yml"
+    owners:
+      - "@devops-team"
+  
+  - path: "requirements*.txt"
+    owners:
+      - "@backend-team"
+      - "@security-team"

@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ team.name }} - Team</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body { background:#f8f9fa; }
+        .card { box-shadow:0 2px 10px rgba(0,0,0,.08) }
+        .badge-pos { font-size:.75rem; padding:.3rem .45rem }
+        .gk{background:#dc3545;color:#fff} .def{background:#007bff;color:#fff} .mid{background:#28a745;color:#fff} .fwd{background:#ffc107;color:#212529}
+        /* Keep links default color (not blue) across team page */
+        .table a,
+        .table a:visited,
+        .table a:hover,
+        .table a:active,
+        .table a:focus { color: inherit !important; text-decoration: none !important; }
+    </style>
+</head>
+<body class="p-4">
+    {% include '_navbar.html' %}
+
+    <div class="container">
+        <div class="row g-3">
+            <div class="col-lg-5">
+                <div class="card p-3">
+                    <div class="d-flex align-items-center gap-3 mb-2">
+                        {% if team_logo_file %}
+                            <img src="/static/{{ team_logo_file }}" alt="{{ team.name }} logo" style="height:48px;width:auto;"/>
+                        {% endif %}
+                        <h3 class="mb-0">{{ team.name }}</h3>
+                    </div>
+                    <div>Short Name: <strong>{{ team.short_name }}</strong></div>
+                    <div>Code: <strong>{{ team.code }}</strong></div>
+                    <div>Strength: <strong>{{ team.strength }}</strong></div>
+                </div>
+                <div class="card p-3 mt-3">
+                    <h4 class="mb-2">Schedule (GW1–9)</h4>
+                    <div class="table-responsive">
+                        <table class="table table-sm table-striped">
+                            <thead><tr><th>GW</th><th>Home</th><th>Away</th><th>Home FDR</th><th>Away FDR</th></tr></thead>
+                            <tbody>
+                                {% for f in fixtures %}
+                                <tr>
+                                    <td>{{ f.gameweek }}</td>
+                                    <td>{% if team_id_by_name and team_id_by_name.get(f.home_team) %}<a href="/team/{{ team_id_by_name.get(f.home_team) }}" class="text-decoration-none">{{ f.home_team }}</a>{% else %}{{ f.home_team }}{% endif %}</td>
+                                    <td>{% if team_id_by_name and team_id_by_name.get(f.away_team) %}<a href="/team/{{ team_id_by_name.get(f.away_team) }}" class="text-decoration-none">{{ f.away_team }}</a>{% else %}{{ f.away_team }}{% endif %}</td>
+                                    <td>{{ f.home_difficulty }}</td>
+                                    <td>{{ f.away_difficulty }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-7">
+                <div class="card p-3">
+                    <h4 class="mb-2">Squad</h4>
+                    <div class="table-responsive">
+                        <table class="table table-sm table-striped">
+                            <thead><tr><th>Name</th><th>Pos</th><th>Price</th><th>Total Pts</th></tr></thead>
+                            <tbody>
+                                {% set positions = ['Goalkeeper','Defender','Midfielder','Forward'] %}
+                                {% for pos in positions %}
+                                    {% set group = squad | selectattr('position','equalto',pos) | list %}
+                                    {% if group|length %}
+                                        <tr class="table-secondary"><td colspan="4"><strong>{{ pos }}{% if pos != 'Goalkeeper' %}s{% endif %}</strong></td></tr>
+                                        {% for p in group %}
+                                            {% set poscls = 'gk' if p.position=='Goalkeeper' else ('def' if p.position=='Defender' else ('mid' if p.position=='Midfielder' else 'fwd')) %}
+                                            <tr>
+                                                <td><a href="/player/{{ p.id }}" class="text-decoration-none">{{ p.name }}</a></td>
+                                                <td><span class="badge badge-pos {{ poscls }}">{{ p.position[0:3] }}</span></td>
+                                                <td>£{{ '%.1f'|format(p.price) }}M</td>
+                                                <td>{{ '%.1f'|format(p.total_points) }}</td>
+                                            </tr>
+                                        {% endfor %}
+                                    {% endif %}
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+
+
